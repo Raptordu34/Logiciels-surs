@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+    <h2>Exercice 5 — Préconditions et Postconditions</h2>
+
+    <!-- ── EN-TÊTE ── -->
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 10 pts</span>
+            <span class="exo-time">⏱ 10–15 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Comprendre ce que signifie un triplet de Hoare <code>{P} C {Q}</code></li>
+                <li>Calculer une précondition la plus faible (<em>weakest precondition</em>) par substitution</li>
+                <li>Dériver la postcondition la plus forte à partir d'une précondition donnée</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours 2 — Sémantique axiomatique, logique de Hoare</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3 style="margin-top:0;">De l'exécution à la preuve</h3>
+        <p>
+            Jusqu'ici, la sémantique opérationnelle décrivait <em>comment</em> un programme s'exécute — étape par étape.
+            La <strong>sémantique axiomatique</strong> (logique de Hoare) change de perspective : elle spécifie
+            <em>ce que fait</em> un programme en termes de propriétés logiques, sans simuler son exécution.
+            On ne demande plus "quelle valeur a x après ?" mais "quelle propriété est garantie après ?".
+        </p>
+    </div>
+
+    <!-- ── RAPPEL DE COURS ── -->
+    <button class="hint-btn" data-hint="rappel-hoare" data-label="Rappel de cours : triplets de Hoare et préconditions faibles" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours : triplets de Hoare et préconditions faibles</span>
+    </button>
+    <div class="hint" id="rappel-hoare">
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Le triplet de Hoare</span></p>
+            <p>Un <strong>triplet de Hoare</strong> s'écrit <code>{P} C {Q}</code> et se lit :</p>
+            <blockquote style="border-left: 3px solid var(--accent); padding-left: 1rem; margin: 0.5rem 0; font-style: italic;">
+                "Si la propriété P est vraie <strong>avant</strong> d'exécuter C, et si C <strong>termine</strong>,
+                alors la propriété Q est vraie <strong>après</strong>."
+            </blockquote>
+            <p>C'est une <strong>promesse conditionnelle</strong> : si P est fausse au départ, le triplet ne dit rien du tout sur le résultat.</p>
+            <p class="inline-note">Note : les triplets de Hoare standards expriment la <em>correction partielle</em> — ils supposent que le programme termine. La preuve de terminaison est séparée.</p>
+        </div>
+
+        <div class="two-col">
+            <div class="callout-info">
+                <p><span class="badge badge-blue">Analogie — Le contrat</span></p>
+                <p>Un triplet de Hoare est comme un contrat entre un appelant et une fonction :</p>
+                <ul>
+                    <li><strong>L'appelant promet</strong> : "P sera vraie avant l'appel."</li>
+                    <li><strong>La fonction promet</strong> : "Si tu respectes P, je garantis Q à la sortie."</li>
+                    <li>Si l'appelant viole sa part (P est fausse), la fonction n'a plus aucune obligation.</li>
+                </ul>
+                <p class="inline-note">C'est exactement le principe du <em>Design by Contract</em> (Eiffel, Ada, Dafny).</p>
+            </div>
+            <div class="callout-info">
+                <p><span class="badge badge-blue">Analogie — La recette</span></p>
+                <ul>
+                    <li><strong>Précondition</strong> : "Vous avez 200g de farine, 2 œufs, un four à 180°C."</li>
+                    <li><strong>Programme</strong> : mélanger, verser, enfourner 25 min.</li>
+                    <li><strong>Postcondition</strong> : "Vous avez un gâteau cuit."</li>
+                </ul>
+                <p>Si vous démarrez sans œufs (P fausse), la recette ne garantit pas de gâteau. Elle ne dit rien de ce qui se passe alors.</p>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">La précondition la plus faible — <code>wp</code></span></p>
+            <p>Plutôt que de vérifier un triplet donné, on peut calculer <em>automatiquement</em> la précondition minimale à partir de la postcondition. C'est le calcul de <strong>précondition la plus faible</strong> (weakest precondition) :</p>
+            <blockquote style="border-left: 3px solid var(--accent); padding-left: 1rem; margin: 0.5rem 0; font-style: italic;">
+                <code>wp(C, Q)</code> = "la condition minimale à vérifier <em>avant</em> C pour que Q soit vraie après"
+            </blockquote>
+            <p>On travaille <strong>à rebours</strong> — de la postcondition vers la précondition.</p>
+            <p class="inline-note">Analogie : wp, c'est lire le mode d'emploi à l'envers. On part du résultat voulu ("l'appareil fonctionne") et on remonte vers les conditions minimales requises ("alimentation 220V, pas d'immersion dans l'eau"). C'est exactement ce que font les vérificateurs automatiques (Why3, Frama-C, Dafny).</p>
+        </div>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Règle wp pour l'affectation</span></p>
+            <p>C'est la règle fondamentale :</p>
+            <p style="text-align:center; font-size: 1.1em;"><code>wp(x := e, Q)  =  Q[e/x]</code></p>
+            <p>On <strong>substitue</strong> l'expression <code>e</code> à la place de chaque occurrence de <code>x</code> dans Q.</p>
+            <table class="table-glass" style="margin-top:1rem;">
+                <thead><tr><th>Commande</th><th>Postcondition Q</th><th>wp = Q[e/x]</th></tr></thead>
+                <tbody>
+                    <tr><td><code>x := 0</code></td><td><code>x = 0</code></td><td><code>0 = 0</code> → <strong>Vrai</strong></td></tr>
+                    <tr><td><code>x := x + 1</code></td><td><code>x > 0</code></td><td><code>x + 1 > 0</code> → <code>x > -1</code></td></tr>
+                    <tr><td><code>x := y + 1</code></td><td><code>x > 0</code></td><td><code>y + 1 > 0</code> → <code>y > -1</code></td></tr>
+                    <tr><td><code>x := 3</code></td><td><code>x + y > 0</code></td><td><code>3 + y > 0</code> → <code>y > -3</code></td></tr>
+                </tbody>
+            </table>
+            <div class="erreur-freq" style="margin-top: 1rem;">
+                <strong>Piège classique :</strong> substituer dans le mauvais sens — remplacer <code>e</code> par <code>x</code> au lieu de <code>x</code> par <code>e</code>.
+                La règle est : dans Q, partout où apparaît <strong>la variable assignée</strong> (<code>x</code>), la remplacer par <strong>l'expression du membre droit</strong> (<code>e</code>).
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Précondition la plus faible vs postcondition la plus forte</span></p>
+            <p>Ces deux notions sont duales :</p>
+            <div class="table-glass">
+                <table>
+                    <thead><tr><th></th><th>Précondition la plus faible (wp)</th><th>Postcondition la plus forte (sp)</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Direction</strong></td>
+                            <td>← Raisonnement à rebours (de Q vers P)</td>
+                            <td>→ Raisonnement avant (de P vers Q)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Question</strong></td>
+                            <td>Quelle hypothèse minimale avant C garantit Q après ?</td>
+                            <td>Quelle propriété maximale est garantie après C, sachant P avant ?</td>
+                        </tr>
+                        <tr>
+                            <td><strong>"La plus faible/forte"</strong></td>
+                            <td>Impose le <em>moins</em> de contraintes → admet le plus d'états initiaux</td>
+                            <td>Décrit le <em>plus précisément</em> les états finaux possibles</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="margin-top:0.8rem;"><strong>Intuition :</strong> une condition est d'autant plus <em>forte</em> qu'elle décrit un <em>petit</em> ensemble d'états (<code>x = 5 ∧ y > 0</code> est plus forte que <code>x = 5</code>). La précondition la plus <em>faible</em> est donc celle qui impose le moins — elle autorise le plus grand ensemble d'états de départ pour lesquels le programme respecte Q.</p>
+        </div>
+
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Précondition <code>Vrai</code> et précondition <code>Faux</code></span></p>
+            <ul>
+                <li><code>{Vrai} C {Q}</code> : C garantit Q quelle que soit la valeur initiale des variables — le programme est totalement sûr vis-à-vis de Q.</li>
+                <li><code>{Faux} C {Q}</code> : toujours <strong>valide vacuoirement</strong> (aucun état ne satisfait Faux, donc la promesse n'est jamais déclenchée). Valid mais totalement inutile en pratique.</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- ── SCAFFOLDING ── -->
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple guidé — wp d'une affectation</span></p>
+            <p>Calculer <code>wp(y := y + 2, y > 10)</code>.</p>
+            <ol>
+                <li>Postcondition : <code>y > 10</code></li>
+                <li>Substituer <code>y + 2</code> à la place de <code>y</code> : <code>(y + 2) > 10</code></li>
+                <li>Simplifier : <code>y > 8</code></li>
+            </ol>
+            <p>Vérification : si <code>y = 9</code> (satisfait <code>y > 8</code>), après <code>y := y + 2</code>, <code>y = 11 > 10</code>. ✓</p>
+        </div>
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple guidé — postcondition la plus forte</span></p>
+            <p>Précondition <code>x > 0</code>, commande <code>x := x * 2</code>.</p>
+            <ol>
+                <li>On sait que <code>x > 0</code> avant.</li>
+                <li>Après <code>x := x * 2</code>, la nouvelle valeur est <code>x * 2</code>.</li>
+                <li>La postcondition la plus forte est ce qu'on peut dire exactement : <code>x > 0</code> (car si l'ancienne valeur était > 0, la nouvelle vaut le double, donc aussi > 0).</li>
+            </ol>
+            <p class="inline-note">On peut également vérifier par wp : <code>wp(x := x*2, x > 0) = x*2 > 0 = x > 0</code>. Cohérent.</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 1                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">5 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Quelle est la précondition la plus faible <code>P</code> pour que le triplet suivant soit prouvable ?</p>
+        <p style="text-align:center; font-size:1.1em;"><code>{P} x := 0 {x = 0}</code></p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> répondre <code>x = 0</code> ou <code>x ≥ 0</code> par réflexe.
+            La précondition ne doit pas sur-contraindre l'état initial — cherchez la condition <em>minimale</em>,
+            c'est-à-dire celle qui est vraie pour le plus grand nombre d'états de départ possibles.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            Appliquez la règle wp pour l'affectation : <code>wp(x := 0, x = 0)</code>.
+            Il faut substituer <code>0</code> à la place de <code>x</code> dans la postcondition <code>x = 0</code>.
+            Qu'obtenez-vous ?
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            En substituant : <code>0 = 0</code>. Cette proposition est <strong>toujours vraie</strong>, indépendamment
+            de toute variable. La précondition la plus faible est donc <code>Vrai</code>.
+            Intuitivement : peu importe l'état initial, <code>x := 0</code> met toujours x à 0 — la postcondition est toujours satisfaite.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Calculez wp(x := 0, x = 0) en appliquant la règle de substitution…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <p><strong>Application de la règle wp :</strong></p>
+            <p style="margin-left:1.5rem;">
+                <code>wp(x := 0, x = 0)</code><br>
+                = substituer <code>0</code> à la place de <code>x</code> dans <code>x = 0</code><br>
+                = <code>0 = 0</code><br>
+                = <strong>Vrai</strong>
+            </p>
+
+            <div class="callout-info">
+                <strong>Interprétation</strong>
+                <p>La précondition <code>Vrai</code> signifie : <em>aucune hypothèse n'est nécessaire</em> sur l'état initial.
+                Quelle que soit la valeur de x avant l'affectation, l'instruction <code>x := 0</code> écrase cette valeur et
+                place 0 dans x. La postcondition <code>x = 0</code> est donc toujours satisfaite.</p>
+                <p>On dit que <code>{Vrai} x := 0 {x = 0}</code> est un triplet <strong>universellement valide</strong> :
+                il n'impose aucune restriction sur l'appelant.</p>
+            </div>
+
+            <p><em>Toute précondition plus forte (ex. <code>x > 0</code>) est aussi valide, mais elle sur-contraint inutilement : elle exclut des états initiaux parfaitement légitimes.</em></p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 2                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">5 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Quelle est la postcondition la plus forte <code>Q</code> pour que le triplet suivant soit prouvable ?</p>
+        <p style="text-align:center; font-size:1.1em;"><code>{x ≥ 0} x := x + 2 {Q}</code></p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> répondre <code>Q = Vrai</code> ou <code>Q = x ≥ 0</code>.
+            Ces postconditions sont <em>valides</em> mais pas les plus fortes — elles perdent de l'information.
+            La plus forte est celle qui décrit le plus précisément l'état final, sans rien laisser de flou.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            Si <code>x ≥ 0</code> avant l'affectation, quelle est la valeur minimale que peut atteindre <code>x</code>
+            après <code>x := x + 2</code> ? Pensez aux cas limites : si x = 0 avant, quelle est la valeur après ?
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q2-h2">
+            Si x ≥ 0 avant, la nouvelle valeur de x est <code>x + 2 ≥ 0 + 2 = 2</code>.
+            Donc <code>Q = x ≥ 2</code>. Vérifiez avec wp : <code>wp(x := x+2, x ≥ 2) = x+2 ≥ 2 = x ≥ 0</code>.
+            C'est exactement notre précondition — le calcul boucle cohéremment. ✓
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Raisonnez à partir de la précondition x ≥ 0 : que peut-on dire de x après x := x + 2 ?"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+
+            <p><strong>Raisonnement avant (de P vers Q) :</strong></p>
+            <ul>
+                <li>On sait que <code>x ≥ 0</code> avant l'affectation.</li>
+                <li>Après <code>x := x + 2</code>, la nouvelle valeur de x est l'ancienne + 2.</li>
+                <li>Donc : nouvelle valeur ≥ 0 + 2 = 2, soit <code>x ≥ 2</code>.</li>
+            </ul>
+
+            <p><strong>La postcondition la plus forte est <code>Q = x ≥ 2</code>.</strong></p>
+
+            <div class="callout-info">
+                <strong>Vérification par wp (cohérence)</strong>
+                <p>On peut vérifier que ce Q est correct en calculant wp à rebours :</p>
+                <p style="margin-left:1.5rem;">
+                    <code>wp(x := x + 2, x ≥ 2)</code><br>
+                    = substituer <code>x + 2</code> à la place de <code>x</code> dans <code>x ≥ 2</code><br>
+                    = <code>x + 2 ≥ 2</code><br>
+                    = <code>x ≥ 0</code>
+                </p>
+                <p>On retrouve exactement la précondition de départ. Le triplet est bien formé.</p>
+            </div>
+
+            <div class="callout-info">
+                <strong>Pourquoi <code>x ≥ 0</code> ou <code>Vrai</code> sont-ils insuffisants comme Q ?</strong>
+                <p>Ces postconditions sont <em>valides</em> (le triplet est prouvable), mais elles sont trop <em>faibles</em> :
+                elles disent moins que ce qu'on peut réellement conclure. En pratique, une postcondition trop faible rend
+                la spécification inutile — on ne peut pas s'appuyer dessus pour prouver des propriétés ultérieures.
+                La postcondition <em>la plus forte</em> est celle qui capture <em>tout</em> ce qu'on peut déduire.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q1 — Règle wp appliquée</span>
+        <span class="bareme-desc">Substitution correcte de 0 à la place de x dans la postcondition</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q1 — Précondition identifiée</span>
+        <span class="bareme-desc">Résultat <code>0 = 0</code> → <code>Vrai</code> correctement justifié</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q2 — Raisonnement sur la précondition</span>
+        <span class="bareme-desc">x ≥ 0 avant → x + 2 ≥ 2 après, inégalité correctement propagée</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q2 — Postcondition la plus forte identifiée</span>
+        <span class="bareme-desc"><code>x ≥ 2</code> annoncé clairement</span>
+
+        <span class="bareme-pts">1</span>
+        <span class="bareme-label">Q2 — Vérification par wp</span>
+        <span class="bareme-desc"><code>wp(x := x+2, x ≥ 2) = x ≥ 0</code> cohérent avec la précondition</span>
+
+        <div class="bareme-total">Total : <strong>10 pts</strong></div>
+    </div>
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Calculez <code>wp(x := x * 2, x > 10)</code>. Quelle précondition obtenez-vous ? Vérifiez avec un exemple numérique.</li>
+            <li>Le triplet <code>{Faux} x := x + 1 {x = 0}</code> est-il valide ? Pourquoi ? Est-il utile ?</li>
+            <li>Donnez la précondition la plus faible pour <code>{P} x := x + 1 ; y := x * 2 {y > 6}</code>. Indice : appliquez wp de droite à gauche sur la séquence.</li>
+            <li>Dans un vérificateur comme Dafny ou Frama-C, les annotations <code>requires</code> et <code>ensures</code> correspondent exactement à P et Q d'un triplet de Hoare. Cherchez un exemple simple de fonction annotée.</li>
+        </ul>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 8 — Tautologies LTL</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-avance">Avancé</span>
+            <span class="exo-points">◎ 10 pts</span>
+            <span class="exo-time">⏱ 20–25 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Identifier les tautologies LTL parmi un ensemble de formules</li>
+                <li>Prouver qu'une formule est une tautologie par raisonnement sémantique</li>
+                <li>Réfuter une formule non-tautologique par un contre-exemple</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> Cours — <em>Tautologies, sémantique LTL des opérateurs ○, □, ◇, U</em></p>
+    </div>
+
+    <div class="context-block">
+        <h3>Définition</h3>
+        <p>
+            Une formule LTL φ est une <strong>tautologie</strong> si elle est vraie sur <em>toute</em> trace σ
+            et à tout instant i. Pour réfuter une tautologie supposée, il suffit de donner
+            un <strong>contre-exemple</strong> : une trace et un instant où la formule est fausse.
+        </p>
+        <div class="callout-info">
+            <strong>Notation :</strong> On utilise ici <code>○</code> pour l'opérateur <em>next</em> (X).
+        </div>
+    </div>
+
+    <button class="hint-btn" data-hint="rappel-ltl-ex8" data-label="Rappel : sémantique de ○, □, ◇, U" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel : sémantique de ○, □, ◇, U</span>
+    </button>
+    <div class="hint" id="rappel-ltl-ex8">
+        <p><code>σ, i ⊨ ○φ</code> &nbsp;⟺&nbsp; <code>σ, i+1 ⊨ φ</code></p>
+        <p><code>σ, i ⊨ □φ</code> &nbsp;⟺&nbsp; <code>∀j ≥ i, σ, j ⊨ φ</code></p>
+        <p><code>σ, i ⊨ ◇φ</code> &nbsp;⟺&nbsp; <code>∃j ≥ i, σ, j ⊨ φ</code></p>
+        <p><code>σ, i ⊨ φ U ψ</code> &nbsp;⟺&nbsp; <code>∃k ≥ i, (σ, k ⊨ ψ) ∧ (∀i ≤ j &lt; k, σ, j ⊨ φ)</code></p>
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Repère clé</span></p>
+            <p><code>○φ ≡ ¬○¬φ</code> : l'opérateur next est déterministe — à l'instant i, l'instant i+1 est unique.
+            Donc ○φ et ¬○¬φ sont équivalents, ce qui donne <code>¬○p ≡ ○¬p</code>.</p>
+        </div>
+    </div>
+
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q</span>
+            <span class="question-pts">10 pts</span>
+            <span class="diff-badge diff-avance">Avancé</span>
+        </div>
+        <p>
+            Parmi les formules suivantes, indiquer lesquelles sont des tautologies LTL.
+            Pour chaque tautologie, donner une justification par la sémantique.
+            Pour chaque non-tautologie, donner un contre-exemple (trace + instant).
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Prouver une tautologie en vérifiant seulement un exemple de trace.
+            Pour qu'une formule soit une tautologie, elle doit être vraie sur <em>toute</em> trace et à <em>tout</em> instant.
+            Un seul contre-exemple suffit pour réfuter.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1-ex8" data-label="Indice — méthode générale" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice — méthode générale</span>
+        </button>
+        <div class="hint" id="q1-h1-ex8">
+            <p><strong>Pour prouver une tautologie :</strong> raisonner par équivalences sémantiques.
+            Par exemple, <code>¬○p ≡ ○¬p</code> parce que la sémantique de ○ est déterministe
+            (pas de branchement sur l'instant suivant).</p>
+            <p><strong>Pour réfuter :</strong> construire une trace minimale (souvent 1 ou 2 états suffisent)
+            où la formule est fausse.</p>
+        </div>
+    </div>
+
+    <!-- Sous-questions en blocs séparés pour réponses individuelles -->
+
+    <h4 style="margin-top:1.5rem;">a) <code>¬○p ⇒ ○¬p</code></h4>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="a) Tautologie ou non ? Justification / contre-exemple…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution a)</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution a)</h4>
+            <p><strong>TAUTOLOGIE.</strong></p>
+            <p>Preuve : supposons σ, i ⊨ ¬○p (l'hypothèse).</p>
+            <ul>
+                <li>σ, i ⊨ ¬○p &nbsp;⟺&nbsp; σ, i ⊭ ○p &nbsp;⟺&nbsp; σ, i+1 ⊭ p</li>
+                <li>σ, i+1 ⊭ p &nbsp;⟺&nbsp; σ, i+1 ⊨ ¬p &nbsp;⟺&nbsp; σ, i ⊨ ○¬p</li>
+            </ul>
+            <p>
+                Donc l'hypothèse ¬○p entraîne bien ○¬p.
+                La formule est vraie sur toute trace et à tout instant.
+            </p>
+            <p class="inline-note">
+                Ce résultat dit : l'opérateur ○ "distribue" sur la négation — ¬○p ≡ ○¬p.
+                Ceci est propre à LTL (traces déterministes) ; en logique de branchement (CTL), cette équivalence n'est pas valide.
+            </p>
+        </div>
+    </div>
+
+    <h4 style="margin-top:1.5rem;">b) <code>○(p ∧ q) ⇒ ○p</code></h4>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="b) Tautologie ou non ? Justification / contre-exemple…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution b)</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution b)</h4>
+            <p><strong>TAUTOLOGIE.</strong></p>
+            <p>Supposons σ, i ⊨ ○(p∧q).</p>
+            <ul>
+                <li>σ, i ⊨ ○(p∧q) &nbsp;⟺&nbsp; σ, i+1 ⊨ p∧q</li>
+                <li>σ, i+1 ⊨ p∧q &nbsp;⟹&nbsp; σ, i+1 ⊨ p &nbsp;(conjonction → membre gauche)</li>
+                <li>σ, i+1 ⊨ p &nbsp;⟺&nbsp; σ, i ⊨ ○p</li>
+            </ul>
+            <p>Donc ○(p∧q) implique bien ○p. Tautologie.</p>
+        </div>
+    </div>
+
+    <h4 style="margin-top:1.5rem;">c) <code>○(p ∨ q) ⇒ ◇p</code></h4>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="c) Tautologie ou non ? Justification / contre-exemple…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution c)</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution c)</h4>
+            <p><strong>PAS une tautologie.</strong></p>
+            <p><strong>Contre-exemple :</strong></p>
+            <pre><code>σ = {q}, {q}, {q}, {q}, …   (q vrai partout, p jamais vrai)</code></pre>
+            <p>Évaluation à i = 0 :</p>
+            <ul>
+                <li>○(p∨q) : σ(1) = {q}, donc p∨q est vrai en i=1 → ○(p∨q) = <strong>VRAI</strong></li>
+                <li>◇p : p ∉ σ(j) pour tout j ≥ 0 → ◇p = <strong>FAUX</strong></li>
+            </ul>
+            <p>L'hypothèse est vraie et la conclusion est fausse : l'implication est fausse. Ce n'est pas une tautologie.</p>
+        </div>
+    </div>
+
+    <h4 style="margin-top:1.5rem;">d) <code>○p ⇒ ◇p</code></h4>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="d) Tautologie ou non ? Justification / contre-exemple…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution d)</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution d)</h4>
+            <p><strong>TAUTOLOGIE.</strong></p>
+            <p>Supposons σ, i ⊨ ○p.</p>
+            <ul>
+                <li>σ, i ⊨ ○p &nbsp;⟺&nbsp; σ, i+1 ⊨ p</li>
+                <li>i+1 ≥ i et σ, i+1 ⊨ p → il existe j = i+1 ≥ i tel que p est vraie en j</li>
+                <li>Par définition de ◇ : σ, i ⊨ ◇p ✓</li>
+            </ul>
+            <p>
+                Si p est vrai à l'instant suivant (i+1), alors p est vrai à un instant futur — ce qui satisfait ◇p.
+                Tautologie.
+            </p>
+        </div>
+    </div>
+
+    <h4 style="margin-top:1.5rem;">e) <code>(p U q) ⇒ ◇q</code></h4>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="e) Tautologie ou non ? Justification / contre-exemple…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution e)</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution e)</h4>
+            <p><strong>TAUTOLOGIE.</strong></p>
+            <p>Supposons σ, i ⊨ p U q (avec Until <em>fort</em>).</p>
+            <p>Par définition de U :</p>
+            <ul>
+                <li>Il existe k ≥ i tel que σ, k ⊨ q</li>
+                <li>Et pour tout i ≤ j &lt; k : σ, j ⊨ p</li>
+            </ul>
+            <p>
+                En particulier, k ≥ i et σ, k ⊨ q — il existe donc un instant ≥ i où q est vraie.
+                Par définition de ◇ : σ, i ⊨ ◇q ✓
+            </p>
+            <p>
+                Le Until fort garantit que q sera atteint ; ◇q ne demande qu'un tel instant.
+                Tautologie.
+            </p>
+            <p class="inline-note">
+                Cette tautologie illustre le rapport entre Until fort et ◇ : <code>φ U ψ ⊨ ◇ψ</code>.
+                Avec le Until faible (W), cette implication ne tient pas.
+            </p>
+        </div>
+    </div>
+
+
+    <div class="bareme">
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">a) ¬○p ⇒ ○¬p — TAUTOLOGIE</span>
+        <span class="bareme-desc">1 pt réponse · 1 pt preuve par sémantique de ○</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">b) ○(p∧q) ⇒ ○p — TAUTOLOGIE</span>
+        <span class="bareme-desc">1 pt réponse · 1 pt décomposition conjonction</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">c) ○(p∨q) ⇒ ◇p — NON</span>
+        <span class="bareme-desc">1 pt réponse · 1 pt contre-exemple valide (trace sans p)</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">d) ○p ⇒ ◇p — TAUTOLOGIE</span>
+        <span class="bareme-desc">1 pt réponse · 1 pt justification (j=i+1 témoin pour ◇)</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">e) (p U q) ⇒ ◇q — TAUTOLOGIE</span>
+        <span class="bareme-desc">1 pt réponse · 1 pt lien entre Until fort et existence de k</span>
+
+        <div class="bareme-total">Total : <strong>10 pts</strong></div>
+    </div>
+
+
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Vérifier si <code>□p ⇒ ○p</code> est une tautologie. Et <code>○p ⇒ □p</code> ?</li>
+            <li>La formule <code>□◇p ⇒ ◇□p</code> est-elle une tautologie ? (Indice : non — construire une trace alternant.)</li>
+            <li>Montrer que <code>◇□p ⇒ □◇p</code> est une tautologie. Quel est le sens intuitif de cette implication ?</li>
+        </ul>
+    </div>
+
+</body>
+</html>

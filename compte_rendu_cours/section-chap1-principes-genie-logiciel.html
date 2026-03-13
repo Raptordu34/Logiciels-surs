@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body class="mode-detailed">
+
+    <h2>Chap 1 — Principes du génie logiciel</h2>
+
+    <!-- ════════════════════════════════════════════════
+         MODE RÉSUMÉ
+    ════════════════════════════════════════════════ -->
+    <div class="compact-content">
+        <h3 style="margin-top: 0;">Synthèse</h3>
+        <ul>
+            <li><strong>Logiciel ≠ matériel</strong> — immatériel, invisible, complexité non physique, duplication parfaite ; rend son développement intrinsèquement difficile</li>
+            <li><strong>Crise du logiciel (1968)</strong> — projets en retard, over-budget, produits peu fiables → naissance du génie logiciel comme discipline rigoureuse</li>
+            <li><strong>Qualités attendues (ISO 25010:2023)</strong> — utilité, utilisabilité, fiabilité, interopérabilité, performance, portabilité, réutilisabilité, maintenabilité</li>
+            <li><strong>Processus de développement</strong> — phases (analyse → conception → codage → tests), cycles de vie (V, spirale, agile), proportions : tests ≈ 30–40 % de l'effort</li>
+            <li><strong>VVT indispensable</strong> — Vérification ("construit-on bien le produit ?"), Validation ("construit-on le bon produit ?"), Tests + Méthodes Formelles + Model-Checking pour systèmes critiques (avionique DO-178C)</li>
+        </ul>
+    </div>
+
+    <!-- ════════════════════════════════════════════════
+         MODE DÉTAILLÉ
+    ════════════════════════════════════════════════ -->
+    <div class="detailed-content">
+
+        <!-- ── 1. Matériel et logiciel ── -->
+        <h3>1. Matériel et logiciel</h3>
+
+        <h4>Définitions</h4>
+        <p>Le <strong>matériel</strong> (<em>hardware</em>) désigne l'ensemble des composants physiques d'un système informatique : processeurs, mémoires, cartes réseau, capteurs. Le <strong>logiciel</strong> (<em>software</em>) regroupe les programmes, les données qu'ils manipulent et la documentation associée.</p>
+
+        <h4>Spécificités du logiciel</h4>
+        <ul>
+            <li><strong>Immatériel</strong> — le logiciel n'a pas de forme physique ; on ne peut ni le toucher ni le peser</li>
+            <li><strong>Pas d'usure physique</strong> — contrairement au matériel, un programme ne se dégrade pas avec le temps ; il peut cependant devenir obsolète</li>
+            <li><strong>Duplication parfaite</strong> — copier un logiciel est trivial et ne dégrade pas l'original, ce qui change radicalement les modèles économiques</li>
+            <li><strong>Complexité cachée</strong> — la taille et la complexité interne d'un logiciel sont invisibles depuis l'extérieur ; un programme de quelques lignes peut cacher des milliers d'interactions</li>
+            <li><strong>Facilement modifiable (en apparence)</strong> — il est tentant de croire qu'une modification mineure est sans conséquence, mais les effets de bord peuvent être catastrophiques</li>
+        </ul>
+
+        <div class="highlight-box">
+            <strong>Définition IEEE 610.12-1990</strong><br>
+            <em>« Software: programs, procedures, rules, and associated documentation and data pertaining to the operation of a computer system. »</em>
+            <p style="margin-top: 0.75rem; margin-bottom: 0;">Le logiciel englobe donc bien plus que le seul code source : la documentation, les données de configuration et les procédures font partie intégrante du produit livrable.</p>
+        </div>
+
+        <!-- ── 2. Crise du logiciel ── -->
+        <h3>2. Crise du logiciel</h3>
+
+        <h4>Contexte historique</h4>
+        <p>Dans les années 1960, la puissance des ordinateurs croît exponentiellement (loi de Moore), mais les méthodes de développement restent artisanales. Des projets militaires et commerciaux majeurs accumulent les retards et dépassent largement leurs budgets. C'est dans ce contexte que l'OTAN organise une conférence fondatrice à Garmisch, en Allemagne.</p>
+
+        <div class="callout-info">
+            <strong>Conférence OTAN — Garmisch, octobre 1968</strong><br>
+            Réunion de ~50 experts internationaux commanditée par le Comité scientifique de l'OTAN. Première utilisation officielle du terme <em>"software engineering"</em>. Objectif : doter le développement logiciel du même niveau de rigueur que l'ingénierie classique. Les actes de la conférence restent une lecture de référence.
+        </div>
+
+        <h4>Causes de la crise</h4>
+        <ul>
+            <li>Croissance de la puissance matérielle non accompagnée par les méthodes de développement</li>
+            <li>Approches <em>ad hoc</em>, absence de méthodes systématiques et de documentation</li>
+            <li>Manque de formation des développeurs à la gestion de projets complexes</li>
+            <li>Mauvaise estimation des coûts et des délais</li>
+        </ul>
+
+        <h4>Conséquences</h4>
+        <ul>
+            <li>Projets systématiquement livrés en retard ou purement annulés</li>
+            <li>Coûts explosifs : le logiciel représente jusqu'à 70–90 % du coût total d'un système</li>
+            <li>Produits peu fiables, bogués, non maintenables</li>
+            <li>Émergence du génie logiciel (<em>software engineering</em>) comme discipline scientifique et industrielle à part entière</li>
+        </ul>
+
+        <!-- ── 3. Erreurs célèbres ── -->
+        <h3>3. Erreurs célèbres</h3>
+
+        <div class="callout-danger">
+            Les accidents logiciels ont causé des pertes humaines, des catastrophes financières et des dommages d'image irréparables. Ils illustrent concrètement pourquoi le génie logiciel rigoureux est indispensable.
+        </div>
+
+        <h4>Ariane 501 — 4 juin 1996</h4>
+        <p>Lors du premier vol de la fusée Ariane 5, le système de référence inertielle (SRI) produit une exception non gérée 37 secondes après le décollage. Cause : <strong>conversion d'un flottant 64 bits (vitesse horizontale) en entier 16 bits</strong>, provoquant un dépassement de capacité (<em>overflow</em>). Le SRI transmet alors un code de diagnostic interprété comme des données de vol, ce qui conduit le calculateur de bord à braquer les tuyères à fond. La fusée se désintègre.</p>
+        <ul>
+            <li>Coût : perte d'une charge utile de ~370 M$ (4 satellites Cluster)</li>
+            <li>Cause racine : réutilisation sans revalidation du logiciel de la SRI d'Ariane 4, qui volait plus lentement — la valeur de vitesse ne pouvait pas dépasser 32 767 avec Ariane 4, mais le dépassait avec Ariane 5</li>
+            <li>Leçon : la réutilisation de composants dans un contexte aux hypothèses différentes exige une revalidation complète</li>
+        </ul>
+
+        <h4>Toyota ETCS — 2009-2011</h4>
+        <p>Lors du procès Bookout v. Toyota (verdict du jury en 2013), les experts en sécurité logicielle ont analysé le système de contrôle du moteur (ETCS) de plusieurs modèles Toyota impliqués dans des accidents mortels avec accélération non commandée.</p>
+        <ul>
+            <li><strong>81 514 violations</strong> des règles de codage MISRA-C relevées dans le code source</li>
+            <li>Code spaghetti avec ~10 000 variables globales non protégées</li>
+            <li>Possibilité de débordement de pile (<em>stack overflow</em>) conduisant à une corruption mémoire</li>
+            <li>Absence de mécanisme de détection de corruption du compteur de programme</li>
+        </ul>
+
+        <h4>Therac-25 — 1985-1987</h4>
+        <p>Accélérateur de particules utilisé pour la radiothérapie. Six patients ont reçu des doses de radiation létales (parfois 100× la dose thérapeutique) à cause d'une <strong>race condition</strong> dans le logiciel de contrôle.</p>
+        <ul>
+            <li>Les sécurités matérielles présentes sur les modèles précédents (Therac-6, Therac-20) avaient été <strong>supprimées</strong>, la sécurité étant entièrement déléguée au logiciel</li>
+            <li>La <em>race condition</em> ne se produisait que si l'opérateur tapait très vite — les tests automatiques ne la déclenchaient pas</li>
+            <li>Leçon : ne jamais supprimer des sécurités physiques en supposant que le logiciel est infaillible</li>
+        </ul>
+
+        <h4>Autres accidents notables</h4>
+        <ul>
+            <li><strong>Y2K (2000)</strong> — anticipation de la crise due à la représentation à 2 chiffres des années ; budget mondial de correction estimé à 300–600 Md$</li>
+            <li><strong>Mars Pathfinder (1997)</strong> — réinitialisation répétée du calculateur en vol à cause d'une <em>priority inversion</em> dans le scheduler temps-réel VxWorks ; résolu par patch à distance</li>
+        </ul>
+
+        <!-- ── 4. Qualités attendues ── -->
+        <h3>4. Qualités attendues d'un logiciel</h3>
+
+        <p>La norme <strong>ISO/IEC 25010:2023</strong> (SQuaRE — Systems and Software Quality Requirements and Evaluation) définit un modèle hiérarchique de qualité. Elle identifie des caractéristiques de qualité en utilisation et des caractéristiques de qualité du produit.</p>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Qualité</th>
+                        <th>Définition</th>
+                        <th>Exemple</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Utilité fonctionnelle</strong></td>
+                        <td>Le logiciel fait ce qui est attendu selon les besoins explicites</td>
+                        <td>Un compilateur qui compile correctement</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Utilisabilité</strong></td>
+                        <td>Facilité d'apprentissage, d'utilisation et satisfaction de l'utilisateur</td>
+                        <td>Interface intuitive, messages d'erreur clairs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fiabilité</strong></td>
+                        <td>Capacité à fonctionner sans défaillance dans des conditions données pendant une durée définie</td>
+                        <td>MTTF élevé, tolérance aux pannes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Interopérabilité</strong></td>
+                        <td>Capacité à interagir avec d'autres systèmes</td>
+                        <td>Respect de protocoles standard (REST, TCP/IP)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Performance / Efficacité</strong></td>
+                        <td>Utilisation optimale des ressources (temps, mémoire, énergie)</td>
+                        <td>Temps de réponse &lt; 100 ms pour 95 % des requêtes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Portabilité</strong></td>
+                        <td>Facilité de transfert vers un autre environnement</td>
+                        <td>Code compilable sur Linux, Windows, macOS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Réutilisabilité</strong></td>
+                        <td>Capacité à être utilisé dans d'autres contextes sans modification</td>
+                        <td>Bibliothèque de tri générique</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Maintenabilité</strong></td>
+                        <td>Facilité de modification (correction, adaptation, évolution)</td>
+                        <td>Code modulaire, documenté, couvert par des tests</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4>Attention — qualités antagonistes</h4>
+        <p>Les qualités d'un logiciel sont souvent en tension les unes avec les autres :</p>
+        <ul>
+            <li><strong>Performance vs Portabilité</strong> — un code optimisé pour une architecture matérielle spécifique (SIMD, GPU) est difficile à porter</li>
+            <li><strong>Sécurité vs Utilisabilité</strong> — l'authentification forte (2FA, mots de passe complexes) dégrade l'expérience utilisateur</li>
+            <li><strong>Fiabilité vs Coût/Délai</strong> — atteindre une fiabilité élevée exige plus de tests, de vérifications formelles et de temps</li>
+        </ul>
+        <p>L'ingénierie logicielle consiste en partie à gérer ces compromis en fonction du contexte (domaine critique, grand public, embarqué…).</p>
+
+        <!-- ── 5. Facilité de maintenance ── -->
+        <h3>5. Facilité de maintenance</h3>
+
+        <div class="callout-warning">
+            La maintenance représente <strong>60 à 80 % du coût total</strong> sur la durée de vie d'un logiciel industriel. Investir dans la qualité du code dès la conception est économiquement rationnel.
+        </div>
+
+        <h4>Types de maintenance</h4>
+        <ul>
+            <li><strong>Corrective</strong> — correction de défauts détectés après la mise en production (<em>bug fixes</em>)</li>
+            <li><strong>Adaptative</strong> — adaptation à un nouvel environnement : nouveau système d'exploitation, nouveau matériel, nouvelle version de dépendances</li>
+            <li><strong>Perfective</strong> — amélioration des performances, de l'utilisabilité ou de la maintenabilité sans changer les fonctionnalités</li>
+            <li><strong>D'extension</strong> — ajout de nouvelles fonctionnalités en réponse à de nouveaux besoins utilisateurs</li>
+        </ul>
+
+        <h4>Objectifs, enjeux et solutions</h4>
+        <p><strong>Pourquoi la maintenance est-elle coûteuse ?</strong> Comprendre un code que l'on n'a pas écrit (ou que l'on a écrit il y a des années) est difficile. Les modifications mal maîtrisées introduisent de nouvelles régressions. Les systèmes legacy accumulent la dette technique.</p>
+        <p><strong>Solutions :</strong></p>
+        <ul>
+            <li>Documentation à jour (commentaires, architecture, décisions de conception — ADR)</li>
+            <li>Architecture modulaire et couplage faible</li>
+            <li>Couverture de tests automatisés élevée (régression rapide)</li>
+            <li>Revues de code systématiques</li>
+            <li>Refactoring régulier pour réduire la dette technique</li>
+        </ul>
+
+        <!-- ── 6. Processus de développement ── -->
+        <h3>6. Processus de développement</h3>
+
+        <h4>Phases classiques</h4>
+        <ol>
+            <li><strong>Analyse des besoins</strong> — recueil des exigences fonctionnelles et non fonctionnelles ; formalisation en cahier des charges ou spécifications</li>
+            <li><strong>Conception architecturale</strong> — choix de l'architecture globale (modules, interfaces, protocoles)</li>
+            <li><strong>Conception détaillée</strong> — description précise de chaque composant (algorithmes, structures de données)</li>
+            <li><strong>Codage</strong> — implémentation selon les spécifications de conception</li>
+            <li><strong>Tests unitaires</strong> — vérification de chaque composant isolément</li>
+            <li><strong>Tests d'intégration</strong> — vérification des interactions entre composants</li>
+            <li><strong>Tests fonctionnels / recette</strong> — validation du produit final vis-à-vis des besoins exprimés</li>
+        </ol>
+
+        <h4>Proportions typiques d'effort</h4>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <span class="metric-value">~15%</span>
+                <span class="metric-label">Analyse</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-value">~20%</span>
+                <span class="metric-label">Conception</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-value">~20%</span>
+                <span class="metric-label">Codage</span>
+            </div>
+            <div class="metric-card accent">
+                <span class="metric-value">30–40%</span>
+                <span class="metric-label">Tests</span>
+            </div>
+            <div class="metric-card bad">
+                <span class="metric-value">60–80%</span>
+                <span class="metric-label">Maintenance (cycle de vie)</span>
+            </div>
+        </div>
+
+        <p style="margin-top: 1rem;">Ces proportions illustrent que la grande majorité de l'effort n'est pas dans le codage, mais dans la vérification et la maintenance. Les méthodes agiles modifient ces proportions en intégrant tests et conception en continu.</p>
+
+        <!-- ── 7. Cycles de vie ── -->
+        <h3>7. Cycles de vie</h3>
+
+        <h4>Modèle en V</h4>
+        <p>Le modèle en V est le cycle de vie de référence pour les systèmes critiques (avionique, automobile, ferroviaire). Il structure le développement en deux branches symétriques :</p>
+        <ul>
+            <li><strong>Branche descendante</strong> (définition) : Besoins → Spécifications → Conception architecturale → Conception détaillée → Codage</li>
+            <li><strong>Branche montante</strong> (vérification) : Tests unitaires → Tests d'intégration → Tests système → Tests de recette</li>
+        </ul>
+        <p>Chaque phase de la branche montante correspond à une phase symétrique de la branche descendante : les tests de recette valident les besoins, les tests système valident les spécifications, etc.</p>
+
+        <div class="compare-grid">
+            <div class="compare-item good" data-label="Avantages">
+                <ul>
+                    <li>Traçabilité entre exigences et tests</li>
+                    <li>Référence normative (DO-178C, IEC 61508)</li>
+                    <li>Clair pour les audits et certifications</li>
+                </ul>
+            </div>
+            <div class="compare-item bad" data-label="Limites">
+                <ul>
+                    <li>Peu adapté aux exigences changeantes</li>
+                    <li>Retours tardifs des utilisateurs</li>
+                    <li>Coût élevé des modifications en cours de projet</li>
+                </ul>
+            </div>
+        </div>
+
+        <h4>Modèle en spirale (Boehm, 1986)</h4>
+        <p>Proposé par Barry Boehm, ce modèle itératif structure chaque cycle en <strong>4 quadrants</strong> :</p>
+        <ol>
+            <li><strong>Planification</strong> — définition des objectifs, alternatives et contraintes</li>
+            <li><strong>Analyse des risques</strong> — identification et réduction des risques majeurs (prototypes, simulations)</li>
+            <li><strong>Ingénierie</strong> — développement et validation du produit de l'itération</li>
+            <li><strong>Évaluation</strong> — revue client et planification de l'itération suivante</li>
+        </ol>
+        <p>La gestion explicite des risques est la contribution centrale de ce modèle. Il est adapté aux grands projets à exigences incertaines.</p>
+
+        <div class="compare-grid">
+            <div class="compare-item good" data-label="Avantages">
+                <ul>
+                    <li>Gestion explicite des risques</li>
+                    <li>Livraisons intermédiaires</li>
+                    <li>Adapté aux projets longs et complexes</li>
+                </ul>
+            </div>
+            <div class="compare-item bad" data-label="Limites">
+                <ul>
+                    <li>Complexité de pilotage</li>
+                    <li>Demande une expertise en analyse de risques</li>
+                    <li>Peu adapté aux petits projets</li>
+                </ul>
+            </div>
+        </div>
+
+        <h4>Modèles agiles</h4>
+        <p>Les approches agiles (Scrum, XP, Kanban) reposent sur des itérations courtes (<em>sprints</em> de 1 à 4 semaines) avec livraison incrémentale et feedback fréquent des utilisateurs. Elles sont décrites dans le <em>Manifeste Agile</em> (2001).</p>
+
+        <div class="compare-grid">
+            <div class="compare-item good" data-label="Avantages">
+                <ul>
+                    <li>Adaptabilité aux changements d'exigences</li>
+                    <li>Implication continue du client</li>
+                    <li>Détection précoce des problèmes</li>
+                </ul>
+            </div>
+            <div class="compare-item bad" data-label="Limites">
+                <ul>
+                    <li>Documentation moins formelle (problématique pour certifications)</li>
+                    <li>Nécessite une forte discipline d'équipe</li>
+                    <li>Moins adapté aux systèmes à exigences figées (avionique)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ── 8. VVT ── -->
+        <h3>8. VVT — Vérification, Validation, Tests</h3>
+
+        <h4>Définitions</h4>
+        <div class="highlight-box">
+            <ul style="margin: 0;">
+                <li><strong>Vérification</strong> — <em>« Are we building the product right? »</em> — Conformité du logiciel à ses spécifications. On vérifie que chaque étape de développement respecte les contraintes de l'étape précédente.</li>
+                <li style="margin-top: 0.75rem;"><strong>Validation</strong> — <em>« Are we building the right product? »</em> — Conformité du logiciel aux besoins réels de l'utilisateur. On valide que le produit final résout bien le problème posé.</li>
+                <li style="margin-top: 0.75rem;"><strong>Tests</strong> — Exécution du logiciel avec des données choisies pour détecter des défauts. Les tests peuvent révéler la présence de bugs, mais ne peuvent pas prouver leur absence (Dijkstra).</li>
+            </ul>
+        </div>
+
+        <h4>Nécessité du VVT — la règle ×10</h4>
+        <p>Le coût de correction d'un défaut croît <strong>exponentiellement</strong> avec le temps entre son introduction et sa détection :</p>
+        <div class="metrics-grid">
+            <div class="metric-card good">
+                <span class="metric-value">×1</span>
+                <span class="metric-label">Détecté en phase d'analyse</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-value">×10</span>
+                <span class="metric-label">Détecté en conception</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-value">×100</span>
+                <span class="metric-label">Détecté en codage</span>
+            </div>
+            <div class="metric-card bad">
+                <span class="metric-value">×1000</span>
+                <span class="metric-label">Détecté en production</span>
+            </div>
+        </div>
+        <p style="margin-top: 1rem;">Cette règle justifie l'investissement dans les revues, les méthodes formelles et les tests précoces plutôt que dans la correction a posteriori.</p>
+
+        <h4>Méthodes formelles</h4>
+        <p>Les méthodes formelles utilisent des mathématiques discrètes pour spécifier, vérifier et démontrer des propriétés d'un logiciel :</p>
+        <ul>
+            <li><strong>Typage fort</strong> — vérification statique de types à la compilation (Rust, Ada, ML)</li>
+            <li><strong>Model-checking</strong> — exploration exhaustive (ou symbolique) de l'espace d'états d'un modèle pour vérifier des propriétés temporelles (SPIN, NuSMV, TLA+)</li>
+            <li><strong>Preuve de théorèmes</strong> — démonstration mathématique de la correction d'un programme (Coq, Isabelle, Why3)</li>
+        </ul>
+
+        <div class="compare-grid">
+            <div class="compare-item neutral" data-label="Tests">
+                <ul>
+                    <li>Exécution sur des cas représentatifs</li>
+                    <li>Peut trouver des bugs concrets</li>
+                    <li>Ne peut pas prouver l'absence de bugs</li>
+                    <li>Coût raisonnable</li>
+                </ul>
+            </div>
+            <div class="compare-item neutral" data-label="Model-Checking">
+                <ul>
+                    <li>Vérification exhaustive sur un modèle abstrait</li>
+                    <li>Prouve ou réfute une propriété</li>
+                    <li>Explosion combinatoire possible</li>
+                    <li>Limité à la taille du modèle</li>
+                </ul>
+            </div>
+            <div class="compare-item neutral" data-label="Preuve formelle">
+                <ul>
+                    <li>Preuve mathématique complète</li>
+                    <li>Garantie la plus forte</li>
+                    <li>Très coûteux en expertise et temps</li>
+                    <li>Réservé aux composants les plus critiques</li>
+                </ul>
+            </div>
+        </div>
+
+        <h4>Cas de l'avionique — DO-178C</h4>
+        <p>L'avionique civile est gouvernée par la norme <strong>DO-178C</strong> (RTCA, 2011), aussi reconnue par l'EASA sous la référence ED-12C. Elle définit les exigences de développement logiciel selon 5 niveaux de criticité (<em>Design Assurance Levels</em>) :</p>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Niveau DAL</th>
+                        <th>Effet d'une défaillance</th>
+                        <th>Exemple</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>DAL A</strong></td>
+                        <td>Catastrophique — perte de l'appareil et des passagers</td>
+                        <td>Commandes de vol primaires</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DAL B</strong></td>
+                        <td>Dangereux — blessures graves ou décès de passagers</td>
+                        <td>Système hydraulique</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DAL C</strong></td>
+                        <td>Majeur — réduction significative des marges de sécurité</td>
+                        <td>Système de navigation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DAL D</strong></td>
+                        <td>Mineur — légère réduction des marges de sécurité</td>
+                        <td>Divertissement à bord</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DAL E</strong></td>
+                        <td>Sans effet sur la sécurité</td>
+                        <td>Application de maintenance au sol</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p style="margin-top: 1rem;">Le supplément <strong>DO-333</strong> à la norme DO-178C définit le cadre d'utilisation des méthodes formelles comme substitut ou complément aux tests. Pour un logiciel DAL A, la couverture MC/DC (<em>Modified Condition/Decision Coverage</em>) est obligatoire.</p>
+
+        <h4>But du cours</h4>
+        <p>Ce cours vise à maîtriser les techniques de <strong>VVT</strong> pour le développement de logiciels sûrs :</p>
+        <ul>
+            <li>Comprendre les fondements du génie logiciel et les causes des défaillances</li>
+            <li>Appliquer des méthodes formelles : typage, spécification, preuve</li>
+            <li>Utiliser le model-checking (logiques temporelles LTL/CTL, outils SPIN/NuSMV)</li>
+            <li>Concevoir des stratégies de tests rigoureuses pour les systèmes critiques</li>
+        </ul>
+
+        <div class="tip-box">
+            Un logiciel sûr n'est pas exempt de bugs par hasard : c'est le résultat d'un processus rigoureux de conception, vérification et validation appliqué dès le début du projet.
+        </div>
+
+    </div>
+
+</body>
+</html>

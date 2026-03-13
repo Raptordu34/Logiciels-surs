@@ -1,0 +1,38 @@
+{
+  "workspaceName": "Logiciels surs",
+  "workspaceFolderId": "file:///home/jarysb/Documents/A3/Logiciels%20surs",
+  "workflowId": "workflow-mmj1ywwq-vGAOpu-i",
+  "branchId": "main",
+  "createdAt": "2026-03-09T10:43:07.418Z",
+  "label": "Rediges la correction detailé de ce td, en ajoutant des exemples/analogies, des explications de cours, etc.",
+  "updatedAt": "2026-03-09T10:43:07.418Z",
+  "currentStageIndex": 1,
+  "currentPreset": "build",
+  "currentProvider": "gemini",
+  "currentProviderModel": "gemini-3.1-pro-preview",
+  "briefFile": ".ai-orchestrator/brief.md",
+  "stages": [
+    {
+      "index": 1,
+      "workflowId": "workflow-mmj1ywwq-vGAOpu-i",
+      "branchId": "main",
+      "preset": "build",
+      "provider": "gemini",
+      "providerModel": "gemini-3.1-pro-preview",
+      "status": "prepared",
+      "stageFile": ".ai-orchestrator/stages/01-build.md",
+      "generatedAt": "2026-03-09T10:43:07.418Z",
+      "briefSummary": "Rediges la correction detailé de ce td, en ajoutant des exemples/analogies, des explications de cours, etc.",
+      "contextFile": ".ai-context.md",
+      "artifactFiles": [
+        "GEMINI.md",
+        ".gemini/agents/orchestrator-architect.md",
+        ".gemini/agents/orchestrator-implementer.md",
+        ".gemini/agents/orchestrator-reviewer.md",
+        ".gemini/agents/orchestrator-tester.md",
+        ".gemini/skills/orchestrator-build-workflow/SKILL.md"
+      ],
+      "upstreamStageFiles": []
+    }
+  ]
+}

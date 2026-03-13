@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+    <h2>Exercice 6 — Preuves de triplets de Hoare</h2>
+
+    <!-- ── EN-TÊTE ── -->
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 10 pts</span>
+            <span class="exo-time">⏱ 15 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Maîtriser la méthode de preuve en deux étapes : calcul de wp puis vérification de l'implication</li>
+                <li>Appliquer la règle de conséquence pour justifier qu'une précondition plus forte que wp reste valide</li>
+                <li>Distinguer un triplet valide d'un triplet non prouvable</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Exercice 5 — Préconditions et Postconditions</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3 style="margin-top:0;">Prouver qu'un triplet est correct</h3>
+        <p>
+            Dans l'exercice 5, on <em>calculait</em> une précondition ou une postcondition.
+            Ici, le triplet est <strong>déjà entièrement donné</strong> — il faut le <em>prouver</em> valide.
+            La méthode est systématique : calculer wp à rebours, puis vérifier que la précondition donnée implique ce wp.
+        </p>
+    </div>
+
+    <!-- ── RAPPEL DE COURS ── -->
+    <button class="hint-btn" data-hint="rappel-preuve" data-label="Rappel de cours : méthode de preuve et règle de conséquence" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours : méthode de preuve et règle de conséquence</span>
+    </button>
+    <div class="hint" id="rappel-preuve">
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">La méthode de preuve en deux étapes</span></p>
+            <p>Pour prouver <code>{P} C {Q}</code>, on procède toujours ainsi :</p>
+            <ol>
+                <li><strong>Calculer</strong> <code>wp(C, Q)</code> — la précondition la plus faible par rapport à Q.</li>
+                <li><strong>Vérifier</strong> que <code>P ⟹ wp(C, Q)</code> est un théorème logique.</li>
+            </ol>
+            <p>Si l'implication est vraie, le triplet est <strong>valide</strong>. Sinon, il ne l'est pas.</p>
+            <div class="callout-info" style="margin-top:0.8rem;">
+                <strong>Théorème fondamental :</strong>
+                <p style="text-align:center; font-size:1.05em;"><code>{P} C {Q}</code> est valide &nbsp;⟺&nbsp; <code>P ⟹ wp(C, Q)</code></p>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">La règle de conséquence</span></p>
+            <p>Cette règle permet d'utiliser une précondition <em>plus forte</em> ou une postcondition <em>plus faible</em> que celles calculées mécaniquement :</p>
+            <div style="text-align:center; font-family: monospace; margin: 1rem 0; line-height: 2;">
+                P ⟹ P' &nbsp;&nbsp;&nbsp; {P'} C {Q'} &nbsp;&nbsp;&nbsp; Q' ⟹ Q<br>
+                <span style="border-top: 1px solid currentColor; display:inline-block; padding-top:0.3rem; min-width: 28rem;">
+                    {P} C {Q}
+                </span>
+            </div>
+            <p>En pratique dans cet exercice, la règle de conséquence intervient quand <code>P ≠ wp(C, Q)</code> syntaxiquement, mais que <code>P ⟹ wp(C, Q)</code> est quand même vrai logiquement.</p>
+        </div>
+
+        <div class="two-col">
+            <div class="callout-info">
+                <p><span class="badge badge-blue">P = wp(C, Q) exactement</span></p>
+                <p>La précondition donnée est <em>exactement</em> la plus faible possible. L'implication est vraie par réflexivité (<code>P ⟹ P</code>). C'est le cas le plus "serré" — la précondition ne sur-contraint pas.</p>
+            </div>
+            <div class="callout-info">
+                <p><span class="badge badge-blue">P plus forte que wp(C, Q)</span></p>
+                <p>La précondition impose plus que le minimum nécessaire. L'implication <code>P ⟹ wp(C, Q)</code> est quand même vraie. Le triplet est <strong>valide</strong>, mais P exclut inutilement des états initiaux qui auraient aussi garanti Q.</p>
+                <p class="inline-note">Analogie : la limite de vitesse garantit la sécurité à 90 km/h (wp). Rouler à 60 km/h (P plus forte) garantit aussi la sécurité — on est bien dans la zone sûre.</p>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Rappel : règle wp pour l'affectation</span></p>
+            <p style="text-align:center;"><code>wp(x := e, Q) = Q[e/x]</code></p>
+            <p>Substituer l'expression <code>e</code> à la place de la variable <code>x</code> dans Q. Toujours remplacer la <strong>variable assignée</strong> par <strong>l'expression du membre droit</strong>.</p>
+        </div>
+
+        <div class="erreur-freq">
+            <strong>Piège fréquent :</strong> confondre "prouver le triplet" avec "trouver la précondition la plus faible".
+            Ici, P est <em>déjà donné</em> — il ne faut pas le calculer, mais vérifier qu'il implique wp.
+            La preuve échoue seulement si P n'implique <em>pas</em> wp.
+        </div>
+
+    </div>
+
+    <!-- ── SCAFFOLDING ── -->
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple guidé</span></p>
+            <p>Prouver <code>{y > 0} x := y + 1 {x > 1}</code>.</p>
+            <ol>
+                <li>Calculer <code>wp(x := y+1, x > 1)</code><br>
+                    → substituer <code>y+1</code> à <code>x</code> dans <code>x > 1</code><br>
+                    → <code>y + 1 > 1</code>, soit <code>y > 0</code></li>
+                <li>Vérifier <code>(y > 0) ⟹ (y > 0)</code> — vrai par réflexivité.</li>
+            </ol>
+            <p>Triplet valide. P = wp exactement.</p>
+        </div>
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple avec règle de conséquence</span></p>
+            <p>Prouver <code>{y > 5} x := y + 1 {x > 1}</code>.</p>
+            <ol>
+                <li><code>wp(x := y+1, x > 1) = y > 0</code> (même calcul).</li>
+                <li>Vérifier <code>(y > 5) ⟹ (y > 0)</code> — vrai (5 > 0).</li>
+            </ol>
+            <p>Triplet valide. P est <em>plus forte</em> que wp — la règle de conséquence s'applique.</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 1                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">5 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Prouver le triplet suivant :</p>
+        <p style="text-align:center; font-size:1.1em;"><code>{x = 3a} &nbsp; a := a + 2 &nbsp; {x = 3a − 6}</code></p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> substituer <code>a</code> par <code>a+2</code> dans la <em>précondition</em> au lieu de la postcondition.
+            La règle wp demande toujours de transformer la <strong>postcondition</strong> à rebours — jamais la précondition.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            Calculez <code>wp(a := a+2, x = 3a − 6)</code>. La variable assignée est <code>a</code>,
+            l'expression assignée est <code>a+2</code>. Dans la postcondition <code>x = 3a − 6</code>,
+            remplacez chaque occurrence de <code>a</code> par <code>a+2</code>.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            Après substitution : <code>x = 3(a+2) − 6 = 3a + 6 − 6 = 3a</code>.
+            Donc <code>wp = (x = 3a)</code>. Comparez maintenant ce résultat avec la précondition donnée <code>x = 3a</code>.
+            Que concluez-vous ?
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Étape 1 : calculer wp(a := a+2, x = 3a−6) par substitution.&#10;Étape 2 : vérifier que la précondition implique ce wp.&#10;Étape 3 : conclure."></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <p><strong>Étape 1 — Calcul de wp :</strong></p>
+            <div style="margin-left:1.5rem; font-family: monospace; line-height: 2;">
+                wp(a := a+2, &nbsp; x = 3a − 6)<br>
+                = &nbsp; (x = 3a − 6)[a+2 / a]<br>
+                = &nbsp; x = 3(a+2) − 6<br>
+                = &nbsp; x = 3a + 6 − 6<br>
+                = &nbsp; <strong>x = 3a</strong>
+            </div>
+
+            <p style="margin-top:1rem;"><strong>Étape 2 — Vérification de l'implication :</strong></p>
+            <p style="margin-left:1.5rem;">
+                Précondition donnée : <code>x = 3a</code><br>
+                wp calculé : <code>x = 3a</code><br>
+                Implication : <code>(x = 3a) ⟹ (x = 3a)</code> — <strong>vrai par réflexivité</strong>.
+            </p>
+
+            <p><strong>Étape 3 — Conclusion :</strong> Le triplet est <strong>valide</strong>. La précondition donnée est exactement égale à wp — c'est la précondition la plus faible possible pour cette postcondition.</p>
+
+            <div class="callout-info">
+                <strong>Interprétation sémantique</strong>
+                <p>Si <code>x = 3a</code> avant l'affectation, alors après <code>a := a+2</code> la valeur de <code>a</code> augmente de 2.
+                La postcondition dit <code>x = 3a − 6</code>, c'est-à-dire <code>x = 3(a_nouveau) − 6 = 3(a_ancien + 2) − 6 = 3·a_ancien + 6 − 6 = 3·a_ancien</code>.
+                On retrouve exactement ce que garantissait la précondition.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 2                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">5 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Prouver le triplet suivant :</p>
+        <p style="text-align:center; font-size:1.1em;"><code>{a ≥ 0} &nbsp; x := 1 &nbsp; {a = x * a}</code></p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> conclure que le triplet est invalide parce que la précondition (<code>a ≥ 0</code>)
+            semble "sans rapport" avec la postcondition (<code>a = x * a</code>).
+            La bonne démarche reste la même : calculer wp, puis vérifier l'implication.
+            Une précondition plus forte que wp reste tout à fait valide.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            Calculez <code>wp(x := 1, a = x * a)</code>. La variable assignée est <code>x</code>,
+            l'expression assignée est <code>1</code>. Dans la postcondition <code>a = x * a</code>,
+            remplacez chaque occurrence de <code>x</code> par <code>1</code>.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q2-h2">
+            Après substitution : <code>a = 1 * a</code>, soit <code>a = a</code>, ce qui est <strong>Vrai</strong>.
+            Donc wp = <code>Vrai</code>. La précondition donnée est <code>a ≥ 0</code>.
+            Vérifiez : est-ce que <code>(a ≥ 0) ⟹ Vrai</code> ? Que concluez-vous sur la relation entre P et wp ?
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Étape 1 : calculer wp(x := 1, a = x*a) par substitution.&#10;Étape 2 : vérifier que la précondition implique ce wp.&#10;Étape 3 : conclure (précondition plus forte que wp ?)."></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+
+            <p><strong>Étape 1 — Calcul de wp :</strong></p>
+            <div style="margin-left:1.5rem; font-family: monospace; line-height: 2;">
+                wp(x := 1, &nbsp; a = x * a)<br>
+                = &nbsp; (a = x * a)[1 / x]<br>
+                = &nbsp; a = 1 * a<br>
+                = &nbsp; a = a<br>
+                = &nbsp; <strong>Vrai</strong>
+            </div>
+
+            <p style="margin-top:1rem;"><strong>Étape 2 — Vérification de l'implication :</strong></p>
+            <p style="margin-left:1.5rem;">
+                Précondition donnée : <code>a ≥ 0</code><br>
+                wp calculé : <code>Vrai</code><br>
+                Implication : <code>(a ≥ 0) ⟹ Vrai</code> — <strong>vrai</strong> (toute proposition implique Vrai).
+            </p>
+
+            <p><strong>Étape 3 — Conclusion :</strong> Le triplet est <strong>valide</strong>.</p>
+
+            <div class="callout-info">
+                <strong>La précondition est plus forte que wp — règle de conséquence</strong>
+                <p>Ici, wp = <code>Vrai</code> : la postcondition <code>a = x * a</code> est garantie quelle que soit la valeur initiale des variables (après <code>x := 1</code>, on a toujours <code>a = 1 * a</code>).</p>
+                <p>La précondition donnée <code>a ≥ 0</code> est <em>plus forte</em> que wp — elle impose une restriction inutile sur <code>a</code>. Mais l'implication <code>(a ≥ 0) ⟹ Vrai</code> est toujours vraie, donc le triplet reste valide par la <strong>règle de conséquence</strong>.</p>
+                <p class="inline-note">Précondition la plus faible qui rendrait ce triplet valide : <code>Vrai</code>. Le triplet <code>{Vrai} x := 1 {a = x * a}</code> est donc aussi valide, et plus général.</p>
+            </div>
+
+            <div class="callout-info">
+                <strong>Interprétation sémantique</strong>
+                <p>L'affectation <code>x := 1</code> fixe x à 1, indépendamment de toute valeur initiale.
+                La postcondition <code>a = x * a</code> devient alors <code>a = 1 * a = a</code>, qui est une tautologie.
+                Aucune précondition n'est nécessaire — d'où wp = <code>Vrai</code>.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q1 — Calcul de wp</span>
+        <span class="bareme-desc">Substitution de a+2 à a dans x=3a−6, développement correct → x=3a</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q1 — Implication et conclusion</span>
+        <span class="bareme-desc">(x=3a) ⟹ (x=3a) identifiée comme vraie par réflexivité, triplet déclaré valide</span>
+
+        <span class="bareme-pts">1</span>
+        <span class="bareme-label">Q1 — Interprétation</span>
+        <span class="bareme-desc">Explication en langage naturel de pourquoi la précondition est exactement wp</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q2 — Calcul de wp</span>
+        <span class="bareme-desc">Substitution de 1 à x dans a=x*a → a=a → Vrai</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q2 — Implication, règle de conséquence et conclusion</span>
+        <span class="bareme-desc">(a≥0) ⟹ Vrai identifiée comme vraie, règle de conséquence mentionnée, triplet déclaré valide</span>
+
+        <div class="bareme-total">Total : <strong>9 pts</strong> (+ 1 pt pour la qualité de la justification)</div>
+    </div>
+
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Le triplet <code>{x = 3a + 1} a := a + 2 {x = 3a − 6}</code> est-il valide ? Calculez wp et vérifiez l'implication.</li>
+            <li>Donnez un exemple de précondition P telle que <code>{P} x := 1 {a = x * a}</code> soit <em>invalide</em>. Est-ce possible ? Pourquoi ?</li>
+            <li>La règle de conséquence peut aussi servir à <em>affaiblir</em> une postcondition. Montrez que <code>{x = 3a} a := a+2 {x ≥ 0}</code> est valide si on suppose <code>x ≥ 0</code> dans la précondition, en utilisant la règle de conséquence.</li>
+            <li>Dans Dafny ou Frama-C, qu'arrive-t-il si vous écrivez une précondition <code>requires</code> plus forte que le wp ? Le vérificateur accepte-t-il quand même la preuve ?</li>
+        </ul>
+    </div>
+
+</body>
+</html>

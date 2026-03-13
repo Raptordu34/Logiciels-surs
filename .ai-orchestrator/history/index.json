@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "workflowId": "workflow-mmj1ywwq-vGAOpu-i",
+      "branchId": "main",
+      "label": "Rediges la correction detailé de ce td, en ajoutant des exemples/analogies, d...",
+      "createdAt": "2026-03-09T10:43:07.418Z",
+      "updatedAt": "2026-03-09T10:43:07.418Z",
+      "currentStageIndex": 1,
+      "stageCount": 1,
+      "currentPreset": "build",
+      "currentProvider": "gemini",
+      "briefSummary": "Rediges la correction detailé de ce td, en ajoutant des exemples/analogies, des explications de cours, etc.",
+      "manifestPath": ".ai-orchestrator/history/workflow-mmj1ywwq-vGAOpu-i/manifest.json",
+      "latestStageFile": ".ai-orchestrator/stages/01-build.md"
+    }
+  ],
+  "activeWorkflowId": "workflow-mmj1ywwq-vGAOpu-i"
+}

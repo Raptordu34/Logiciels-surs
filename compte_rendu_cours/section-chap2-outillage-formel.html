@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/katex.min.css" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "$",  right: "$",  display: false }
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+    <script src="./section-utils.js" defer></script>
+</head>
+<body class="mode-detailed">
+
+    <h2>Chap 2 — Outillage Formel</h2>
+
+    <!-- MODE RÉSUMÉ -->
+    <div class="compact-content">
+        <h3 style="margin-top: 0;">Synthèse</h3>
+        <ul>
+            <li><strong>Syntaxe vs Sémantique</strong> — La syntaxe vérifie la grammaire du code, la sémantique en définit le sens profond et le comportement.</li>
+            <li><strong>Langage des données</strong> — Modélisation de l'état d'un logiciel par la théorie des ensembles (ensembles, relations, fonctions).</li>
+            <li><strong>Morphismes</strong> — Outil mathématique permettant de traduire un système complexe en un modèle réduit tout en préservant ses propriétés.</li>
+            <li><strong>Substitutions Généralisées (SG)</strong> — Langage mathématique modélisant les transitions d'états (affectations, préconditions, indéterminisme).</li>
+            <li><strong>Calcul de la précondition</strong> — Évaluer $[S]R$ revient à calculer ce qui doit être vrai <em>avant</em> l'opération $S$ pour garantir le résultat $R$ <em>après</em>.</li>
+        </ul>
+    </div>
+
+    <!-- MODE DÉTAILLÉ -->
+    <div class="detailed-content">
+
+        <!-- ── 1. Syntaxe et Sémantique ── -->
+        <h3>1. Introduction : Syntaxe et Sémantique</h3>
+
+        <p>Un langage de programmation, comme une langue naturelle, repose sur deux piliers fondamentaux : la <strong>syntaxe</strong> (comment on écrit) et la <strong>sémantique</strong> (ce que l'on veut dire).</p>
+
+        <div class="two-col">
+            <div class="highlight-box">
+                <strong>Syntaxe</strong><br>
+                Séquence de mots ou structure du langage de programmation. Elle dicte comment écrire un programme de manière valide au regard des règles du compilateur.<br><br>
+                <em>Exemple :</em> <code>z := x; x := y; y := z;</code>
+            </div>
+            <div class="highlight-box">
+                <strong>Sémantique</strong><br>
+                Relative au sens du programme, à l'action qu'il réalise ou à son comportement d'exécution. Elle est indispensable pour certifier et vérifier formellement le code.<br><br>
+                <em>Sens de l'exemple :</em> Échange (swap) des valeurs entre $x$ et $y$.
+            </div>
+        </div>
+
+        <div class="callout-info">
+            <strong>Analogie : La phrase de Noam Chomsky</strong><br>
+            Le linguiste Noam Chomsky a illustré la séparation entre syntaxe et sémantique avec la phrase : <em>"Colorless green ideas sleep furiously"</em> (D'incolores idées vertes dorment furieusement).<br>
+            La phrase est <strong>syntaxiquement parfaite</strong> (Sujet + Verbe + Adverbe), mais elle est <strong>sémantiquement absurde</strong>. De la même manière, le code <code>x := y / z</code> est syntaxiquement correct, mais sémantiquement dangereux si $z = 0$.
+        </div>
+
+        <p>Pour développer des logiciels sûrs, on distingue dans notre formalisation :</p>
+        <ul>
+            <li><strong>Les données :</strong> L'état du programme en mémoire, modélisé par des outils issus de la théorie des ensembles.</li>
+            <li><strong>La dynamique :</strong> Les opérations modifiant cet état, modélisées par des <em>Substitutions Généralisées</em>.</li>
+        </ul>
+
+        <!-- ── 2. Langage des données ── -->
+        <h3>2. Le langage des données</h3>
+        
+        <p>Afin de prouver mathématiquement le comportement d'un programme, nous ne raisonnons pas sur des tableaux ou des pointeurs, mais sur des abstractions mathématiques pures.</p>
+
+        <h4>2.1. Les Ensembles</h4>
+        <p>Les ensembles permettent de regrouper des éléments. On peut les définir de deux manières :</p>
+        <ul>
+            <li><strong>En extension :</strong> On liste explicitement tous les éléments. <em>Exemple : $A = \{2, 4, 6\}$</em>.</li>
+            <li><strong>En compréhension :</strong> On définit une règle ou propriété logique que les éléments doivent respecter. <em>Exemple : $A = \{x \in \mathbb{N} \mid x \text{ est pair et } x < 10\}$</em>.</li>
+        </ul>
+        
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Opération</th>
+                        <th>Syntaxe</th>
+                        <th>Explication intuitive</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Union</td><td>$A \cup B$</td><td>Tous les éléments de A <strong>ou</strong> B (fusion).</td></tr>
+                    <tr><td>Intersection</td><td>$A \cap B$</td><td>Seulement les éléments présents dans A <strong>et</strong> B (les points communs).</td></tr>
+                    <tr><td>Différence</td><td>$A - B$</td><td>Les éléments de A, <strong>sauf</strong> ceux qui sont aussi dans B.</td></tr>
+                    <tr><td>Ensemble des parties</td><td>$\mathbb{P}(A)$</td><td>Toutes les combinaisons possibles (sous-ensembles) d'éléments de A.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4>2.2. Les Relations</h4>
+        <p>Une relation de $A$ vers $B$ est un sous-ensemble du produit cartésien $A \times B$. On la note $A \leftrightarrow B$.</p>
+        
+        <div class="tip-box">
+            <strong>Analogie : Le réseau social (Relations)</strong><br>
+            Imaginons un réseau social où la relation est "<em>est ami avec</em>". Une personne peut avoir aucun, un, ou plusieurs amis. C'est le propre d'une relation : un élément de départ (domaine) peut pointer vers plusieurs éléments d'arrivée (images).
+        </div>
+
+        <ul>
+            <li><strong>Domaine ($\text{dom}(r)$) :</strong> Les utilisateurs qui ont au moins un ami.</li>
+            <li><strong>Codomaine / Image ($\text{ran}(r)$) :</strong> Les utilisateurs qui ont été ajoutés en ami par au moins une personne.</li>
+            <li><strong>Relation inverse ($r^{-1}$) :</strong> Si Alice a ajouté Bob, alors dans la relation inverse, Bob a été ajouté par Alice.</li>
+            <li><strong>Composition ($r ; q$) :</strong> Les "amis d'amis". Si $x$ est ami avec $y$, et $y$ est ami avec $z$, alors la composition permet de relier directement $x$ à $z$.</li>
+        </ul>
+
+        <h4>2.3. Les Fonctions</h4>
+        <p>Une fonction est un cas particulier de relation : <strong>chaque élément de départ possède au plus UNE SEULE image.</strong></p>
+
+        <div class="callout-info">
+            <strong>Analogie : Le numéro de Sécurité Sociale (Fonctions)</strong><br>
+            Contrairement aux amis sur un réseau social, pour le registre d'état civil, un individu possède un et un seul numéro de sécurité sociale.
+        </div>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type de Fonction</th>
+                        <th>Notation</th>
+                        <th>Définition & Analogie</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Fonction partielle</strong></td><td>$A \not\to B$</td><td>Un élément a au plus une image. <em>(Ex: La carte d'identité. Les nouveau-nés n'en ont pas tous une).</em></td></tr>
+                    <tr><td><strong>Fonction totale</strong></td><td>$A \to B$</td><td>Tous les éléments de départ ont exactement une image. <em>(Ex: Date de naissance. Tout le monde en a une).</em></td></tr>
+                    <tr><td><strong>Injective</strong></td><td>$A \not\mapsto B$</td><td>Deux éléments différents n'ont jamais la même image (pas de collision). <em>(Ex: Le numéro de Sécurité Sociale. Personne ne partage le même numéro).</em></td></tr>
+                    <tr><td><strong>Surjective</strong></td><td>$A \twoheadrightarrow B$</td><td>Tous les éléments d'arrivée sont atteints par au moins un élément de départ.</td></tr>
+                    <tr><td><strong>Bijective</strong></td><td>$A \rightarrowtail B$</td><td>Correspondance parfaite (1-pour-1). Injective <strong>et</strong> surjective.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4>2.4. Les Morphismes</h4>
+        <div class="theorem-box" data-label="Définition">
+            Soient $\langle E, f, *, R \rangle$ et $\langle E', f', *', R' \rangle$ deux structures. Un morphisme $\varphi : E \to E'$ préserve :<br>
+            <ul>
+                <li>La fonction : $\varphi(f(x)) = f'(\varphi(x))$</li>
+                <li>L'opération : $\varphi(x * y) = \varphi(x) *' \varphi(y)$</li>
+                <li>La relation : si $x R y$ alors $\varphi(x) R' \varphi(y)$</li>
+            </ul>
+        </div>
+        
+        <p>
+            <strong>Pourquoi est-ce important ?</strong> L'informatique utilise massivement les polymorphismes et isomorphismes. 
+            <br><em>Analogie :</em> Une carte routière (modèle $E'$) est un morphisme du terrain réel (modèle $E$). La carte ne reproduit pas les cailloux de la route, mais elle <strong>préserve parfaitement les connexions</strong> (les relations). Si la ville A est reliée à B en réalité, elles sont reliées sur la carte. Ainsi, on peut prouver qu'un trajet est possible sur la carte, et être certain que cela fonctionnera dans le monde réel. C'est le principe de la vérification logicielle : on prouve un modèle abstrait pour garantir le comportement du programme physique.
+        </p>
+
+        <!-- ── 3. Logique des propositions ── -->
+        <h3>3. Logique des propositions</h3>
+        
+        <p>Pour exprimer des contraintes (les Invariants), on utilise la logique mathématique. C'est l'assemblage de propositions vraies ou fausses via des connecteurs.</p>
+
+        <ul class="steps">
+            <li><strong>Conjonction ($\land$ / ET) :</strong> $A \land B$ est vrai uniquement si A et B sont tous les deux vrais. <em>"Le mot de passe est bon ET le compte est actif."</em></li>
+            <li><strong>Disjonction ($\lor$ / OU) :</strong> $A \lor B$ est vrai si au moins l'un des deux est vrai. <em>"Paiement par carte OU par chèque."</em></li>
+            <li><strong>Implication ($\implies$) :</strong> $A \implies B$. Si A est vrai, alors B doit l'être. <em>"S'il pleut, le sol est mouillé."</em> Attention : si la prémisse est fausse (il ne pleut pas), l'implication reste vraie globalement (le sol peut être mouillé pour une autre raison).</li>
+            <li><strong>Équivalence ($\iff$) :</strong> $A \iff B$. A et B ont toujours la même valeur de vérité. <em>"Le voyant est vert SI ET SEULEMENT SI le système est allumé."</em></li>
+        </ul>
+
+        <p>On associe souvent ces connecteurs aux <strong>quantificateurs</strong> : $\forall x$ (Pour tout $x$) et $\exists x$ (Il existe au moins un $x$).</p>
+
+        <!-- ── 4. Langage pour la dynamique (SG) ── -->
+        <h3>4. Langage pour la dynamique (Substitutions Généralisées)</h3>
+        
+        <p>Si la théorie des ensembles décrit l'état de la mémoire (la photo à l'instant T), les <strong>Substitutions Généralisées (SG)</strong> décrivent les transitions, c'est-à-dire comment on passe d'un état à l'autre (l'équivalent des instructions informatiques).</p>
+        
+        <div class="callout-warning">
+            <strong>Indéterminisme des spécifications</strong><br>
+            En développement classique, une instruction est déterministe. En spécification B, les SG peuvent être <strong>non-déterministes</strong> (plusieurs résultats possibles).<br>
+            <em>Analogie :</em> Au restaurant, commander "Un plat végétarien" est une requête <strong>non déterministe</strong> (le client laisse le choix au cuisinier). Lorsque le cuisinier préparera une "Salade de quinoa", on dira qu'il a effectué un <strong>raffinement déterministe</strong> de la spécification initiale. Ce flou volontaire permet au concepteur de définir un "quoi" sans imposer de "comment".
+        </div>
+
+        <h4>Substitutions de base</h4>
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Notation (Pseudo-code)</th>
+                        <th>Concept Sémantique</th>
+                        <th>Explication</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>x := E</code></td><td>Affectation simple</td><td>L'état de $x$ prend la valeur $E$.</td></tr>
+                    <tr><td><code>x, y := E, F</code></td><td>Affectation multiple</td><td>S'exécute en parallèle, instantanément. Permet de faire `x,y := y,x` (swap) sans variable temporaire.</td></tr>
+                    <tr><td><code>PRE P THEN S END</code></td><td>Pré-conditionnée ($P \mid S$)</td><td>Si $P$ est faux au lancement, le système crashe (imprédictible). Le programmeur <strong>doit</strong> s'assurer que $P$ est vrai avant l'appel.</td></tr>
+                    <tr><td><code>IF P THEN S END</code></td><td>Gardée ($P \implies S$)</td><td>Substitution classique "if". Si $P$ est faux, il ne se passe rien (Skip).</td></tr>
+                    <tr><td><code>CHOICE S OR T END</code></td><td>Choix borné ($S \;\square\; T$)</td><td>Le système choisit arbitrairement d'exécuter $S$ ou $T$.</td></tr>
+                    <tr><td><code>ANY z WHERE P THEN S END</code></td><td>Choix non borné ($@z \cdot (P \implies S)$)</td><td>Prend n'importe quelle valeur $z$ satisfaisant $P$, et exécute $S$.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4>Sémantique des SG (Calcul de [S]R)</h4>
+        
+        <p>Le but ultime de ces substitutions est de pouvoir prouver mathématiquement qu'un programme fait ce qu'on attend de lui. Pour cela, on utilise le concept de <strong>transformateur de prédicat</strong> de Dijkstra, noté $[S]R$.</p>
+
+        <div class="highlight-box">
+            <strong>La plus faible précondition : $[S]R$</strong><br>
+            La formule $[S]R$ représente la question : <em>"Quelle condition doit obligatoirement être vérifiée <strong>AVANT</strong> d'exécuter la substitution $S$, pour être absolument certain que la condition $R$ sera vraie <strong>APRÈS</strong> ?"</em>
+        </div>
+
+        <p>La règle d'or est l'axiome de l'affectation :</p>
+        <div class="formula-box">
+            $$[x := e]R \iff R[x \leftarrow e]$$
+            <span class="formula-label">On remplace toutes les occurrences de $x$ par $e$ dans la formule $R$.</span>
+        </div>
+
+        <div class="algo-block" data-name="Exemple de calcul pas à pas">
+<pre><code>Question : Que doit valoir x avant l'opération "x := x + 1" pour être sûr
+que x soit strictement positif (x > 0) à la fin ?
+
+Calcul :
+    [x := x + 1] (x > 0)
+    -- On applique la règle (remplacer x par x + 1)
+<=> (x + 1) > 0
+    -- On résout mathématiquement
+<=> x > -1
+
+Réponse : Il faut que "x > -1" soit vrai avant l'instruction.</code></pre>
+        </div>
+
+        <p>Quelques autres règles de calcul de sémantique formelle pour les SG :</p>
+        <ul>
+            <li><strong>Séquence :</strong> $[S ; T]R = [S]([T]R)$ — On calcule d'abord de droite à gauche.</li>
+            <li><strong>Pré-conditionnée :</strong> $[P \mid S]R = P \land [S]R$ — La précondition $P$ doit être vraie ET la substitution doit mener à $R$.</li>
+            <li><strong>Gardée :</strong> $[P \implies S]R = P \implies [S]R$</li>
+        </ul>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 4 — Obligations de preuve d'une boucle</h2>
+
+    <!-- ── EN-TÊTE ── -->
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-avance">Avancé</span>
+            <span class="exo-points">◎ 10 pts</span>
+            <span class="exo-time">⏱ 15–20 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Comprendre le rôle d'un invariant de boucle dans une preuve de correction</li>
+                <li>Formuler les trois obligations de preuve associées à un invariant</li>
+                <li>Vérifier chaque obligation par calcul de wp ou implication logique</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours 2 — Logique de Hoare · Exercice 3 (wp et validité de triplets)</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3 style="margin-top:0;">Programme à prouver</h3>
+        <p>On considère la boucle suivante, où <code>b</code> est une constante entière quelconque :</p>
+        <pre><code>{ x >= 0 }
+while x < b do
+    x := x + 1
+done
+{ x >= 0  ∧  ¬(x < b) }</code></pre>
+        <p>
+            L'invariant proposé est <code>I : x ≥ 0</code>.
+            Votre objectif est de formuler et de vérifier les trois obligations de preuve qui établissent la <strong>correction partielle</strong> de cette boucle vis-à-vis de cet invariant.
+        </p>
+    </div>
+
+    <!-- ── RAPPEL DE COURS ── -->
+    <button class="hint-btn" data-hint="rappel-invariant" data-label="Rappel de cours : invariant et obligations de preuve" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours : invariant et obligations de preuve</span>
+    </button>
+    <div class="hint" id="rappel-invariant">
+        <p>
+            Pour prouver <code>{P} while B do S done {Q}</code> en logique de Hoare,
+            on choisit un prédicat <strong>I</strong> (l'invariant) et on établit trois obligations :
+        </p>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Obligation 1 — Initialisation</span></p>
+            <p><code>P ⟹ I</code></p>
+            <p>La précondition doit impliquer l'invariant : I est vrai dès l'entrée dans la boucle.</p>
+        </div>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Obligation 2 — Conservation</span></p>
+            <p><code>{ I ∧ B } S { I }</code></p>
+            <p>
+                Si l'invariant est vrai et que la condition est vraie, alors après une itération
+                l'invariant est à nouveau vrai. On prouve ce triplet via wp :
+            </p>
+            <p><code>(I ∧ B) ⟹ wp(S, I)</code></p>
+        </div>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Obligation 3 — Postcondition</span></p>
+            <p><code>(I ∧ ¬B) ⟹ Q</code></p>
+            <p>
+                À la sortie de la boucle, la condition est fausse et l'invariant est encore vrai.
+                Ces deux faits réunis doivent impliquer la postcondition attendue.
+            </p>
+        </div>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>Obligation</th><th>Formule générale</th><th>Question posée</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Initialisation</strong></td>
+                        <td><code>P ⟹ I</code></td>
+                        <td>L'invariant est-il vrai avant d'entrer ?</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Conservation</strong></td>
+                        <td><code>(I ∧ B) ⟹ wp(S, I)</code></td>
+                        <td>Une itération préserve-t-elle I ?</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Postcondition</strong></td>
+                        <td><code>(I ∧ ¬B) ⟹ Q</code></td>
+                        <td>La sortie garantit-elle Q ?</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Correction partielle vs totale</span></p>
+            <p>
+                Ces trois obligations établissent la <strong>correction partielle</strong> : <em>si</em> la boucle termine, <em>alors</em> la postcondition est satisfaite.
+                La <strong>correction totale</strong> (garantie de terminaison) nécessite en plus un <em>variant</em> — un entier strictement décroissant à chaque itération.
+            </p>
+        </div>
+    </div>
+
+    <!-- ── SCAFFOLDING ── -->
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple guidé</span></p>
+            <p>Boucle : <code>{ n ≥ 0 } while n > 0 do n := n − 1 done { n = 0 }</code>, invariant <code>I : n ≥ 0</code>.</p>
+            <ul>
+                <li><strong>Init :</strong> <code>n ≥ 0 ⟹ n ≥ 0</code> — trivial ✓</li>
+                <li><strong>Cons. :</strong> wp(n := n−1, n ≥ 0) = n−1 ≥ 0 = n ≥ 1. Or <code>(n ≥ 0 ∧ n > 0) = n ≥ 1</code> ✓</li>
+                <li><strong>Post :</strong> <code>(n ≥ 0 ∧ ¬(n > 0)) = n = 0 ⟹ n = 0</code> ✓</li>
+            </ul>
+        </div>
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Analogie</span></p>
+            <p><strong>L'invariant comme règle d'entreprise :</strong> imaginez une chaîne de montage qui doit respecter la règle "aucune pièce défectueuse ne circule". L'initialisation vérifie cette règle à l'ouverture. La conservation vérifie qu'aucune opération ne l'enfreint. La postcondition vérifie que la règle suffit à garantir la qualité du produit fini.</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 1                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">10 pts</span>
+            <span class="diff-badge diff-avance">Avancé</span>
+        </div>
+        <p>
+            Pour la boucle présentée en contexte, avec l'invariant <code>I : x ≥ 0</code>,
+            formulez et vérifiez les trois obligations de preuve.
+        </p>
+
+        <div class="sub-question">
+            <strong>a)</strong> Obligation d'initialisation — montrez que <code>P ⟹ I</code>. <em>(2 pts)</em>
+        </div>
+        <div class="sub-question">
+            <strong>b)</strong> Obligation de conservation — montrez que <code>{ I ∧ B } x := x+1 { I }</code> est valide. <em>(5 pts)</em>
+        </div>
+        <div class="sub-question">
+            <strong>c)</strong> Obligation de postcondition — montrez que <code>(I ∧ ¬B) ⟹ Q</code>. <em>(3 pts)</em>
+        </div>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Confondre l'obligation de conservation et celle de postcondition.
+            La conservation utilise <code>I ∧ B</code> (condition <em>vraie</em>, on est encore dans la boucle).
+            La postcondition utilise <code>I ∧ ¬B</code> (condition <em>fausse</em>, on vient d'en sortir).
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            Instanciez les trois formules générales avec les valeurs du problème :
+            <code>P = (x ≥ 0)</code>, <code>B = (x &lt; b)</code>, <code>S = (x := x+1)</code>,
+            <code>I = (x ≥ 0)</code>, <code>Q = (x ≥ 0 ∧ ¬(x &lt; b))</code>.
+            Les obligations a) et c) sont des implications simples à vérifier directement.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            Pour l'obligation b), calculez <code>wp(x := x+1, x ≥ 0)</code> par substitution :
+            remplacez x par (x+1) dans <code>x ≥ 0</code>.
+            Vous obtenez <code>x+1 ≥ 0</code>, soit <code>x ≥ −1</code>.
+            Vérifiez ensuite que <code>(x ≥ 0 ∧ x &lt; b) ⟹ x ≥ −1</code>.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Rédigez les trois obligations a), b), c) et leur vérification…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <p><strong>Données :</strong> P = (x ≥ 0), B = (x &lt; b), S = (x := x+1), I = (x ≥ 0), Q = (x ≥ 0 ∧ ¬(x &lt; b)).</p>
+
+            <!-- Obligation a) -->
+            <div class="highlight-box" style="margin-top: 1.5rem;">
+                <p><span class="badge badge-green">a) Initialisation — 2 pts</span></p>
+                <p><strong>Formule :</strong> <code>P ⟹ I</code></p>
+                <p><strong>Instance :</strong> <code>x ≥ 0 ⟹ x ≥ 0</code></p>
+                <p>Implication triviale par réflexivité. ✓</p>
+            </div>
+
+            <!-- Obligation b) -->
+            <div class="highlight-box" style="margin-top: 1rem;">
+                <p><span class="badge badge-orange">b) Conservation — 5 pts</span></p>
+                <p><strong>Formule :</strong> <code>{ I ∧ B } S { I }</code>, soit <code>{ x ≥ 0 ∧ x &lt; b } x := x+1 { x ≥ 0 }</code></p>
+                <p>On réduit via wp :</p>
+                <ul class="steps">
+                    <li>
+                        Calculer <code>wp(x := x+1, x ≥ 0)</code><br>
+                        = substituer x par (x+1) dans <code>x ≥ 0</code><br>
+                        = <code>x+1 ≥ 0</code><br>
+                        = <code>x ≥ −1</code>
+                    </li>
+                    <li>
+                        Vérifier <code>(x ≥ 0 ∧ x &lt; b) ⟹ x ≥ −1</code><br>
+                        La conjonction implique <code>x ≥ 0</code>, et <code>x ≥ 0 ⟹ x ≥ −1</code> car 0 &gt; −1. ✓
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Obligation c) -->
+            <div class="highlight-box" style="margin-top: 1rem;">
+                <p><span class="badge badge-blue">c) Postcondition — 3 pts</span></p>
+                <p><strong>Formule :</strong> <code>(I ∧ ¬B) ⟹ Q</code></p>
+                <p><strong>Instance :</strong> <code>(x ≥ 0 ∧ ¬(x &lt; b)) ⟹ (x ≥ 0 ∧ ¬(x &lt; b))</code></p>
+                <p>Implication triviale : la postcondition Q est exactement <code>I ∧ ¬B</code>. ✓</p>
+            </div>
+
+            <div class="callout-info" style="margin-top: 1.5rem;">
+                <strong>Conclusion</strong>
+                <p>
+                    Les trois obligations sont vérifiées : la boucle est <strong>partiellement correcte</strong> vis-à-vis de l'invariant <code>x ≥ 0</code>.
+                    La terminaison (correction totale) n'est pas demandée ici, mais s'établirait avec le variant <code>b − x</code>, strictement décroissant à chaque itération tant que <code>x &lt; b</code>.
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">a) Initialisation</span>
+        <span class="bareme-desc">1 pt formule P ⟹ I correctement instanciée · 1 pt justification de l'implication</span>
+
+        <span class="bareme-pts">5</span>
+        <span class="bareme-label">b) Conservation</span>
+        <span class="bareme-desc">1 pt triplet {I∧B} S {I} correctement posé · 2 pts calcul wp · 2 pts vérification de l'implication</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">c) Postcondition</span>
+        <span class="bareme-desc">1 pt formule (I∧¬B) ⟹ Q instanciée · 2 pts identification Q = I∧¬B et conclusion</span>
+
+        <div class="bareme-total">Total : <strong>10 pts</strong></div>
+    </div>
+
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Proposez un <strong>variant</strong> pour cette boucle et vérifiez qu'il est strictement décroissant à chaque itération. Que se passe-t-il si <code>b &lt; 0</code> initialement ?</li>
+            <li>Que se passerait-il si l'invariant choisi était <code>I : x &lt; b</code> ? Laquelle des trois obligations échouerait, et pourquoi ?</li>
+            <li>Modifiez le corps de la boucle en <code>x := x + 2</code>. L'obligation de conservation est-elle encore vérifiable avec <code>I : x ≥ 0</code> ? Faut-il renforcer l'invariant ?</li>
+        </ul>
+    </div>
+
+</body>
+</html>

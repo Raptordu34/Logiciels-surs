@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/katex.min.css" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "$",  right: "$",  display: false }
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+    <script src="./section-utils.js" defer></script>
+</head>
+<body class="mode-detailed">
+
+    <h2>Chap 3 — Développement de logiciels sûrs</h2>
+
+    <!-- MODE RÉSUMÉ -->
+    <div class="compact-content">
+        <h3 style="margin-top: 0;">Synthèse</h3>
+        <ul>
+            <li><strong>Méthode B</strong> — approche formelle pour développer des programmes corrects par construction, modélisés par des Machines Abstraites.</li>
+            <li><strong>Machine Abstraite (MA)</strong> — encapsule l'état (variables, invariants) et les services (opérations) du système.</li>
+            <li><strong>Obligations de Preuve (PO)</strong> — garanties mathématiques : l'initialisation établit l'invariant, chaque opération préserve l'invariant.</li>
+            <li><strong>Raffinement</strong> — démarche progressive transformant un modèle abstrait non déterministe en code exécutable déterministe, tout en conservant les preuves.</li>
+        </ul>
+    </div>
+
+    <!-- MODE DÉTAILLÉ -->
+    <div class="detailed-content">
+
+        <!-- ── 1. Méthode B ── -->
+        <h3>1. Introduction à la méthode B</h3>
+        
+        <p>Le développement formel vise à produire des logiciels garantis <strong>sans bug</strong> par construction. La méthode B, très répandue dans l'industrie critique, en est un excellent exemple.</p>
+
+        <div class="two-col">
+            <div class="highlight-box">
+                <strong>Langage de spécification</strong><br>
+                Basé sur la théorie des ensembles et la logique du premier ordre pour modéliser les données et les propriétés attendues.
+            </div>
+            <div class="highlight-box">
+                <strong>Méthode de développement</strong><br>
+                Démarche progressive du modèle abstrait de haut niveau vers l'implémentation finale (raffinement successif).
+            </div>
+        </div>
+
+        <div class="tip-box">
+            <strong>Ligne 14 du Métro parisien (octobre 1998) :</strong> 
+            Le premier métro automatique a été développé avec la méthode B. Environ 110 000 lignes de modèle B ont généré 86 000 lignes de code Ada. Résultat : <strong>aucun bug</strong> détecté lors des tests, ni en opération à ce jour.
+        </div>
+
+        <!-- ── 2. Machine Abstraite ── -->
+        <h3>2. Composants d'une Machine Abstraite (MA)</h3>
+
+        <p>L'approche B est orientée "modèle à états". Le système est décrit par une machine abstraite contenant un état interne, des propriétés invariantes, une initialisation et des opérations (transitions).</p>
+
+        <pre><code>MACHINE Nom (paramètres)
+SETS S                     -- Ensembles définissant les types
+VARIABLES V                -- Variables d’état
+INVARIANTS INV             -- Propriétés d’invariance (ce qui doit toujours être vrai)
+INITIALISATION INIT        -- État de départ
+OPERATIONS op  P|S        -- Services offerts
+END;</code></pre>
+
+        <div class="callout-info">
+            <strong>Opérations :</strong> Spécifier une opération, c'est définir sa <em>précondition</em> (les contraintes d'entrée) et son effet (corps de l'opération modifiant l'état).
+        </div>
+
+        <!-- ── 3. Exemple de MA ── -->
+        <h3>3. Exemple : Système de réservation</h3>
+
+        <p>On modélise un système de réservation de places numérotées de $1$ à $nbmax$.</p>
+
+        <div class="algo-block" data-name="Machine Abstraite : Réservation">
+<pre><code>MACHINE Reservation(nbmax)
+CONSTRAINTS
+    nbmax : 1..MAXINT
+DEFINITIONS
+    SIEGES == (1..nbmax)
+VARIABLES
+    occupes, nblibre
+INVARIANT
+    occupes ⊆ SIEGES ∧
+    nblibre ∈ 0..nbmax ∧
+    nblibre = nbmax - card(occupes)
+INITIALISATION
+    occupes := ∅ || nblibre := nbmax
+OPERATIONS
+    nb <-- place_libre = BEGIN nb := nblibre END
+
+    pp <-- reserver =
+       PRE card(occupes) ≠ nbmax THEN
+           ANY place WHERE place ∈ SIEGES - occupes THEN
+               pp := place || 
+               occupes := occupes ∪ {place} || 
+               nblibre := nblibre - 1
+           END
+       END
+
+    liberer(place) =
+       PRE place ∈ occupes THEN
+           occupes := occupes - {place} || 
+           nblibre := nblibre + 1
+       END
+END</code></pre>
+        </div>
+
+        <!-- ── 4. Obligations de Preuve ── -->
+        <h3>4. Obligations de Preuve (PO - Proof Obligations)</h3>
+
+        <p>Pour garantir la correction mathématique du modèle défini par une MA, le développeur doit décharger des preuves appelées <strong>Obligations de Preuve (PO)</strong>.</p>
+
+        <div class="theorem-box" data-label="Règles de Preuve B">
+            Soit $I$ l'invariant, $U$ l'initialisation, et $S$ une opération sous la précondition $P$.
+            <ol>
+                <li><strong>Initialisation :</strong> L'initialisation doit établir l'invariant. On doit prouver $[U]I$.</li>
+                <li><strong>Conservation :</strong> Chaque opération invoquée dans sa précondition doit préserver l'invariant. On doit prouver $I \land P \implies [S]I$.</li>
+            </ol>
+        </div>
+
+        <h4>Application à l'opération de réservation</h4>
+        <p>Lorsqu'on réserve une place, la post-condition (nouvel état) remplace <code>occupes</code> par <code>occupes ∪ {place}</code> et <code>nblibre</code> par <code>nblibre - 1</code>. Les PO s'écrivent :</p>
+        <div class="formula-box">
+            $$occupes \cup \{place\} \subseteq SIEGES$$
+            $$nblibre - 1 \in 0..nbmax$$
+            $$nblibre - 1 = nbmax - \text{card}(occupes \cup \{place\})$$
+            <span class="formula-label">Exemple de PO à démontrer à partir de $I \land P$</span>
+        </div>
+
+        <!-- ── 5. Raffinement ── -->
+        <h3>5. Raffinement et Implémentation</h3>
+
+        <p>Le <strong>raffinement</strong> est l'étape où l'on ajoute des précisions au modèle abstrait pour se rapprocher du code exécutable. Il consiste à :</p>
+        <ul>
+            <li>Représenter concrètement des données abstraites (ex: remplacer un ensemble mathématique <code>occupes</code> par un tableau de booléens <code>etat</code>).</li>
+            <li>Réduire le non-déterminisme (ex: l'opération <code>reserver</code> utilisait <code>ANY place</code> ; le raffinement va imposer de prendre la première place libre, via <code>min()</code>).</li>
+            <li>Affaiblir les préconditions si nécessaire.</li>
+        </ul>
+
+        <div class="highlight-box">
+            <strong>Invariant de liaison :</strong> Lors du raffinement, on doit définir un lien entre les variables abstraites et concrètes. Par exemple : $occupes = \{s \in SIEGES \mid etat(s) = \text{TRUE}\}$.
+        </div>
+
+        <p><strong>L'implémentation :</strong> C'est l'étape ultime du raffinement, où le code respecte toutes les contraintes d'un langage de programmation impératif classique (retrait des affectations parallèles au profit du séquencement, utilisation de pointeurs, etc.).</p>
+
+    </div>
+
+</body>
+</html>

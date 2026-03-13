@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 5 — Vérification de formules sur un préfixe de trace</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 9 pts</span>
+            <span class="exo-time">⏱ 15–20 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Évaluer une formule LTL sur une trace finie donnée</li>
+                <li>Appliquer la sémantique de □ et ◇ en repérant l'instant critique</li>
+                <li>Trouver un contre-exemple précis pour réfuter une formule universelle</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> Cours — <em>Sémantique LTL, évaluation sur trace</em></p>
+    </div>
+
+    <div class="context-block">
+        <h3>Préfixe de trace</h3>
+        <p>
+            On considère le préfixe de trace suivant, avec des propositions atomiques <code>p</code>, <code>q</code>, <code>r</code> :
+        </p>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr>
+                        <th>i</th>
+                        <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>σ(i)</strong></td>
+                        <td>{q,r}</td><td>{q}</td><td>∅</td><td>{p,r}</td><td>{p}</td><td>{r}</td><td>{p,r}</td>
+                    </tr>
+                    <tr>
+                        <td><code>p</code></td>
+                        <td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td>
+                    </tr>
+                    <tr>
+                        <td><code>q</code></td>
+                        <td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+                    </tr>
+                    <tr>
+                        <td><code>r</code></td>
+                        <td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="inline-note">
+            La trace est évaluée depuis i = 0. Pour une formule □φ ou ◇φ, l'évaluation commence à i = 0
+            et porte sur les instants 0 à 6 (préfixe fini).
+        </p>
+    </div>
+
+    <button class="hint-btn" data-hint="rappel-ltl-ex5" data-label="Rappel : évaluation sur une trace" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel : évaluation sur une trace</span>
+    </button>
+    <div class="hint" id="rappel-ltl-ex5">
+        <p><strong>◇φ vraie à partir de i :</strong> il existe un j ≥ i tel que φ est vraie en σ(j).</p>
+        <p><strong>□φ vraie à partir de i :</strong> pour tout j ≥ i, φ est vraie en σ(j).</p>
+        <p><strong>φ ⇒ ψ :</strong> fausse seulement quand φ est vraie ET ψ est fausse.</p>
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Méthode</span></p>
+            <ul class="steps">
+                <li>Pour ◇φ : chercher le <em>premier</em> instant i où φ est vraie.</li>
+                <li>Pour □φ : chercher le <em>premier</em> instant i où φ est <em>fausse</em> (contre-exemple).</li>
+                <li>Pour □(φ ⇒ ψ) : tester à chaque instant où φ est vraie si ψ l'est aussi.</li>
+            </ul>
+        </div>
+    </div>
+
+
+    <!-- Q1 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>La formule <code>◇p</code> est-elle vraie sur ce préfixe depuis i = 0 ? Justifier.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Vérifier seulement σ(0). ◇p ne demande pas que p soit vrai
+            en i = 0, mais qu'il existe <em>un</em> instant ≥ 0 où p est vrai.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1-ex5" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q1-h1-ex5">
+            Parcourez la ligne p dans le tableau : y a-t-il un instant où p = 1 ?
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="◇p est vraie / fausse car… (indiquer l'instant témoin si vrai, ou l'argument si faux)"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+            <p><strong>◇p est VRAIE.</strong></p>
+            <p>
+                À i = 3 : p ∈ σ(3) = {p,r}, donc p est vraie en i = 3.
+                Comme 3 ≥ 0, il existe bien un instant ≥ 0 où p est vraie.
+            </p>
+            <p class="inline-note">Instants témoins possibles : 3, 4 ou 6 (tous ont p = 1).</p>
+        </div>
+    </div>
+
+
+    <!-- Q2 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>La formule <code>◇q</code> est-elle vraie sur ce préfixe depuis i = 0 ? Justifier.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Constater que q disparaît après i = 1 et en conclure que ◇q est fausse.
+            ◇q est évalué depuis i = 0, donc i = 0 ou i = 1 suffisent comme témoins.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1-ex5" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q2-h1-ex5">
+            q ∈ σ(0) = {q,r}. Un instant ≥ 0 où q est vrai existe dès le départ.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="◇q est vraie / fausse car…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+            <p><strong>◇q est VRAIE.</strong></p>
+            <p>
+                À i = 0 : q ∈ σ(0) = {q,r}, donc q est vraie en i = 0.
+                Bien que q ne réapparaisse pas après i = 1, un seul instant témoin suffit pour ◇q.
+            </p>
+        </div>
+    </div>
+
+
+    <!-- Q3 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q3</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>La formule <code>□(p ⇒ ◇q)</code> est-elle vraie sur ce préfixe depuis i = 0 ? Justifier en identifiant précisément le contre-exemple le cas échéant.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Vérifier □φ en testant seulement i = 0. Pour □(p ⇒ ◇q),
+            il faut tester <em>chaque instant i</em> où p est vrai et vérifier que ◇q est vraie depuis ce i.
+        </div>
+
+        <button class="hint-btn" data-hint="q3-h1-ex5" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q3-h1-ex5">
+            Les instants où p est vrai sont i = 3, 4, 6. Pour chacun, vérifiez si q apparaît
+            dans σ(i), σ(i+1), σ(i+2)…
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q3-h2-ex5" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q3-h2-ex5">
+            Depuis i = 3, les états restants sont σ(3)={p,r}, σ(4)={p}, σ(5)={r}, σ(6)={p,r}.
+            q apparaît-il dans l'un d'eux ?
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="□(p ⇒ ◇q) est vraie / fausse car… (donner le contre-exemple précis)"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q3</h4>
+            <p><strong>□(p ⇒ ◇q) est FAUSSE.</strong></p>
+            <p><strong>Contre-exemple :</strong> i = 3.</p>
+            <ul>
+                <li>En i = 3 : p ∈ σ(3) = {p,r} → l'hypothèse de l'implication est vraie</li>
+                <li>Depuis i = 3 : les états restants sont σ(3)={p,r}, σ(4)={p}, σ(5)={r}, σ(6)={p,r}</li>
+                <li>Aucun de ces états ne contient q → ◇q est <strong>fausse</strong> depuis i = 3</li>
+            </ul>
+            <p>
+                Donc en i = 3 : <code>p ⇒ ◇q</code> = VRAI ⇒ FAUX = <strong>FAUX</strong>.
+                La formule □(p ⇒ ◇q) exige que cela soit vrai à <em>tout</em> instant — or elle est fausse en i = 3.
+            </p>
+            <p class="inline-note">
+                Le même argument s'applique pour i = 4 et i = 6 : p y est vrai, mais q n'apparaît plus dans la suite.
+            </p>
+        </div>
+    </div>
+
+
+    <div class="bareme">
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q1 — ◇p</span>
+        <span class="bareme-desc">2 pts réponse correcte (VRAI) · 1 pt instant témoin explicité (i=3, 4 ou 6)</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q2 — ◇q</span>
+        <span class="bareme-desc">2 pts réponse correcte (VRAI) · 1 pt instant témoin explicité (i=0 ou 1)</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q3 — □(p ⇒ ◇q)</span>
+        <span class="bareme-desc">1 pt réponse correcte (FAUX) · 2 pts contre-exemple i=3 justifié (p vrai, q absent de la suite)</span>
+
+        <div class="bareme-total">Total : <strong>9 pts</strong></div>
+    </div>
+
+
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Si la trace était infinie et bouclait de σ(6) vers σ(0), la formule □(p ⇒ ◇q) serait-elle vraie ? Justifier.</li>
+            <li>Évaluer <code>□◇p</code> et <code>◇□p</code> sur cette trace finie. Quelle est la différence ?</li>
+            <li>Construire une trace de longueur 5 sur laquelle <code>□(p ⇒ ◇q)</code> est vraie.</li>
+        </ul>
+    </div>
+
+</body>
+</html>

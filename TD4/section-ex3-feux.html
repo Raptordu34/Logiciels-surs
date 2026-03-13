@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 3 — Feux de circulation</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 18 pts</span>
+            <span class="exo-time">⏱ 25–35 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Modéliser un système cyclique en Logique Temporelle Linéaire</li>
+                <li>Utiliser les opérateurs □, ◇, ○ et U pour exprimer des propriétés de sûreté et de vivacité</li>
+                <li>Distinguer "exclusion mutuelle" (sûreté) de "progression infinie" (vivacité)</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> Cours — <em>Opérateurs LTL, propriétés de sûreté et de vivacité</em></p>
+    </div>
+
+    <div class="context-block">
+        <h3>Feux de circulation — modèle</h3>
+        <p>
+            On considère trois variables propositionnelles atomiques :
+            <code>v</code> (feu vert), <code>r</code> (feu rouge), <code>j</code> (feu jaune).
+        </p>
+        <p>
+            L'ordre du changement de couleur est : <strong>vert → jaune → rouge → vert → …</strong>
+            On suppose que les trois couleurs fonctionnent toujours (aucune panne).
+        </p>
+        <div class="highlight-box">
+            <p><span class="badge badge-blue">Cycle du feu</span></p>
+            <pre><code>vert (v) ──→ jaune (j) ──→ rouge (r) ──→ vert (v) ──→ …</code></pre>
+        </div>
+    </div>
+
+    <button class="hint-btn" data-hint="rappel-ltl-ex3" data-label="Rappel de cours — Sûreté vs vivacité" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours — Sûreté vs vivacité</span>
+    </button>
+    <div class="hint" id="rappel-ltl-ex3">
+        <p><strong>Propriété de sûreté :</strong> quelque chose de mauvais n'arrive jamais. Typiquement de la forme <code>□φ</code>.</p>
+        <p><strong>Propriété de vivacité :</strong> quelque chose de bon finit toujours par arriver. Typiquement de la forme <code>□◇φ</code> ou <code>◇φ</code>.</p>
+        <p><strong>Exclusion mutuelle :</strong> deux états ne peuvent pas être vrais simultanément.</p>
+        <ul>
+            <li><code>□¬(v∧r)</code> = "jamais vert et rouge en même temps"</li>
+            <li><code>□(v → ¬r ∧ ¬j)</code> = "quand c'est vert, ni rouge ni jaune" (formulation équivalente)</li>
+        </ul>
+        <p><strong>Exactement un parmi n :</strong> au moins un ET pas deux simultanément.</p>
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Repère</span></p>
+            <p><code>□(v → (v U j))</code> : "toujours, si vert, alors vert reste vrai jusqu'au jaune".
+            Différent de <code>□(v → ○j)</code> qui forcerait le changement à l'instant suivant (le feu ne pourrait rester vert qu'un seul instant).</p>
+        </div>
+    </div>
+
+    <h3 style="margin-top: 1.5rem;">Partie 1 — Exprimer en logique temporelle</h3>
+
+    <!-- Q1 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>
+            À tout moment, le feu a <strong>exactement une</strong> des 3 couleurs
+            (ni zéro couleur, ni deux simultanément).
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Écrire seulement <code>□(v∨r∨j)</code> — cela garantit "au moins une couleur"
+            mais ne dit pas "au plus une". Il faut aussi exclure toutes les paires simultanées.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            Pour "exactement un parmi {v, j, r}" : <br>
+            (1) au moins un : <code>v ∨ j ∨ r</code><br>
+            (2) au plus un : aucune paire possible → <code>¬(v∧j) ∧ ¬(v∧r) ∧ ¬(j∧r)</code><br>
+            Mettez □ devant la conjonction.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            Formulation alternative (3 cas exclusifs) :<br>
+            <code>□( (v∧¬j∧¬r) ∨ (¬v∧j∧¬r) ∨ (¬v∧¬j∧r) )</code><br>
+            Les deux formulations sont équivalentes.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Votre formule LTL pour Q1…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+            <pre><code>□( (v ∧ ¬j ∧ ¬r)
+ ∨ (¬v ∧ j ∧ ¬r)
+ ∨ (¬v ∧ ¬j ∧ r) )</code></pre>
+            <p>Ou de façon équivalente (au moins un ET pas deux) :</p>
+            <pre><code>□(v ∨ j ∨ r)  ∧  □¬(v∧j)  ∧  □¬(v∧r)  ∧  □¬(j∧r)</code></pre>
+        </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>
+            Si le feu est dans un état vert, cette couleur persiste jusqu'à ce qu'on passe au jaune.
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Écrire <code>□(v → ○j)</code> — cela forcerait le feu à passer
+            immédiatement au jaune à l'instant suivant, interdisant au feu de rester vert plusieurs instants.
+            L'opérateur Until (U) est nécessaire ici.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            <code>φ U ψ</code> = "φ reste vrai jusqu'à ce que ψ devienne vrai". Ici φ = v et ψ = j.
+            Avec le □ devant : "à tout instant vert, cette propriété s'applique".
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Votre formule LTL pour Q2…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+            <pre><code>□(v → (v U j))</code></pre>
+            <p>Se lit : "À tout instant, si le feu est vert, alors il reste vert jusqu'à ce qu'il passe au jaune."</p>
+            <p class="inline-note">
+                <code>v U j</code> garantit deux choses : (1) v est vrai à chaque instant intermédiaire,
+                (2) j finit par devenir vrai.
+            </p>
+        </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q3</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>
+            Description générale de l'ordre du changement des couleurs des feux :
+            chaque couleur est immédiatement suivie de la couleur qui lui succède dans le cycle v→j→r→v.
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Oublier la flèche retour <code>r → v</code> (cycle complet).
+            La formule doit couvrir les trois transitions.
+        </div>
+
+        <button class="hint-btn" data-hint="q3-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q3-h1">
+            Utilisez l'opérateur ○ (suivant) : à l'instant où le feu est vert, l'instant suivant est jaune, etc.
+            Combinez trois implications avec □ et ○.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Votre formule LTL pour Q3…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q3</h4>
+            <pre><code>□(v → ○j)  ∧  □(j → ○r)  ∧  □(r → ○v)</code></pre>
+            <p>
+                Se lit : "Toujours, vert est immédiatement suivi de jaune, jaune est immédiatement suivi de rouge,
+                et rouge est immédiatement suivi de vert."
+            </p>
+            <p class="inline-note">
+                Cette formule implique que chaque couleur ne dure qu'un seul instant. Pour modéliser un feu pouvant
+                rester plusieurs instants sur une couleur avant de changer, la formule de la Q2 (utilisant U) est plus adaptée.
+            </p>
+        </div>
+    </div>
+
+    <h3 style="margin-top: 1.5rem;">Partie 2 — Exprimer en LTL</h3>
+
+    <!-- Q4 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q4</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Le système ne reste pas tout le temps en feu rouge.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> <code>□¬r</code> dirait "jamais rouge" — c'est bien plus fort que demandé.
+            La propriété ici est une propriété de vivacité, pas d'exclusion.
+        </div>
+
+        <button class="hint-btn" data-hint="q4-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q4-h1">
+            "Ne reste pas rouge indéfiniment" = "il finira par ne pas être rouge" = "à un moment, ¬r sera vrai".
+            Quel opérateur LTL dit "à un moment" ?
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Votre formule LTL pour Q4…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q4</h4>
+            <pre><code>◇¬r</code></pre>
+            <p>Équivalent à <code>¬□r</code> ("il n'est pas vrai que r soit toujours vrai").</p>
+            <p class="inline-note">
+                <code>◇¬r</code> dit : "à un instant futur (ou présent), le feu ne sera pas rouge." C'est une propriété
+                de vivacité faible : le feu sortira un jour de l'état rouge.
+            </p>
+        </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q5</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Le système passe infiniment souvent du feu vert au feu rouge.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> <code>□◇(v∧r)</code> demanderait d'être vert et rouge simultanément — impossible.
+            Il faut distinguer les deux couleurs apparaissant à des instants différents dans le cycle.
+        </div>
+
+        <button class="hint-btn" data-hint="q5-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q5-h1">
+            "Infiniment souvent" en LTL s'exprime par <code>□◇φ</code> : "à tout instant, φ finit par arriver."
+            Si le feu passe infiniment souvent par le vert ET infiniment souvent par le rouge, les deux propriétés tiennent.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Votre formule LTL pour Q5…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q5</h4>
+            <pre><code>□◇v  ∧  □◇r</code></pre>
+            <p>
+                Se lit : "Le feu est infiniment souvent vert ET infiniment souvent rouge."
+            </p>
+            <p>
+                Pour capturer plus précisément le passage "de vert vers rouge" à chaque cycle :
+            </p>
+            <pre><code>□◇(v ∧ ○(¬v ∧ ◇r))</code></pre>
+            <p class="inline-note">
+                La formule courte <code>□◇v ∧ □◇r</code> est acceptée. La formule longue est plus précise
+                (elle spécifie l'ordre) mais plus complexe.
+            </p>
+        </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q6</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Le système passe infiniment souvent par le vert.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Confondre <code>□◇v</code> ("infiniment souvent vert", vivacité forte)
+            avec <code>◇□v</code> ("éventuellement vert pour toujours", hypothèse bien plus forte).
+        </div>
+
+        <button class="hint-btn" data-hint="q6-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q6-h1">
+            "Passer infiniment souvent par φ" = "à tout instant, on finira par voir φ" = GFφ = <code>□◇φ</code>.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Votre formule LTL pour Q6…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q6</h4>
+            <pre><code>□◇v</code></pre>
+            <p>
+                Se lit : "À tout instant, il existera un futur instant où le feu sera vert." Autrement dit : le feu
+                repasse toujours par le vert, sans jamais rester bloqué sur une autre couleur indéfiniment.
+            </p>
+        </div>
+    </div>
+
+
+    <div class="bareme">
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q1 — Exactement une couleur</span>
+        <span class="bareme-desc">1 pt "au moins un" · 2 pts exclusion mutuelle des 3 paires</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q2 — Persistance du vert jusqu'au jaune</span>
+        <span class="bareme-desc">1 pt □ · 1 pt implication v→ · 1 pt opérateur U correctement utilisé</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q3 — Ordre général du cycle</span>
+        <span class="bareme-desc">1 pt par transition (v→○j, j→○r, r→○v) avec □ devant</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q4 — Ne reste pas rouge indéfiniment</span>
+        <span class="bareme-desc">2 pts formule correcte · 1 pt justification</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q5 — Passe infiniment souvent de v à r</span>
+        <span class="bareme-desc">3 pts □◇v ∧ □◇r ou formule équivalente justifiée</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q6 — Passe infiniment souvent par le vert</span>
+        <span class="bareme-desc">2 pts □◇v correct · 1 pt distinction avec ◇□v expliquée</span>
+
+        <div class="bareme-total">Total : <strong>18 pts</strong></div>
+    </div>
+
+
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Exprimer la propriété de <em>fairness</em> : "chaque couleur est activée infiniment souvent". Est-ce la même chose que Q5 + Q6 combinés ?</li>
+            <li>Modifier la Q2 pour modéliser un feu qui peut aussi passer directement du vert au rouge (sans jaune obligatoire). Quelle formule faut-il ?</li>
+            <li>Vérifier la Q3 avec un model-checker (SPIN ou nuXmv) sur un modèle Kripke du feu à 3 états.</li>
+        </ul>
+    </div>
+
+</body>
+</html>

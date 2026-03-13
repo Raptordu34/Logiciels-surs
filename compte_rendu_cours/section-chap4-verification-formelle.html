@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/katex.min.css" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "$",  right: "$",  display: false }
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+    <script src="./section-utils.js" defer></script>
+</head>
+<body class="mode-detailed">
+
+    <h2>Chap 4 — Vérification formelle de logiciels</h2>
+
+    <!-- MODE RÉSUMÉ -->
+    <div class="compact-content">
+        <h3 style="margin-top: 0;">Synthèse</h3>
+        <ul>
+            <li><strong>Sémantique formelle</strong> — 3 approches : Opérationnelle (états et transitions), Dénotationnelle (fonctions), Axiomatique (assertions logiques).</li>
+            <li><strong>Sémantique Opérationnelle (SO)</strong> — vision impérative. Définit les règles d'évaluation via des systèmes d'inférence modifiant l'état mémoire.</li>
+            <li><strong>Sémantique Axiomatique (SA)</strong> — vision déclarative. Utilise les triplets de Hoare $\{P\} S \{Q\}$ pour prouver la correction.</li>
+            <li><strong>Logique de Dijkstra (wp)</strong> — approche ascendante. Calcule la plus faible précondition (weakest precondition) $Wp(S, Q)$ permettant d'atteindre $Q$.</li>
+        </ul>
+    </div>
+
+    <!-- MODE DÉTAILLÉ -->
+    <div class="detailed-content">
+
+        <!-- ── 1. Types de Sémantiques ── -->
+        <h3>1. Les trois approches de la sémantique formelle</h3>
+
+        <p>La sémantique permet de donner un sens rigoureux à l'exécution d'un programme, ouvrant la voie à la vérification formelle exhaustive de sa correction.</p>
+
+        <div class="compare-grid">
+            <div class="compare-item neutral" data-label="SO - Opérationnelle">
+                <p><strong>Vision impérative</strong><br>
+                Décrit le comportement exact de la machine et l'évolution des états (transitions). Orientée développeur de compilateur.</p>
+            </div>
+            <div class="compare-item neutral" data-label="SD - Dénotationnelle">
+                <p><strong>Vision fonctionnelle</strong><br>
+                Représente le programme par une fonction mathématique s'intéressant à l'effet final. Orientée concepteur de langages.</p>
+            </div>
+            <div class="compare-item neutral" data-label="SA - Axiomatique">
+                <p><strong>Vision déclarative</strong><br>
+                Prouve les propriétés via des assertions logiques (pré/post conditions). Orientée programmeur pour vérifier la correction.</p>
+            </div>
+        </div>
+
+        <!-- ── 2. Sémantique Opérationnelle ── -->
+        <h3>2. Sémantique Opérationnelle (SO)</h3>
+
+        <p>En SO, un programme est évalué par des règles de transition. L'état $S$ associe une valeur à chaque variable (ex: $S_x = 3$). On écrit la transition d'un état à un autre : $\langle cmd, S_1 \rangle \to S_2$.</p>
+
+        <h4>Règles d'évaluation (Système d'inférence)</h4>
+        <p>L'évaluation s'appuie sur des règles lues sous forme de fraction : prémisse sur conclusion.</p>
+
+        <div class="formula-box">
+            $$ \frac{\langle a_1, S \rangle \to n_1 \quad \langle a_2, S \rangle \to n_2}{\langle a_1 + a_2, S \rangle \to n_1 + n_2} $$
+            <span class="formula-label">Règle d'évaluation d'une addition</span>
+        </div>
+
+        <h4>Transitions des commandes</h4>
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Commande</th>
+                        <th>Règle de transition</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Affectation</td><td>$\langle x := e, S \rangle \to S[x \leftarrow m]$ (où $e$ s'évalue en $m$)</td></tr>
+                    <tr><td>Séquence</td><td>$\frac{\langle c_1, S \rangle \to S' \quad \langle c_2, S' \rangle \to S''}{\langle c_1 ; c_2, S \rangle \to S''}$</td></tr>
+                    <tr><td>Boucle While</td><td>$\frac{\langle b, S \rangle \to \text{true} \quad \langle c, S \rangle \to S' \quad \langle \text{While } b \text{ do } c, S' \rangle \to S''}{\langle \text{While } b \text{ do } c, S \rangle \to S''}$</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ── 3. Sémantique Axiomatique ── -->
+        <h3>3. Sémantique Axiomatique (Hoare & Dijkstra)</h3>
+
+        <h4>Logique de Hoare (Calcul descendant)</h4>
+        <p>Une action $S$ est spécifiée par une <strong>précondition</strong> $P$ et une <strong>postcondition</strong> $Q$.</p>
+        
+        <div class="highlight-box">
+            <strong>Triplet de Hoare :</strong> $\{P\} \; S \; \{Q\}$<br>
+            Si la propriété $P$ est vraie avant l'exécution de $S$, et si $S$ se termine, alors $Q$ est vraie après l'exécution.
+        </div>
+
+        <p><strong>Axiome de l'affectation :</strong> Pour que $P$ soit vraie pour $x$ après $x := E$, il faut qu'elle soit vraie pour $E$ avant l'affectation. Soit : $\{P[x \leftarrow E]\} \; x := E \; \{P\}$</p>
+
+        <div class="formula-box">
+            $$ \frac{P \implies P' \quad \{P'\} S \{Q'\} \quad Q' \implies Q}{\{P\} S \{Q\}} $$
+            <span class="formula-label">Règle de conséquence</span>
+        </div>
+
+        <h4>Logique de Dijkstra (Calcul ascendant - wp)</h4>
+        <p>Dijkstra propose de partir de la postcondition $Q$ pour calculer la <strong>plus faible précondition</strong> (wp) assurant la terminaison et $Q$. On note $Wp(S, Q)$.</p>
+        
+        <div class="theorem-box" data-label="Propriété de wp">
+            $\{P\} S \{Q\} \iff P \implies Wp(S, Q)$
+        </div>
+
+        <h4>Règles de calcul du Wp</h4>
+        <ul>
+            <li><strong>Skip :</strong> $Wp(\text{skip}, Q) = Q$</li>
+            <li><strong>Affectation :</strong> $Wp(x := e, Q) = Q[x \leftarrow e]$</li>
+            <li><strong>Séquence :</strong> $Wp(S_1 ; S_2, Q) = Wp(S_1, Wp(S_2, Q))$</li>
+            <li><strong>Conditionnelle :</strong> $Wp(\text{if } P \text{ then } S_1 \text{ else } S_2, Q) = (P \implies Wp(S_1, Q)) \land (\neg P \implies Wp(S_2, Q))$</li>
+        </ul>
+
+        <div class="algo-block" data-name="Exemple de calcul Wp">
+<pre><code>Wp(z:=2; y:=z+1; x:=y+z, x ∈ 3..8)
+= Wp(z:=2; Wp(y:=z+1; Wp(x:=y+z, x ∈ 3..8)))
+= Wp(z:=2; Wp(y:=z+1, y+z ∈ 3..8))
+= Wp(z:=2, z+1+z ∈ 3..8)
+= 2+1+2 ∈ 3..8
+= 5 ∈ 3..8
+= TRUE</code></pre>
+        </div>
+
+    </div>
+
+</body>
+</html>

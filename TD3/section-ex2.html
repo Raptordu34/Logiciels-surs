@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 2 — Règles d'exécution</h2>
+
+    <!-- ── EN-TÊTE ── -->
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 15 pts</span>
+            <span class="exo-time">⏱ 15–20 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Distinguer évaluation d'expression (→ valeur) et exécution d'instruction (→ nouvel état)</li>
+                <li>Appliquer les règles d'affectation, de conditionnelle et de boucle</li>
+                <li>Construire des arbres de dérivation pour des programmes complets</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours 1 — Sémantique opérationnelle · Exercice 1 (évaluation d'expressions)</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3 style="margin-top:0;">Du calcul de valeur à la transformation d'état</h3>
+        <p>
+            Dans l'exercice 1, les expressions produisaient une <strong>valeur</strong> : <code>⟨E, s⟩ → v</code>.
+            Les <strong>instructions</strong> produisent quant à elles un <strong>nouvel état</strong> : <code>⟨I, s⟩ → s'</code>.
+            L'affectation, le conditionnel et la boucle modifient la mémoire — ils ne calculent pas.
+        </p>
+    </div>
+
+    <!-- ── RAPPEL DE COURS ── -->
+    <button class="hint-btn" data-hint="rappel-instructions" data-label="Rappel de cours : règles des instructions" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours : règles des instructions</span>
+    </button>
+    <div class="hint" id="rappel-instructions">
+        <p>Chaque instruction possède une ou plusieurs règles de dérivation. Les prémisses sont au-dessus de la barre, la conclusion en dessous.</p>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Affectation</span></p>
+            <p>Si <code>⟨E, s⟩ → v</code>, alors <code>⟨x := E, s⟩ → s[x ↦ v]</code></p>
+            <p class="inline-note">Une seule prémisse : évaluer l'expression E, puis mettre à jour l'état.</p>
+        </div>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Conditionnelle — deux règles</span></p>
+            <ul>
+                <li>
+                    <strong>IF-Vrai :</strong> si <code>⟨B, s⟩ → Vrai</code> et <code>⟨I₁, s⟩ → s'</code>,<br>
+                    alors <code>⟨if B then I₁ else I₂, s⟩ → s'</code>
+                </li>
+                <li>
+                    <strong>IF-Faux :</strong> si <code>⟨B, s⟩ → Faux</code> et <code>⟨I₂, s⟩ → s'</code>,<br>
+                    alors <code>⟨if B then I₁ else I₂, s⟩ → s'</code>
+                </li>
+            </ul>
+            <p class="inline-note">On trace <strong>une seule branche</strong> selon la valeur de B — jamais les deux.</p>
+        </div>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Boucle — deux règles</span></p>
+            <ul>
+                <li>
+                    <strong>WHILE-Faux :</strong> si <code>⟨B, s⟩ → Faux</code>,<br>
+                    alors <code>⟨while B do I, s⟩ → s</code>
+                    <span class="inline-note"> (l'état ne change pas)</span>
+                </li>
+                <li>
+                    <strong>WHILE-Vrai :</strong> si <code>⟨B, s⟩ → Vrai</code>, <code>⟨I, s⟩ → s'</code> et <code>⟨while B do I, s'⟩ → s''</code>,<br>
+                    alors <code>⟨while B do I, s⟩ → s''</code>
+                </li>
+            </ul>
+            <p class="inline-note">WHILE-Vrai a <strong>trois prémisses</strong>. La troisième est récursive : on relance le même while dans le nouvel état.</p>
+        </div>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>Instruction</th><th>Prémisses</th><th>Conclusion</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>x := E</code></td>
+                        <td><code>⟨E, s⟩ → v</code></td>
+                        <td><code>⟨x := E, s⟩ → s[x ↦ v]</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>if B then I₁ else I₂</code></td>
+                        <td><code>⟨B, s⟩ → Vrai/Faux</code> + branche correspondante</td>
+                        <td><code>⟨if…, s⟩ → s'</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>while B do I</code> (arrêt)</td>
+                        <td><code>⟨B, s⟩ → Faux</code></td>
+                        <td><code>⟨while…, s⟩ → s</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>while B do I</code> (itération)</td>
+                        <td><code>⟨B,s⟩→Vrai</code> + <code>⟨I,s⟩→s'</code> + <code>⟨while…,s'⟩→s''</code></td>
+                        <td><code>⟨while…, s⟩ → s''</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Analogie</span></p>
+            <p><strong>Un état est un instantané de la mémoire.</strong> Chaque instruction produit un <em>nouvel</em> instantané. L'arbre de dérivation est le journal de toutes les transformations successives — comme un historique de commits git, chaque état dérivant du précédent.</p>
+        </div>
+    </div>
+
+    <!-- ── SCAFFOLDING ── -->
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple guidé — Affectation</span></p>
+            <p>Exécuter <code>y := y + 2</code> dans l'état s avec <code>s(y) = 5</code>.</p>
+            <ul>
+                <li>Prémisse : <code>⟨y + 2, s⟩ → 7</code> (règle op. binaire sur <code>⟨y,s⟩→5</code> et <code>⟨2,s⟩→2</code>)</li>
+                <li>Conclusion — règle Affectation : <code>⟨y := y + 2, s⟩ → s[y ↦ 7]</code></li>
+            </ul>
+            <p class="inline-note">L'état résultant n'est pas "7" — c'est un état complet où y vaut 7.</p>
+        </div>
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Méthode générale</span></p>
+            <ul class="steps">
+                <li>Identifier la règle principale (affectation / if / while).</li>
+                <li>Lister ses prémisses dans l'ordre.</li>
+                <li>Construire chaque prémisse (souvent un sous-arbre d'expression).</li>
+                <li>Écrire la conclusion avec le bon état résultant.</li>
+            </ul>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 1                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">5 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>
+            Appliquez les règles de la sémantique opérationnelle pour exécuter :<br>
+            <code>x := x + 1</code> dans l'état <code>s</code> tel que <code>s(x) = 2</code>.
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Écrire l'état résultant comme une valeur seule (<code>3</code>).
+            L'affectation modifie l'état — la conclusion doit être <code>⟨x := x+1, s⟩ → s[x ↦ 3]</code>, pas "x vaut 3".
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            La règle Affectation a <strong>une seule prémisse</strong> : évaluer l'expression à droite de <code>:=</code>.
+            Construisez d'abord le sous-arbre pour <code>⟨x + 1, s⟩ → ?</code>.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            <code>⟨x + 1, s⟩ → 3</code> car <code>s(x)=2</code> et <code>2+1=3</code>.
+            Appliquez maintenant la règle Affectation : <code>⟨x := x+1, s⟩ → s[x ↦ 3]</code>.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Construisez ici l'arbre de dérivation de Q1…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <div style="display: flex; justify-content: center; margin: 1.5rem 0; overflow-x: auto;">
+                <div style="display: inline-flex; flex-direction: column; align-items: center; font-family: 'Courier New', monospace; white-space: nowrap; color: var(--text-primary);">
+
+                    <!-- Prémisse : évaluation de x + 1 -->
+                    <div style="display: inline-flex; flex-direction: column; align-items: center; padding-bottom: 0.4rem;">
+                        <div style="display: flex; gap: 1.5rem; padding-bottom: 0.4rem;">
+                            <span>⟨x, s⟩ → 2</span>
+                            <span>⟨1, s⟩ → 1</span>
+                        </div>
+                        <div style="border-top: 1px solid currentColor; width: 100%; text-align: center; padding-top: 0.4rem;">
+                            ⟨x + 1, s⟩ → 3
+                        </div>
+                    </div>
+
+                    <!-- Conclusion : affectation -->
+                    <div style="border-top: 1px solid currentColor; width: 100%; text-align: center; padding-top: 0.4rem;">
+                        ⟨x := x + 1, s⟩ → s[x ↦ 3]
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="callout-info">
+                <strong>Règles appliquées</strong>
+                <ul>
+                    <li><code>⟨x, s⟩ → 2</code> — règle <em>Variable</em> : s(x) = 2</li>
+                    <li><code>⟨1, s⟩ → 1</code> — règle <em>Entier</em></li>
+                    <li><code>⟨x+1, s⟩ → 3</code> — règle <em>Op. binaire (+)</em> : 2+1 = 3</li>
+                    <li><code>⟨x := x+1, s⟩ → s[x ↦ 3]</code> — règle <em>Affectation</em></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 2                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">5 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>
+            Appliquez les règles de la sémantique opérationnelle pour exécuter :<br>
+            <code>if x &lt; 0 then x := x − 1 else x := x + 1</code>
+            dans l'état <code>s</code> tel que <code>s(x) = 5</code>.
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Tracer les deux branches (then <em>et</em> else) dans l'arbre.
+            La règle conditionnelle sélectionne <strong>une seule branche</strong> selon la valeur de vérité de la condition. L'autre branche n'apparaît pas dans la dérivation.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            Évaluez d'abord la condition <code>x &lt; 0</code> dans l'état s avec <code>s(x) = 5</code>.
+            Est-ce Vrai ou Faux ? Quelle règle (IF-Vrai ou IF-Faux) s'applique ?
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q2-h2">
+            <code>5 &lt; 0</code> est <strong>Faux</strong> → règle IF-Faux.
+            Les deux prémisses sont : (1) <code>⟨x &lt; 0, s⟩ → Faux</code> et (2) <code>⟨x := x + 1, s⟩ → ?</code>.
+            Construisez chacune de ces deux prémisses, puis écrivez la conclusion.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Construisez ici l'arbre de dérivation de Q2…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+            <p>La condition <code>x &lt; 0</code> est Fausse (5 &lt; 0 = Faux) → règle <strong>IF-Faux</strong>, deux prémisses :</p>
+
+            <div style="display: flex; justify-content: center; margin: 1.5rem 0; overflow-x: auto;">
+                <div style="display: inline-flex; flex-direction: column; align-items: center; font-family: 'Courier New', monospace; white-space: nowrap; color: var(--text-primary);">
+
+                    <div style="display: flex; gap: 3rem; align-items: flex-end; padding-bottom: 0.4rem;">
+
+                        <!-- Prémisse 1 : évaluation de la condition (Faux) -->
+                        <div style="display: inline-flex; flex-direction: column; align-items: center;">
+                            <div style="display: flex; gap: 1.5rem; padding-bottom: 0.4rem;">
+                                <span>⟨x, s⟩ → 5</span>
+                                <span>⟨0, s⟩ → 0</span>
+                            </div>
+                            <div style="border-top: 1px solid currentColor; width: 100%; text-align: center; padding-top: 0.4rem;">
+                                ⟨x &lt; 0, s⟩ → Faux
+                            </div>
+                        </div>
+
+                        <!-- Prémisse 2 : branche else (affectation x := x + 1) -->
+                        <div style="display: inline-flex; flex-direction: column; align-items: center;">
+                            <div style="display: flex; gap: 1.5rem; padding-bottom: 0.4rem;">
+                                <span>⟨x, s⟩ → 5</span>
+                                <span>⟨1, s⟩ → 1</span>
+                            </div>
+                            <div style="border-top: 1px solid currentColor; width: 100%; text-align: center; padding-top: 0.4rem;">
+                                ⟨x + 1, s⟩ → 6
+                            </div>
+                            <div style="border-top: 1px solid currentColor; width: 100%; text-align: center; padding-top: 0.4rem; margin-top: 0.4rem;">
+                                ⟨x := x + 1, s⟩ → s[x ↦ 6]
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Conclusion : IF-Faux -->
+                    <div style="border-top: 1px solid currentColor; width: 100%; text-align: center; padding-top: 0.4rem;">
+                        ⟨if x &lt; 0 then x := x−1 else x := x+1, s⟩ → s[x ↦ 6]
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="callout-info">
+                <strong>Règles appliquées</strong>
+                <ul>
+                    <li>Prémisse gauche — règle <em>Op. binaire (&lt;)</em> sur <code>⟨x,s⟩→5</code> et <code>⟨0,s⟩→0</code> → Faux</li>
+                    <li>Prémisse droite — règle <em>Affectation</em> sur la branche else (x := x+1 → s[x↦6])</li>
+                    <li>Conclusion — règle <em>IF-Faux</em> : état résultant s[x ↦ 6]</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 3                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="highlight-box">
+        <p><span class="badge badge-orange">Méthode — Boucle while</span></p>
+        <ul class="steps">
+            <li>Nommer les états intermédiaires : s₀ (état initial), s₁ (après le corps), etc.</li>
+            <li>Évaluer la condition dans l'état courant — Vrai → règle WHILE-Vrai (3 prémisses), Faux → règle WHILE-Faux (1 prémisse).</li>
+            <li>Construire le sous-arbre du corps (affectation ou séquence).</li>
+            <li>Ajouter la troisième prémisse : relancer récursivement le while dans le nouvel état.</li>
+        </ul>
+    </div>
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q3</span>
+            <span class="question-pts">5 pts</span>
+            <span class="diff-badge diff-avance">Avancé</span>
+        </div>
+        <p>
+            Appliquez les règles de la sémantique opérationnelle pour exécuter :<br>
+            <code>while x &lt; 100 do x := x * 2</code>
+            dans l'état <code>s</code> tel que <code>s(x) = 50</code>.
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Oublier la troisième prémisse de WHILE-Vrai.
+            La règle exige de prouver que le <code>while</code> <em>termine aussi</em> dans le nouvel état s₁.
+            Sans cette prémisse récursive, la preuve est incomplète.
+        </div>
+
+        <button class="hint-btn" data-hint="q3-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q3-h1">
+            Notez s₀ = s (avec s₀(x) = 50) et s₁ = s[x ↦ 100] (état après le corps).
+            La boucle s'exécute <strong>une seule fois</strong> : vérifiez pourquoi la condition est vraie en s₀ et fausse en s₁.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q3-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q3-h2">
+            L'arbre principal applique WHILE-Vrai avec trois prémisses côte à côte :
+            (1) <code>⟨x &lt; 100, s₀⟩ → Vrai</code>,
+            (2) <code>⟨x := x*2, s₀⟩ → s₁</code>,
+            (3) <code>⟨while x &lt; 100 do…, s₁⟩ → s₁</code> — cette dernière utilise WHILE-Faux car 100 &lt; 100 est Faux.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Construisez ici l'arbre de dérivation de Q3…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q3</h4>
+            <p>On pose <strong>s₀ = s</strong> (s₀(x) = 50) et <strong>s₁ = s[x ↦ 100]</strong>.</p>
+            <p>La condition est vraie en s₀ (50 &lt; 100) → règle <strong>WHILE-Vrai</strong>, trois prémisses.</p>
+
+            <div style="display: flex; justify-content: center; margin: 1.5rem 0; overflow-x: auto;">
+                <div style="display: inline-flex; flex-direction: column; align-items: center; font-family: 'Courier New', monospace; white-space: nowrap; color: var(--text-primary); font-size: 0.88em;">
+
+                    <div style="display: flex; gap: 2rem; align-items: flex-end; padding-bottom: 0.4rem;">
+
+                        <!-- Prémisse 1 : condition vraie en s₀ -->
+                        <div style="display: inline-flex; flex-direction: column; align-items: center;">
+                            <div style="display: flex; gap: 1rem; padding-bottom: 0.4rem;">
+                                <span>⟨x, s₀⟩ → 50</span>
+                                <span>⟨100, s₀⟩ → 100</span>
+                            </div>
+                            <div style="border-top: 1px solid currentColor; width: 100%; text-align: center; padding-top: 0.4rem;">
+                                ⟨x &lt; 100, s₀⟩ → Vrai
+                            </div>
+                        </div>
+
+                        <!-- Prémisse 2 : corps x := x * 2 -->
+                        <div style="display: inline-flex; flex-direction: column; align-items: center;">
+                            <div style="display: flex; gap: 1rem; padding-bottom: 0.4rem;">
+                                <span>⟨x, s₀⟩ → 50</span>
+                                <span>⟨2, s₀⟩ → 2</span>
+                            </div>
+                            <div style="border-top: 1px solid currentColor; width: 100%; text-align: center; padding-top: 0.4rem;">
+                                ⟨x * 2, s₀⟩ → 100
+                            </div>
+                            <div style="border-top: 1px solid currentColor; width: 100%; text-align: center; padding-top: 0.4rem; margin-top: 0.4rem;">
+                                ⟨x := x * 2, s₀⟩ → s₁
+                            </div>
+                        </div>
+
+                        <!-- Prémisse 3 : while récursif dans s₁ (WHILE-Faux) -->
+                        <div style="display: inline-flex; flex-direction: column; align-items: center;">
+                            <div style="display: inline-flex; flex-direction: column; align-items: center; padding-bottom: 0.4rem;">
+                                <div style="display: flex; gap: 1rem; padding-bottom: 0.4rem;">
+                                    <span>⟨x, s₁⟩ → 100</span>
+                                    <span>⟨100, s₁⟩ → 100</span>
+                                </div>
+                                <div style="border-top: 1px solid currentColor; width: 100%; text-align: center; padding-top: 0.4rem;">
+                                    ⟨x &lt; 100, s₁⟩ → Faux
+                                </div>
+                            </div>
+                            <div style="border-top: 1px solid currentColor; width: 100%; text-align: center; padding-top: 0.4rem;">
+                                ⟨while x &lt; 100 do…, s₁⟩ → s₁
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Conclusion : WHILE-Vrai global -->
+                    <div style="border-top: 1px solid currentColor; width: 100%; text-align: center; padding-top: 0.4rem;">
+                        ⟨while x &lt; 100 do x := x * 2, s₀⟩ → s₁
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="callout-info">
+                <strong>Règles appliquées</strong>
+                <ul>
+                    <li>Prémisse 1 — règle <em>Op. binaire (&lt;)</em> : 50 &lt; 100 → Vrai</li>
+                    <li>Prémisse 2 — règles <em>Op. binaire (*)</em> puis <em>Affectation</em> : s₀ → s₁ = s[x ↦ 100]</li>
+                    <li>Prémisse 3 — règle <em>WHILE-Faux</em> dans s₁ : 100 &lt; 100 → Faux, état inchangé</li>
+                    <li>Conclusion — règle <em>WHILE-Vrai</em> : état final s₁ = s[x ↦ 100]</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">5</span>
+        <span class="bareme-label">Q1 — Affectation</span>
+        <span class="bareme-desc">2 pts sous-arbre expression · 2 pts conclusion affectation · 1 pt notation état résultant correcte</span>
+
+        <span class="bareme-pts">5</span>
+        <span class="bareme-label">Q2 — Conditionnelle</span>
+        <span class="bareme-desc">2 pts condition évaluée à Faux · 1 pt règle IF-Faux identifiée · 2 pts branche else construite</span>
+
+        <span class="bareme-pts">5</span>
+        <span class="bareme-label">Q3 — Boucle while</span>
+        <span class="bareme-desc">1 pt nommage états · 2 pts prémisses 1 et 2 · 2 pts prémisse récursive WHILE-Faux + conclusion</span>
+
+        <div class="bareme-total">Total : <strong>15 pts</strong></div>
+    </div>
+
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Que se passerait-il si <code>s(x) = 100</code> dans Q3 ? Quel sous-arbre très court obtient-on ?</li>
+            <li>Ajoutez une <strong>séquence</strong> : <code>x := x + 1 ; y := x * 2</code> avec <code>s(x) = 3</code>. Combien d'états intermédiaires faut-il nommer ?</li>
+            <li>Pour quelles valeurs initiales de x la boucle <code>while x &lt; 100 do x := x * 2</code> ne terminerait-elle pas ? La sémantique à grands pas peut-elle représenter la non-terminaison ?</li>
+        </ul>
+    </div>
+
+</body>
+</html>

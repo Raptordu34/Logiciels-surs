@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 7 — ◇a ∧ ◇b vs ◇(a ∧ b)</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-avance">Avancé</span>
+            <span class="exo-points">◎ 6 pts</span>
+            <span class="exo-time">⏱ 10–15 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Distinguer la conjonction d'occurrences distinctes de la simultanéité</li>
+                <li>Construire un contre-exemple minimal pour séparer deux formules</li>
+                <li>Raisonner sur les propriétés de séparation en LTL</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> Cours — <em>Opérateurs LTL : ◇, ∧ ; sémantique sur traces</em></p>
+    </div>
+
+    <div class="context-block">
+        <h3>Les deux formules à comparer</h3>
+
+        <div class="two-col">
+            <div class="highlight-box">
+                <p><span class="badge badge-orange">Formule A</span></p>
+                <p style="text-align:center; font-size:1.1rem;"><code>◇a ∧ ◇b</code></p>
+                <p>
+                    <em>a est vraie à un moment</em> ET <em>b est vraie à un moment</em>
+                    (les deux instants peuvent être différents).
+                </p>
+            </div>
+            <div class="highlight-box">
+                <p><span class="badge badge-blue">Formule B</span></p>
+                <p style="text-align:center; font-size:1.1rem;"><code>◇(a ∧ b)</code></p>
+                <p>
+                    Il existe un instant où <em>a et b sont simultanément vraies</em>.
+                </p>
+            </div>
+        </div>
+
+        <div class="callout-info">
+            <p><strong>Question :</strong> Ces deux formules sont-elles équivalentes ? Si non, laquelle implique l'autre ?
+            Donner un système de transitions (ST) illustrant la différence.</p>
+        </div>
+    </div>
+
+    <button class="hint-btn" data-hint="rappel-ltl-ex7" data-label="Rappel : implication entre formules LTL" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel : implication entre formules LTL</span>
+    </button>
+    <div class="hint" id="rappel-ltl-ex7">
+        <p><code>φ implique ψ</code> signifie : sur toute trace, si φ est vraie alors ψ est vraie.</p>
+        <p>Pour montrer que φ <strong>n'implique pas</strong> ψ : construire une trace où φ est vraie et ψ est fausse.</p>
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple analogue</span></p>
+            <p>En logique classique : <code>(p ∧ q) ⇒ (p ∨ q)</code> est vrai, mais <code>(p ∨ q) ⇒ (p ∧ q)</code> est faux.
+            En LTL, ◇(a∧b) et ◇a∧◇b jouent des rôles analogues.</p>
+        </div>
+    </div>
+
+
+    <!-- Q1 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-avance">Avancé</span>
+        </div>
+        <p>
+            Expliquer en français la différence entre <code>◇a ∧ ◇b</code> et <code>◇(a ∧ b)</code>.
+            Laquelle est la plus forte ? Justifier.
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Croire que les deux formules sont équivalentes parce que
+            "si les deux arrivent, c'est pareil". Non : l'une exige la co-occurrence instantanée,
+            l'autre non.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1-ex7" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q1-h1-ex7">
+            Imaginez deux signaux a et b qui ne s'allument jamais en même temps, mais chacun s'allume au moins une fois.
+            Quelle formule est vraie ? Quelle formule est fausse ?
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Expliquer la différence + indiquer laquelle est plus forte…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <div class="two-col">
+                <div class="highlight-box">
+                    <p><span class="badge badge-orange">◇a ∧ ◇b</span></p>
+                    <p><strong>Sens :</strong> il existe un instant i où a est vrai, ET il existe un instant j où b est vrai.
+                    i et j peuvent être différents.</p>
+                    <p><strong>Exemples de traces satisfaisantes :</strong></p>
+                    <ul>
+                        <li>{a}, {b}, {a}, {b}, … → ✓</li>
+                        <li>{a,b}, ∅, ∅, … → ✓</li>
+                        <li>{a}, ∅, {b}, ∅, … → ✓</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p><span class="badge badge-blue">◇(a ∧ b)</span></p>
+                    <p><strong>Sens :</strong> il existe un instant k tel que a ET b sont vraies simultanément en k.</p>
+                    <p><strong>Exemples de traces satisfaisantes :</strong></p>
+                    <ul>
+                        <li>{a,b}, ∅, … → ✓</li>
+                        <li>∅, {a,b}, ∅, … → ✓</li>
+                    </ul>
+                    <p><strong>Trace non satisfaisante :</strong> {a}, {b}, {a}, {b}, … → ✗</p>
+                </div>
+            </div>
+
+            <p><strong>Conclusion :</strong> <code>◇(a∧b)</code> est la formule la plus <strong>forte</strong>.</p>
+            <ul>
+                <li><code>◇(a∧b)</code> implique <code>◇a ∧ ◇b</code> : si a et b sont simultanément vraies, chacune est vraie séparément.</li>
+                <li><code>◇a ∧ ◇b</code> n'implique <strong>pas</strong> <code>◇(a∧b)</code> : a et b peuvent arriver à des instants différents sans jamais coïncider.</li>
+            </ul>
+        </div>
+    </div>
+
+
+    <!-- Q2 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-avance">Avancé</span>
+        </div>
+        <p>
+            Donner un système de transitions (ST) tel que <code>◇a ∧ ◇b</code> est vraie
+            mais <code>◇(a ∧ b)</code> est fausse. Utiliser ST comme exemple au sens du cours.
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Proposer un ST avec un seul état contenant a et b — cela satisferait
+            les deux formules. Le ST doit être conçu de sorte que a et b ne soient jamais vrais <em>en même temps</em>.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1-ex7" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q2-h1-ex7">
+            Construire un ST minimaliste : 2 états qui alternent, l'un avec {a} et l'autre avec {b}, sans état {a,b}.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2-ex7" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q2-h2-ex7">
+            ST minimal : S1 avec étiquette {a}, S2 avec étiquette {b}, transitions S1↔S2 (alternance).
+            Sur la trace S1 → S2 → S1 → S2 → … : ◇a ✓, ◇b ✓, mais a∧b jamais vrai → ◇(a∧b) ✗.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Décrire le ST (états, étiquettes, transitions) et vérifier les deux formules dessus…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+
+            <div class="highlight-box">
+                <p><span class="badge badge-green">ST contre-exemple</span></p>
+                <pre><code>États :
+  S1 {a}    ← état initial
+  S2 {b}
+
+Transitions :
+  S1 → S2
+  S2 → S1</code></pre>
+            </div>
+
+            <p><strong>Trace engendrée :</strong> S1 → S2 → S1 → S2 → …</p>
+            <p>Soit σ(0)={a}, σ(1)={b}, σ(2)={a}, σ(3)={b}, …</p>
+
+            <p><strong>Vérification de ◇a ∧ ◇b :</strong></p>
+            <ul>
+                <li>◇a : a ∈ σ(0) = {a} → VRAIE ✓</li>
+                <li>◇b : b ∈ σ(1) = {b} → VRAIE ✓</li>
+                <li>Donc <code>◇a ∧ ◇b</code> = VRAIE ✓</li>
+            </ul>
+
+            <p><strong>Vérification de ◇(a∧b) :</strong></p>
+            <ul>
+                <li>À tout instant i : σ(i) = {a} (si i pair) ou σ(i) = {b} (si i impair)</li>
+                <li>Jamais les deux en même temps → a∧b = faux à tout instant</li>
+                <li>Donc <code>◇(a∧b)</code> = FAUSSE ✗</li>
+            </ul>
+
+            <p class="inline-note">
+                Ce ST minimal démontre que <code>◇a ∧ ◇b</code> est strictement plus faible que <code>◇(a∧b)</code>.
+                Les deux formules sont non équivalentes.
+            </p>
+        </div>
+    </div>
+
+
+    <div class="bareme">
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q1 — Explication de la différence</span>
+        <span class="bareme-desc">1 pt ◇a∧◇b correctement expliqué · 1 pt ◇(a∧b) correctement expliqué · 1 pt direction d'implication justifiée</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q2 — Contre-exemple ST</span>
+        <span class="bareme-desc">1 pt ST valide (a et b jamais co-présents) · 1 pt vérification ◇a∧◇b=V · 1 pt vérification ◇(a∧b)=F</span>
+
+        <div class="bareme-total">Total : <strong>6 pts</strong></div>
+    </div>
+
+
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Dans quel type de ST <code>◇a ∧ ◇b</code> et <code>◇(a∧b)</code> sont-elles équivalentes ? Caractériser la condition.</li>
+            <li>Le même phénomène existe-t-il avec □ ? Comparer <code>□a ∨ □b</code> et <code>□(a ∨ b)</code>.</li>
+            <li>Generaliser : <code>◇(a₁ ∧ a₂ ∧ … ∧ aₙ)</code> implique-t-elle toujours <code>◇a₁ ∧ … ∧ ◇aₙ</code> ?</li>
+        </ul>
+    </div>
+
+</body>
+</html>

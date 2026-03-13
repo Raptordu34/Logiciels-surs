@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 4 — Exprimer des propriétés en LTL</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+            <span class="exo-points">◎ 9 pts</span>
+            <span class="exo-time">⏱ 15–20 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Traduire des propriétés en langue naturelle vers LTL</li>
+                <li>Choisir le bon opérateur selon le sens de la propriété</li>
+                <li>Formuler "au plus une fois" avec les opérateurs □, ¬ et ○</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> Cours — <em>Opérateurs LTL : □, ◇, ○, U</em></p>
+    </div>
+
+    <div class="context-block">
+        <h3>Contexte</h3>
+        <p>
+            Pour chacune des trois propriétés décrites en français, donner la formule LTL correspondante
+            et justifier brièvement le choix des opérateurs.
+        </p>
+        <div class="callout-info">
+            <strong>Rappel de notation :</strong>
+            <ul>
+                <li><code>□φ</code> — φ est vraie à tout instant (G, globally)</li>
+                <li><code>◇φ</code> — φ sera vraie à un instant (F, finally)</li>
+                <li><code>○φ</code> — φ est vraie à l'instant suivant (X, next)</li>
+                <li><code>φ U ψ</code> — φ tient jusqu'à ce que ψ soit vrai</li>
+            </ul>
+        </div>
+    </div>
+
+
+    <!-- Q1 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p><strong>Propriété :</strong> Tous les états satisfont p.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Écrire <code>◇p</code> — cela dit seulement que p sera vrai
+            <em>à un moment</em>, pas à <em>tout</em> moment.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            "Tous les états satisfont p" = "à tout instant i, p est vrai en i". Quel opérateur signifie "à tout instant" ?
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Votre formule LTL pour Q1 + justification…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+            <pre><code>□p</code></pre>
+            <p>
+                Se lit : "p est vrai à cet instant et restera vrai à tout instant futur."
+                C'est la propriété de sûreté la plus simple : p est un invariant global.
+            </p>
+        </div>
+    </div>
+
+
+    <!-- Q2 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p><strong>Propriété :</strong> On peut atteindre p par un chemin où q est toujours vrai.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Écrire <code>□(q → ◇p)</code> — cela dit "partout où q est vrai, p
+            finira par arriver", ce qui est différent. La propriété voulue décrit une progression simultanée :
+            q reste vrai pendant tout le chemin menant à p.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            "q toujours vrai jusqu'à p" — quel opérateur exprime "φ reste vrai jusqu'à ce que ψ devienne vrai" ?
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q2-h2">
+            L'opérateur <strong>Until</strong> : <code>q U p</code> signifie "q reste vrai à tous les instants
+            jusqu'à ce que p devienne vrai, et p finit par devenir vrai."
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Votre formule LTL pour Q2 + justification…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+            <pre><code>q U p</code></pre>
+            <p>
+                Se lit : "q est vrai à chaque instant jusqu'à un instant où p devient vrai, et p finit par devenir vrai."
+            </p>
+            <p>
+                La formule capture simultanément deux idées :
+            </p>
+            <ul>
+                <li>le chemin est "gardé" par q (invariant local)</li>
+                <li>p est finalement atteint (vivacité)</li>
+            </ul>
+            <p class="inline-note">
+                Note : en LTL, "chemin" signifie le préfixe de la trace depuis le moment présent.
+                <code>q U p</code> est bien une propriété de chemin, pas d'état.
+            </p>
+        </div>
+    </div>
+
+
+    <!-- Q3 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q3</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p><strong>Propriété :</strong> p sera vrai au plus une fois.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> <code>□¬p</code> dit "p n'est jamais vrai" — c'est trop fort.
+            La propriété autorise exactement zéro ou une occurrence de p.
+        </div>
+
+        <button class="hint-btn" data-hint="q3-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q3-h1">
+            "Au plus une fois" : si p devient vrai maintenant, alors p ne doit plus jamais être vrai après.
+            Formulez : "si p est vrai en i, qu'est-ce qui doit être vrai à partir de i+1 ?"
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q3-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q3-h2">
+            "À partir de i+1, p ne sera plus jamais vrai" = <code>○□¬p</code>.
+            Combinez avec une implication et □ : "à tout instant, si p est vrai, alors …"
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Votre formule LTL pour Q3 + justification…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q3</h4>
+            <pre><code>□(p → ○□¬p)</code></pre>
+            <p>
+                Se lit : "À tout instant, si p est vrai maintenant, alors p sera faux à l'instant suivant et
+                restera faux pour toujours."
+            </p>
+            <p><strong>Décomposition :</strong></p>
+            <ul>
+                <li><code>□(…)</code> : à tout instant i…</li>
+                <li><code>p →</code> : si p est vrai en i…</li>
+                <li><code>○□¬p</code> : alors dès i+1 et pour toujours, p est faux</li>
+            </ul>
+            <p class="inline-note">
+                Cette formule est satisfaite aussi bien quand p n'est jamais vrai (0 occurrence) que quand p est vrai
+                exactement une fois. Elle interdit strictement la deuxième occurrence.
+            </p>
+        </div>
+    </div>
+
+
+    <div class="bareme">
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q1 — □p</span>
+        <span class="bareme-desc">2 pts formule correcte · 1 pt justification ("invariant global")</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q2 — q U p</span>
+        <span class="bareme-desc">2 pts formule correcte · 1 pt explication du Until (persistance + vivacité)</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q3 — □(p → ○□¬p)</span>
+        <span class="bareme-desc">1 pt □ extérieur · 1 pt implication p→ · 1 pt ○□¬p correctement construit</span>
+
+        <div class="bareme-total">Total : <strong>9 pts</strong></div>
+    </div>
+
+
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Exprimer "p sera vrai <em>exactement</em> une fois" (ni zéro ni deux). Comment ajouter la garantie d'au moins une occurrence ?</li>
+            <li>Exprimer "p sera vrai au moins deux fois". Généraliser à N fois.</li>
+            <li>Peut-on exprimer "p sera vrai exactement N fois" en LTL pour tout N fixé ? Et pour N variable ?</li>
+        </ul>
+    </div>
+
+</body>
+</html>

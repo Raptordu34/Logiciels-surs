@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+    <h2>Exercice 7 — Calcul de wp sur une séquence</h2>
+
+    <!-- ── EN-TÊTE ── -->
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 5 pts</span>
+            <span class="exo-time">⏱ 10 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Appliquer la règle de séquence : calculer wp de droite à gauche sur plusieurs instructions</li>
+                <li>Identifier et nommer les conditions intermédiaires entre chaque instruction</li>
+                <li>Simplifier algébriquement une condition après substitution</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Exercice 5 — Préconditions et Postconditions · Exercice 6 — Preuves de triplets</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3 style="margin-top:0;">wp sur une séquence d'instructions</h3>
+        <p>
+            Jusqu'ici, on a calculé wp pour une seule affectation. Les programmes réels enchaînent plusieurs instructions.
+            La règle de séquence étend wp à ce cas en traitant les instructions <strong>de droite à gauche</strong> —
+            on commence par la dernière et on remonte vers la première.
+        </p>
+    </div>
+
+    <!-- ── RAPPEL DE COURS ── -->
+    <button class="hint-btn" data-hint="rappel-sequence" data-label="Rappel de cours : règle de séquence et méthode pas à pas" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours : règle de séquence et méthode pas à pas</span>
+    </button>
+    <div class="hint" id="rappel-sequence">
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Règle wp pour la séquence</span></p>
+            <p style="text-align:center; font-size:1.05em;"><code>wp(C₁ ; C₂, Q) = wp(C₁, wp(C₂, Q))</code></p>
+            <p>On applique wp <strong>de l'intérieur vers l'extérieur</strong>, c'est-à-dire de la <strong>dernière instruction vers la première</strong> :</p>
+            <ol>
+                <li>Calculer <code>Q₁ = wp(C₂, Q)</code> — la condition intermédiaire entre C₁ et C₂.</li>
+                <li>Calculer <code>wp(C₁, Q₁)</code> — la précondition finale du programme entier.</li>
+            </ol>
+            <p>Pour une séquence plus longue <code>C₁ ; C₂ ; C₃</code>, on applique la même logique :</p>
+            <p style="margin-left:1.5rem;">
+                <code>Q₂ = wp(C₃, Q)</code><br>
+                <code>Q₁ = wp(C₂, Q₂)</code><br>
+                <code>wp = wp(C₁, Q₁)</code>
+            </p>
+        </div>
+
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Analogie — La chaîne de garanties</span></p>
+            <p>Imaginez une chaîne de montage : chaque poste de travail (C₁, C₂…) reçoit une pièce et la transforme.
+            Pour garantir que la pièce finale respecte la norme Q, on demande au dernier poste quelles conditions il exige sur sa pièce entrante — c'est <code>wp(C₂, Q)</code>.
+            On remonte ensuite vers le poste précédent, et ainsi de suite jusqu'au début de la chaîne.
+            Chaque condition intermédiaire est une "norme interne" entre deux postes.</p>
+        </div>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Visualisation avec un tableau annoté</span></p>
+            <p>La méthode de calcul correspond à insérer des assertions logiques entre chaque instruction — comme des étiquettes sur un tapis roulant :</p>
+            <div style="text-align:center; font-family: monospace; line-height: 2.2; margin: 0.5rem 0;">
+                { <strong>wp(C₁, Q₁)</strong> }<br>
+                C₁<br>
+                { <strong>Q₁ = wp(C₂, Q)</strong> }<br>
+                C₂<br>
+                { <strong>Q</strong> }
+            </div>
+            <p>Chaque paire <code>{ assertion } instruction { assertion }</code> forme un triplet de Hoare valide par construction.</p>
+        </div>
+
+        <div class="erreur-freq">
+            <strong>Piège classique :</strong> calculer wp de gauche à droite (dans l'ordre d'exécution).
+            La règle est l'inverse : on part de la postcondition et on remonte instruction par instruction vers le début.
+            Appliquer wp dans le sens de l'exécution donne un résultat faux.
+        </div>
+
+    </div>
+
+    <!-- ── SCAFFOLDING ── -->
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple guidé</span></p>
+            <p>Calculer <code>wp(x := x+1 ; y := x+y, &nbsp; y > 10)</code>.</p>
+            <ol>
+                <li><strong>Étape 1</strong> — wp de la 2ᵉ instruction :<br>
+                    <code>wp(y := x+y, &nbsp; y > 10)</code><br>
+                    → substituer <code>x+y</code> à <code>y</code> : <code>x+y > 10</code></li>
+                <li><strong>Étape 2</strong> — wp de la 1ʳᵉ instruction sur Q₁ :<br>
+                    <code>wp(x := x+1, &nbsp; x+y > 10)</code><br>
+                    → substituer <code>x+1</code> à <code>x</code> : <code>(x+1)+y > 10</code>, soit <code>x+y > 9</code></li>
+            </ol>
+            <p>Résultat : <code>wp = x + y > 9</code>.</p>
+        </div>
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Méthode générale</span></p>
+            <ul class="steps">
+                <li>Identifier les instructions dans l'ordre (C₁ ; C₂ ; …)</li>
+                <li>Partir de la postcondition Q</li>
+                <li>Appliquer wp sur la <em>dernière</em> instruction → obtenir Q₁</li>
+                <li>Appliquer wp sur l'avant-dernière avec Q₁ → obtenir Q₀</li>
+                <li>Répéter jusqu'à la première instruction</li>
+                <li>Simplifier algébriquement le résultat final si possible</li>
+            </ul>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 1                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">5 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Soit le programme :</p>
+        <p style="text-align:center; font-size:1.05em;"><code>S &nbsp;::&nbsp; x := 2*y &nbsp; ; &nbsp; y := y − 1</code></p>
+        <p>Calculer <code>wp(S, &nbsp; x = y + 5)</code>.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> appliquer wp sur <code>x := 2*y</code> en premier.
+            Il faut commencer par <strong>la dernière instruction</strong> (<code>y := y−1</code>) et remonter.
+            Commencer à l'envers donne une condition intermédiaire erronée et un résultat faux.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            <strong>Étape 1 :</strong> Calculez <code>wp(y := y−1, &nbsp; x = y+5)</code>.
+            La variable assignée est <code>y</code>, l'expression est <code>y−1</code>.
+            Substituez <code>y−1</code> à la place de <code>y</code> dans <code>x = y+5</code>.
+            Quelle condition intermédiaire Q₁ obtenez-vous ?
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            Q₁ = <code>x = (y−1)+5 = x = y+4</code>.
+            <strong>Étape 2 :</strong> Calculez maintenant <code>wp(x := 2*y, &nbsp; x = y+4)</code>.
+            Substituez <code>2*y</code> à <code>x</code> dans <code>x = y+4</code>, puis simplifiez.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Étape 1 : wp(y := y−1,  x = y+5)  →  condition intermédiaire Q₁&#10;Étape 2 : wp(x := 2*y,  Q₁)  →  précondition finale&#10;Étape 3 : simplifier algébriquement."></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <p><strong>Étape 1 — wp de la 2ᵉ instruction :</strong></p>
+            <div style="margin-left:1.5rem; font-family: monospace; line-height: 2;">
+                wp(y := y−1, &nbsp; x = y+5)<br>
+                = &nbsp; (x = y+5)[y−1 / y]<br>
+                = &nbsp; x = (y−1)+5<br>
+                = &nbsp; <strong>x = y+4</strong> &nbsp; &nbsp; ← condition intermédiaire Q₁
+            </div>
+
+            <p style="margin-top:1rem;"><strong>Étape 2 — wp de la 1ʳᵉ instruction avec Q₁ :</strong></p>
+            <div style="margin-left:1.5rem; font-family: monospace; line-height: 2;">
+                wp(x := 2*y, &nbsp; x = y+4)<br>
+                = &nbsp; (x = y+4)[2*y / x]<br>
+                = &nbsp; 2*y = y+4<br>
+                = &nbsp; <strong>y = 4</strong> &nbsp; &nbsp; ← précondition finale (après simplification)
+            </div>
+
+            <p style="margin-top:1rem;"><strong>Résultat :</strong> <code>wp(S, x = y+5) = (y = 4)</code></p>
+
+            <div class="callout-info">
+                <strong>Programme annoté complet</strong>
+                <div style="font-family: monospace; line-height: 2.2; margin: 0.5rem 0; padding-left: 1rem;">
+                    { <strong>y = 4</strong> }<br>
+                    x := 2*y<br>
+                    { <strong>x = y+4</strong> }<br>
+                    y := y−1<br>
+                    { <strong>x = y+5</strong> }
+                </div>
+                <p>Chaque accolade est une assertion valide. On peut vérifier : si y = 4 au départ, alors après <code>x := 2*y</code>, x = 8. Ensuite après <code>y := y−1</code>, y = 3. La postcondition donne : 8 = 3+5 = 8. ✓</p>
+            </div>
+
+            <div class="callout-info">
+                <strong>Interprétation sémantique</strong>
+                <p>Le résultat <code>y = 4</code> signifie que la postcondition <code>x = y+5</code> n'est garantie que si <code>y</code> vaut exactement 4 avant l'exécution du programme.
+                Pour toute autre valeur initiale de y, il existera un état final où <code>x ≠ y+5</code>.</p>
+                <p>C'est une précondition <em>très forte</em> (elle fixe y à une seule valeur) — ce qui reflète que la postcondition est elle-même très précise.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Étape 1 — wp de la 2ᵉ instruction</span>
+        <span class="bareme-desc">wp(y := y−1, x=y+5) calculé correctement → x = y+4</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Étape 2 — wp de la 1ʳᵉ instruction</span>
+        <span class="bareme-desc">wp(x := 2*y, x=y+4) calculé correctement → 2y = y+4</span>
+
+        <span class="bareme-pts">1</span>
+        <span class="bareme-label">Simplification et conclusion</span>
+        <span class="bareme-desc">2y = y+4 simplifié en y = 4, résultat final clairement annoncé</span>
+
+        <div class="bareme-total">Total : <strong>5 pts</strong></div>
+    </div>
+
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Calculez <code>wp(x := x+1 ; x := x*2, &nbsp; x > 10)</code>. Quelle précondition obtenez-vous ? Vérifiez avec x = 5 au départ.</li>
+            <li>Inversez l'ordre des instructions de Q1 : calculez <code>wp(y := y−1 ; x := 2*y, &nbsp; x = y+5)</code>. Le résultat est-il le même ? Pourquoi ?</li>
+            <li>Ajoutez une troisième instruction : <code>S' :: x := 2*y ; y := y−1 ; z := x+y</code>. Calculez <code>wp(S', z = 12)</code> en remontant les trois étapes.</li>
+            <li>Un programme est-il toujours "inversible" ? Peut-on reconstruire l'état initial à partir de l'état final de S ? Qu'est-ce que cela implique sur wp ?</li>
+        </ul>
+    </div>
+
+</body>
+</html>

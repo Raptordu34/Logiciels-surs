@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 3 — Preuve de validité</h2>
+
+    <!-- ── EN-TÊTE ── -->
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 10 pts</span>
+            <span class="exo-time">⏱ 15–20 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Calculer la précondition la plus faible (wp) d'une affectation</li>
+                <li>Appliquer la règle de séquence pour une suite d'instructions</li>
+                <li>Conclure à la validité d'un triplet de Hoare par implication logique</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours 2 — Logique de Hoare · Axiome de l'affectation · Règle de séquence</em></p>
+    </div>
+
+    <!-- ── RAPPEL DE COURS ── -->
+    <button class="hint-btn" data-hint="rappel-hoare-long" data-label="Rappel de cours : Hoare et wp" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours : Hoare et wp</span>
+    </button>
+    <div class="hint" id="rappel-hoare-long">
+        <p><strong>Un triplet de Hoare</strong> <code>{P} C {Q}</code> est <em>valide</em> si : chaque fois que P est vraie avant l'exécution de C, alors Q est vraie après.</p>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Précondition la plus faible — wp</span></p>
+            <p><code>wp(C, Q)</code> est la condition <em>minimale</em> à garantir avant C pour être certain que Q soit vraie après. Méthode de preuve :</p>
+            <ul>
+                <li>Calculer <code>wp(C, Q)</code>.</li>
+                <li>Vérifier que <code>P ⟹ wp(C, Q)</code>.</li>
+                <li>Si l'implication est vraie, le triplet <code>{P} C {Q}</code> est valide.</li>
+            </ul>
+        </div>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Axiome de l'affectation</span></p>
+            <p><code>wp(x := E, Q) = Q[E/x]</code></p>
+            <p>On remplace toutes les occurrences de <code>x</code> par l'expression <code>E</code> dans la postcondition Q. La substitution s'effectue <strong>dans la postcondition</strong>, jamais dans la précondition.</p>
+        </div>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Règle de séquence</span></p>
+            <p>Pour <code>{P} C₁ ; C₂ {Q}</code>, on travaille <strong>de droite à gauche</strong> :</p>
+            <ul>
+                <li>Calculer d'abord <code>R = wp(C₂, Q)</code>.</li>
+                <li>Puis calculer <code>wp(C₁, R)</code>.</li>
+                <li>Vérifier que <code>P ⟹ wp(C₁, R)</code>.</li>
+            </ul>
+            <p class="inline-note">On remonte le programme en partant du résultat attendu — comme lire une recette à l'envers pour savoir ce qu'il faut préparer.</p>
+        </div>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>Règle</th><th>Formule</th><th>Condition de validité</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Affectation</strong></td>
+                        <td><code>wp(x := E, Q) = Q[E/x]</code></td>
+                        <td><code>P ⟹ Q[E/x]</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Séquence</strong></td>
+                        <td><code>wp(C₁;C₂, Q) = wp(C₁, wp(C₂, Q))</code></td>
+                        <td><code>P ⟹ wp(C₁, wp(C₂, Q))</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Conséquence</strong></td>
+                        <td><code>{P'} C {Q'}</code> valide</td>
+                        <td><code>P ⟹ P'</code> et <code>Q' ⟹ Q</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ── SCAFFOLDING ── -->
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple guidé</span></p>
+            <p>Prouver <code>{ y &gt; 7 } y := y + 3 { y &gt; 10 }</code>.</p>
+            <ul>
+                <li>Calculer wp : <code>wp(y := y+3, y &gt; 10) = (y+3) &gt; 10 = y &gt; 7</code></li>
+                <li>Vérifier : précondition donnée = <code>y &gt; 7</code> ✓</li>
+                <li>L'implication <code>y &gt; 7 ⟹ y &gt; 7</code> est vraie → triplet valide.</li>
+            </ul>
+        </div>
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Analogie</span></p>
+            <p><strong>wp comme exigence minimale d'entrée :</strong> imaginez une machine qui garantit "la pièce sortira conforme" (postcondition Q). wp(C, Q) est la liste minimale des contrôles à faire sur la matière première (précondition) pour que la garantie tienne. Si votre fournisseur vous livre mieux que ce minimum, c'est encore valide.</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 1                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">5 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>
+            Prouvez la validité du triplet de Hoare :<br>
+            <code>{ x &gt; a } &nbsp; x := x + 1 &nbsp; { x &gt; a + 1 }</code>
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Substituer dans la <em>précondition</em> plutôt que dans la postcondition.
+            L'axiome de l'affectation dit <code>wp(x := E, Q) = Q[E/x]</code> — la substitution s'opère toujours sur <strong>Q</strong> (postcondition), pas sur P.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            Calculez <code>wp(x := x+1, x &gt; a+1)</code> en remplaçant toutes les occurrences de <code>x</code>
+            par <code>(x+1)</code> dans la postcondition <code>x &gt; a+1</code>.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            Après substitution : <code>(x+1) &gt; a+1</code>, ce qui se simplifie en <code>x &gt; a</code>.
+            La précondition donnée est exactement <code>x &gt; a</code>.
+            Concluez par l'implication <code>x &gt; a ⟹ x &gt; a</code>.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Calculez wp, vérifiez l'implication, concluez…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <ul class="steps">
+                <li>
+                    <strong>Calculer wp :</strong>
+                    <pre><code>wp(x := x+1,  x > a+1)
+= [x+1 / x](x > a+1)
+= (x+1) > a+1
+= x > a</code></pre>
+                </li>
+                <li>
+                    <strong>Vérifier l'implication :</strong>
+                    <p>Précondition donnée : <code>x &gt; a</code></p>
+                    <p>wp calculée : <code>x &gt; a</code></p>
+                    <p><code>x &gt; a ⟹ x &gt; a</code> — triviale, toujours vraie. ✓</p>
+                </li>
+                <li>
+                    <strong>Conclusion :</strong> le triplet <code>{ x &gt; a } x := x+1 { x &gt; a+1 }</code> est <strong>valide</strong>.
+                </li>
+            </ul>
+
+            <div class="callout-info">
+                <strong>Reformulation sous forme de triplet prouvé</strong>
+                <p>
+                    On a montré que <code>x &gt; a ⟹ wp(x := x+1, x &gt; a+1)</code>,
+                    ce qui, par la règle de conséquence, établit la validité du triplet.
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 2                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="highlight-box">
+        <p><span class="badge badge-orange">Méthode — Séquence</span></p>
+        <ul class="steps">
+            <li>Partir de la postcondition finale Q.</li>
+            <li>Calculer wp de la <strong>dernière</strong> instruction par rapport à Q → obtenir R.</li>
+            <li>Calculer wp de la <strong>première</strong> instruction par rapport à R → obtenir wp global.</li>
+            <li>Vérifier que P ⟹ wp global.</li>
+        </ul>
+    </div>
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">5 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>
+            Prouvez la validité du triplet de Hoare :<br>
+            <code>{ x &gt; a } &nbsp; x := x + 1 ; x := x + x &nbsp; { x &gt; 2·a + 1 }</code>
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Travailler de gauche à droite (appliquer wp à <code>x := x+1</code> en premier).
+            La règle de séquence se calcule <strong>de droite à gauche</strong> : on commence par la dernière instruction et on remonte.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            Commencez par la <strong>dernière</strong> instruction : calculez
+            <code>wp(x := x+x, &nbsp; x &gt; 2·a+1)</code>.
+            Remplacez x par <code>(x+x)</code>, c'est-à-dire <code>2x</code>, dans la postcondition.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q2-h2">
+            <code>wp(x := x+x, x &gt; 2·a+1) = 2x &gt; 2·a+1</code>. Prenez ce résultat comme nouvelle postcondition
+            et calculez <code>wp(x := x+1, &nbsp; 2x &gt; 2·a+1)</code> en remplaçant x par <code>(x+1)</code>.
+            Simplifiez l'inégalité obtenue, puis vérifiez que <code>x &gt; a</code> l'implique.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Appliquez la règle de séquence de droite à gauche…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+
+            <ul class="steps">
+                <li>
+                    <strong>Étape 1 — wp de la dernière instruction</strong>
+                    <pre><code>wp(x := x+x,  x > 2·a+1)
+= [x+x / x](x > 2·a+1)
+= 2x > 2·a+1</code></pre>
+                </li>
+                <li>
+                    <strong>Étape 2 — wp de la première instruction</strong>
+                    <pre><code>wp(x := x+1,  2x > 2·a+1)
+= [x+1 / x](2x > 2·a+1)
+= 2·(x+1) > 2·a+1
+= 2x + 2 > 2·a + 1
+= 2x > 2·a - 1
+= x > a - ½</code></pre>
+                </li>
+                <li>
+                    <strong>Étape 3 — Vérifier l'implication</strong>
+                    <p>Précondition donnée : <code>x &gt; a</code></p>
+                    <p>wp global calculé : <code>x &gt; a − ½</code></p>
+                    <p><code>x &gt; a ⟹ x &gt; a − ½</code> — vraie car <code>a &gt; a − ½</code>. ✓</p>
+                </li>
+                <li>
+                    <strong>Conclusion :</strong> le triplet est <strong>valide</strong>.
+                </li>
+            </ul>
+
+            <div class="two-col">
+                <div class="highlight-box">
+                    <strong>Récapitulatif des états intermédiaires</strong>
+                    <div class="table-glass" style="margin-top:0.8rem;">
+                        <table>
+                            <thead>
+                                <tr><th>Point du programme</th><th>Condition vraie</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Avant tout</td><td><code>x &gt; a</code> (précondition)</td></tr>
+                                <tr><td>Après <code>x := x+1</code></td><td><code>x &gt; a+1</code> (via Q1)</td></tr>
+                                <tr><td>Après <code>x := x+x</code></td><td><code>x &gt; 2·a+1</code> (postcondition)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="callout-info">
+                    <strong>Pourquoi l'implication fonctionne-t-elle ?</strong>
+                    <p>
+                        La wp calculée (<code>x &gt; a−½</code>) est une condition <em>plus faible</em> que la précondition donnée (<code>x &gt; a</code>).
+                        La règle de conséquence autorise une précondition plus forte que la wp minimale : on garantit <em>plus</em> que le nécessaire, ce qui suffit.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">5</span>
+        <span class="bareme-label">Q1 — Affectation simple</span>
+        <span class="bareme-desc">2 pts calcul wp correct · 2 pts implication établie · 1 pt conclusion explicite</span>
+
+        <span class="bareme-pts">5</span>
+        <span class="bareme-label">Q2 — Séquence</span>
+        <span class="bareme-desc">2 pts wp étape 1 (x+x) · 2 pts wp étape 2 (x+1) et simplification · 1 pt implication et conclusion</span>
+
+        <div class="bareme-total">Total : <strong>10 pts</strong></div>
+    </div>
+
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Le triplet <code>{ x ≥ a } x := x + 1 { x &gt; a + 1 }</code> est-il valide ? Pourquoi la précondition change-t-elle la conclusion ?</li>
+            <li>Construisez un triplet <strong>invalide</strong> sur l'affectation <code>x := x − 1</code> et expliquez précisément pourquoi l'implication échoue.</li>
+            <li>Prouvez <code>{ x &gt; 0 } x := x * 2 { x &gt; 0 }</code>. Ce triplet est-il intéressant pédagogiquement ? Pourquoi ?</li>
+        </ul>
+    </div>
+
+</body>
+</html>

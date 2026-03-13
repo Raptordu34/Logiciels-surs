@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 2 — Propriétés LTL en français</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+            <span class="exo-points">◎ 6 pts</span>
+            <span class="exo-time">⏱ 10–15 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Lire et interpréter une formule LTL en français naturel</li>
+                <li>Distinguer les portées de □ (toujours) et ◇ (un jour)</li>
+                <li>Comprendre l'interaction entre opérateurs temporels et implication logique</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> Cours — <em>Opérateurs LTL : □, ◇, ○, U</em></p>
+    </div>
+
+    <div class="context-block">
+        <h3>Rappel des opérateurs LTL</h3>
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>Opérateur</th><th>Notation</th><th>Sémantique informelle</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Toujours</strong> (G)</td><td><code>□φ</code></td><td>φ est vraie à cet instant et à tous les instants futurs</td></tr>
+                    <tr><td><strong>Un jour</strong> (F)</td><td><code>◇φ</code></td><td>φ sera vraie à cet instant ou à un instant futur</td></tr>
+                    <tr><td><strong>Suivant</strong> (X)</td><td><code>○φ</code></td><td>φ est vraie à l'instant immédiatement suivant</td></tr>
+                    <tr><td><strong>Jusqu'à</strong> (U)</td><td><code>φ U ψ</code></td><td>φ reste vraie jusqu'à ce que ψ devienne vraie (et ψ finit par l'être)</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <button class="hint-btn" data-hint="rappel-ltl-ex2" data-label="Rappel : lecture des formules imbriquées" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel : lecture des formules imbriquées</span>
+    </button>
+    <div class="hint" id="rappel-ltl-ex2">
+        <p><strong>Méthode :</strong> pour lire une formule complexe, déroulez de l'<em>extérieur vers l'intérieur</em>.</p>
+        <ul>
+            <li><code>□φ</code> = "à <em>tout</em> instant i, φ est vraie en i"</li>
+            <li><code>◇φ</code> = "il <em>existe</em> un instant i tel que φ est vraie en i"</li>
+            <li><code>φ ⇒ ψ</code> = "si φ, alors ψ" — l'implication relie deux assertions temporelles</li>
+        </ul>
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Repère</span></p>
+            <p><code>□q</code> ≠ <code>□◇q</code> : □q exige que q soit vrai dès maintenant et pour toujours ;
+            □◇q exige seulement que q revienne infiniment souvent.</p>
+        </div>
+    </div>
+
+
+    <!-- QUESTION 1 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Exprimer en français ordinaire la propriété LTL :</p>
+        <div class="highlight-box">
+            <p style="text-align:center; font-size:1.1rem;"><code>(◇p) ⇒ (□q)</code></p>
+        </div>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Confondre <code>□q</code> (q vrai pour toujours à partir de maintenant)
+            avec <code>□◇q</code> (q revient infiniment souvent). Ici c'est bien <code>□q</code> : une fois l'implication
+            déclenchée, q doit rester vrai sans interruption.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            Décomposez : <code>◇p</code> = "p sera vrai à un moment". <code>□q</code> = "q est vrai maintenant et pour toujours".
+            L'implication ⇒ dit : "si la partie gauche est vraie, alors la partie droite l'est aussi."
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            La formule dit : dès qu'on sait que p deviendra vrai (même dans le futur), on peut conclure que q
+            est vrai maintenant et restera vrai pour toujours. C'est une contrainte très forte sur q.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Votre traduction en français de (◇p) ⇒ (□q)…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+            <div class="highlight-box">
+                <p><span class="badge badge-green">Traduction</span></p>
+                <p><em>« Si p est vraie à un moment quelconque (maintenant ou dans le futur), alors q est vraie maintenant et restera vraie à tout jamais. »</em></p>
+            </div>
+            <p><strong>Lecture formelle :</strong></p>
+            <ul>
+                <li><code>◇p</code> est l'hypothèse : p sera vrai à un instant futur (ou présent)</li>
+                <li><code>□q</code> est la conclusion : q est vrai ici et maintenant, et le restera</li>
+                <li>La formule est vraie si l'hypothèse est fausse (p ne se produit jamais) <em>ou</em> si la conclusion est vraie</li>
+            </ul>
+            <p class="inline-note">
+                Attention : la formule est évaluée à chaque instant i. En i, elle dit : "si à partir de i on finit par voir p, alors q est vrai de i à l'infini."
+            </p>
+        </div>
+    </div>
+
+
+    <!-- QUESTION 2 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Exprimer en français ordinaire la propriété LTL :</p>
+        <div class="highlight-box">
+            <p style="text-align:center; font-size:1.1rem;"><code>□(q ⇒ □¬p)</code></p>
+        </div>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Penser que cette formule interdit p d'être vrai avant que q ne devienne vrai.
+            Non : elle ne parle que de ce qui se passe <em>après</em> que q est devenu vrai.
+            p peut très bien être vrai à des instants antérieurs à q.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            Déroulez de l'extérieur vers l'intérieur :<br>
+            • <code>□( … )</code> = "à tout instant i, ce qui suit est vrai"<br>
+            • ce qui suit : <code>q ⇒ □¬p</code> = "si q est vrai en i, alors p ne sera plus jamais vrai après i"
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Votre traduction en français de □(q ⇒ □¬p)…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+            <div class="highlight-box">
+                <p><span class="badge badge-green">Traduction</span></p>
+                <p><em>« Dès que q devient vrai (à n'importe quel instant), p ne sera plus jamais vrai à partir de ce moment. »</em></p>
+            </div>
+            <p><strong>Lecture formelle :</strong></p>
+            <ul>
+                <li><code>□</code> : à tout instant i…</li>
+                <li><code>q</code> : … si q est vrai en i…</li>
+                <li><code>□¬p</code> : … alors p est faux en i et restera faux pour toujours après i</li>
+            </ul>
+            <p class="inline-note">
+                Cette formule modélise une contrainte d'exclusion : une fois que q s'est produit, p est définitivement exclu.
+                Exemple d'usage : "dès qu'une erreur est détectée (q), le système n'entre plus en mode normal (p)."
+            </p>
+        </div>
+    </div>
+
+
+    <div class="bareme">
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q1 — Traduction de (◇p) ⇒ (□q)</span>
+        <span class="bareme-desc">1 pt ◇p correct · 1 pt □q correct · 1 pt lien par l'implication expliqué</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q2 — Traduction de □(q ⇒ □¬p)</span>
+        <span class="bareme-desc">1 pt □ extérieur ("à tout instant") · 1 pt q hypothèse · 1 pt □¬p conséquence</span>
+
+        <div class="bareme-total">Total : <strong>6 pts</strong></div>
+    </div>
+
+
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Exprimer en LTL : "p et q ne sont jamais vrais simultanément". Puis comparer avec <code>□(p ⇒ □¬q)</code> — sont-elles équivalentes ?</li>
+            <li>Quelle est la différence entre <code>□◇p</code> ("p infiniment souvent") et <code>◇□p</code> ("p vrai pour toujours à partir d'un moment") ?</li>
+            <li>Donner un exemple concret de système satisfaisant <code>□(q ⇒ □¬p)</code> mais pas <code>□(p ⇒ □¬q)</code>.</li>
+        </ul>
+    </div>
+
+</body>
+</html>

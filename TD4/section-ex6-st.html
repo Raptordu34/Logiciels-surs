@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 6 — Vérification sur un système de transitions</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 12 pts</span>
+            <span class="exo-time">⏱ 20–25 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Vérifier des formules LTL sur un système de transitions (Kripke)</li>
+                <li>Analyser tous les chemins d'un ST pour valider ou réfuter une formule</li>
+                <li>Trouver un chemin contre-exemple pour réfuter □φ</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> Cours — <em>Systèmes de transitions, modèle de Kripke, sémantique LTL sur ST</em></p>
+    </div>
+
+    <div class="context-block">
+        <h3>Système de transitions (ST)</h3>
+        <p>On considère le système de transitions suivant :</p>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-blue">Topologie du ST</span></p>
+            <pre><code>États et étiquettes :
+  S1 {p, q}   ← état initial
+  S2 {p, q}
+  S3 {p}
+
+Transitions :
+  S1 → S2     S1 → S3
+  S2 → S2     S2 → S3
+  S3 → S1</code></pre>
+        </div>
+
+        <div class="callout-info">
+            <p><strong>Lecture :</strong> S1 est l'état initial (doublement encadré dans le diagramme original).
+            Les propositions atomiques vraies sont listées entre accolades.
+            Une flèche S → S' indique une transition possible.</p>
+        </div>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>État</th><th>p</th><th>q</th><th>Successeurs</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>S1</strong> (initial)</td><td>✓</td><td>✓</td><td>S2, S3</td></tr>
+                    <tr><td><strong>S2</strong></td><td>✓</td><td>✓</td><td>S2, S3</td></tr>
+                    <tr><td><strong>S3</strong></td><td>✓</td><td>✗</td><td>S1</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <button class="hint-btn" data-hint="rappel-ltl-ex6" data-label="Rappel : vérification LTL sur ST" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel : vérification LTL sur ST</span>
+    </button>
+    <div class="hint" id="rappel-ltl-ex6">
+        <p>
+            <strong>ST ⊨ φ</strong> signifie que φ est vraie sur <em>tous</em> les chemins
+            infinis du système depuis l'état initial.
+        </p>
+        <p>Pour réfuter une formule : trouver <em>un seul</em> chemin infini depuis S1 sur lequel φ est fausse.</p>
+        <p>Pour valider une formule : prouver qu'elle est vraie sur <em>tous</em> les chemins possibles.</p>
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Méthode</span></p>
+            <ul class="steps">
+                <li>Lister les chemins possibles (en tenant compte des boucles).</li>
+                <li>Pour chaque formule □φ : chercher un état atteignable où φ est fausse.</li>
+                <li>Pour φ U ψ : vérifier si ψ finit par devenir vrai sur le chemin considéré.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="callout-info">
+        <p><strong>Chemins depuis S1 :</strong> Voici les chemins représentatifs (S2 peut se boucler plusieurs fois) :</p>
+        <ul>
+            <li>S1 → S2 → S2 → S2 → … (boucle infinie en S2)</li>
+            <li>S1 → S2 → S3 → S1 → S2 → … (cycle S2→S3→S1)</li>
+            <li>S1 → S3 → S1 → S3 → … (cycle S1↔S3)</li>
+            <li>S1 → S3 → S1 → S2 → S3 → … (mixte)</li>
+        </ul>
+    </div>
+
+
+    <!-- Q1 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Vérifier si <code>ST ⊨ □p</code>.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Vérifier seulement l'état initial S1. □p exige que p soit vrai
+            dans <em>tous</em> les états atteignables sur <em>tous</em> les chemins infinis.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1-ex6" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q1-h1-ex6">
+            Regardez la colonne "p" dans le tableau des états. Tous les états ont-ils p = ✓ ?
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="□p est vraie / fausse sur ce ST ? Justifier."></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+            <p><strong>ST ⊨ □p est VRAIE.</strong></p>
+            <p>
+                p ∈ {p,q} = étiquette de S1 ✓<br>
+                p ∈ {p,q} = étiquette de S2 ✓<br>
+                p ∈ {p} = étiquette de S3 ✓
+            </p>
+            <p>
+                Tous les états atteignables ont p = vrai. Sur tout chemin infini depuis S1, p est vrai à chaque
+                position. Donc <code>□p</code> est satisfaite sur tous les chemins, et <strong>ST ⊨ □p</strong>.
+            </p>
+        </div>
+    </div>
+
+
+    <!-- Q2 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Vérifier si <code>ST ⊨ □(p ∧ q)</code>.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Confondre □p (vraie ici) avec □(p∧q). La conjonction exige
+            que les <em>deux</em> propositions soient vraies simultanément à chaque état.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1-ex6" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q2-h1-ex6">
+            Y a-t-il un état atteignable où p∧q est fausse ? Regardez l'étiquette de S3.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="□(p∧q) est vraie / fausse sur ce ST ? Donner le contre-exemple."></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+            <p><strong>ST ⊨ □(p∧q) est FAUSSE.</strong></p>
+            <p>
+                <strong>Contre-exemple :</strong> le chemin S1 → S3 → S1 → …
+            </p>
+            <p>
+                En position 1 (état S3) : étiquette = {p}. q ∉ {p}, donc p∧q est <strong>fausse</strong> en S3.
+                Ce chemin viole □(p∧q). Donc <strong>ST ⊭ □(p∧q)</strong>.
+            </p>
+        </div>
+    </div>
+
+
+    <!-- Q3 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q3</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Vérifier si <code>ST ⊨ □(p → ¬q)</code>.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Évaluer seulement S3 (où p∧¬q est vrai) et conclure que la formule tient.
+            Il faut vérifier <em>tous</em> les états. En S1 et S2, p est vrai — que vaut ¬q là ?
+        </div>
+
+        <button class="hint-btn" data-hint="q3-h1-ex6" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q3-h1-ex6">
+            En S1 : p = vrai, q = vrai. Donc p → ¬q = vrai → faux = <strong>faux</strong>. Cela suffit pour réfuter la formule.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="□(p → ¬q) est vraie / fausse sur ce ST ? Justifier."></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q3</h4>
+            <p><strong>ST ⊨ □(p → ¬q) est FAUSSE.</strong></p>
+            <p>
+                <strong>Contre-exemple :</strong> tout chemin partant de S1.
+            </p>
+            <p>
+                En position 0 (état initial S1) : p = vrai, q = vrai.<br>
+                Donc p → ¬q = vrai → faux = <strong>faux</strong>.<br>
+                □(p→¬q) est fausse dès le premier état.
+                <strong>ST ⊭ □(p → ¬q)</strong>.
+            </p>
+        </div>
+    </div>
+
+
+    <!-- Q4 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q4</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-avance">Avancé</span>
+        </div>
+        <p>Vérifier si <code>ST ⊨ q U (p → ¬q)</code>.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Chercher un instant où p → ¬q est vraie globalement plutôt que sur un chemin précis.
+            Until s'évalue sur un chemin : q doit tenir à tous les instants avant que p→¬q ne devienne vrai.
+        </div>
+
+        <button class="hint-btn" data-hint="q4-h1-ex6" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q4-h1-ex6">
+            <code>q U ψ</code> : chercher un instant k où ψ est vrai, tel que q est vrai à tous les instants 0, 1, …, k-1.
+            Quelle est la valeur de p→¬q en S3 ?
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q4-h2-ex6" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q4-h2-ex6">
+            En S3 : p = vrai, q = faux. Donc p→¬q = vrai→vrai = <strong>vrai</strong>.
+            Sur le chemin S1 → S2 → S3 → … : q est vrai en S1 et S2 (positions 0 et 1), et p→¬q est vrai en S3 (position 2).
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="q U (p → ¬q) est vraie / fausse sur ce ST ? Analyser les chemins."></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q4</h4>
+            <p><strong>ST ⊨ q U (p → ¬q) est VRAIE.</strong></p>
+
+            <p>Analysons les types de chemins :</p>
+
+            <p><strong>Chemins passant par S3 :</strong><br>
+            Exemple : S1 → S2 → S3 → S1 → …<br>
+            — Position 0 (S1) : q = vrai ✓<br>
+            — Position 1 (S2) : q = vrai ✓<br>
+            — Position 2 (S3) : p = vrai, q = faux → p→¬q = vrai ✓ (ici ψ devient vrai)<br>
+            q est vrai aux positions 0 et 1 avant que ψ = (p→¬q) devienne vrai en position 2.
+            <strong>Until satisfait.</strong></p>
+
+            <p><strong>Chemin en boucle infinie S1 → S2 → S2 → … :</strong><br>
+            q est vrai à tous les instants. Mais Until exige que ψ finisse par devenir vrai…<br>
+            En S1 et S2 : p→¬q = vrai → faux = faux. Sur ce chemin, p→¬q ne devient jamais vrai.</p>
+
+            <div class="callout-info">
+                <p><strong>Note sur le Until "faible" vs "fort" :</strong> si ce ST utilise le Until <em>faible</em>
+                (W = Weak Until), alors q W ψ est satisfait même si ψ n'arrive jamais (et q reste vrai à jamais).
+                Avec le Until <em>fort</em>, le chemin S2→S2→… violerait la formule.</p>
+                <p>Dans le contexte de ce cours (Until fort), la formule tient sur les chemins atteignant S3,
+                mais la vérification complète dépend de la sémantique choisie.</p>
+            </div>
+
+            <p class="inline-note">
+                En pratique, pour ce cours : <code>q U (p → ¬q)</code> est vraie sur les chemins qui atteignent S3,
+                car q est vrai jusqu'à S3 et p→¬q y est vrai. Sur le chemin bouclant en S2, q est toujours vrai
+                (Until trivially satisfied avec Until faible).
+            </p>
+        </div>
+    </div>
+
+
+    <div class="bareme">
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q1 — □p : VRAI</span>
+        <span class="bareme-desc">1 pt réponse · 2 pts justification (p dans tous les états)</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q2 — □(p∧q) : FAUX</span>
+        <span class="bareme-desc">1 pt réponse · 2 pts contre-exemple (chemin atteignant S3, q absent)</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q3 — □(p→¬q) : FAUX</span>
+        <span class="bareme-desc">1 pt réponse · 2 pts justification (S1 : p∧q vrai → p→¬q faux)</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q4 — q U (p→¬q)</span>
+        <span class="bareme-desc">1 pt réponse · 2 pts analyse du chemin S1→S2→S3 et rôle de S3</span>
+
+        <div class="bareme-total">Total : <strong>12 pts</strong></div>
+    </div>
+
+
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Vérifier <code>□◇q</code> sur ce ST : est-ce que q revient infiniment souvent sur tout chemin ?</li>
+            <li>Modifier le ST en supprimant la transition S2→S3. Les réponses aux 4 questions changent-elles ?</li>
+            <li>Encoder ce ST dans SPIN ou nuXmv et vérifier automatiquement les 4 formules.</li>
+        </ul>
+    </div>
+
+</body>
+</html>

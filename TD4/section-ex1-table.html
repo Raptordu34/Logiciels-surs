@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 1 — Table de vérité LTL</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+            <span class="exo-points">◎ 8 pts</span>
+            <span class="exo-time">⏱ 15–20 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Évaluer la vérité d'une proposition atomique à partir d'une trace σ</li>
+                <li>Calculer la valeur de formules propositionnelles et temporelles instant par instant</li>
+                <li>Distinguer l'évaluation en i de l'évaluation en i+1 (opérateur ○)</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> Cours — <em>Sémantique LTL, traces, propositions atomiques</em></p>
+    </div>
+
+    <div class="context-block">
+        <h3>Trace σ donnée</h3>
+        <p>
+            La trace σ est une séquence infinie d'états. Chaque état σ(i) est l'ensemble des propositions
+            atomiques vraies à l'instant i. On considère ici la portion i = 0 à 6 :
+        </p>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr>
+                        <th>i</th>
+                        <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>σ(i)</strong></td>
+                        <td>∅</td><td>{p}</td><td>{p,q}</td><td>{q}</td><td>{p}</td><td>∅</td><td>{p,q}</td>
+                    </tr>
+                    <tr>
+                        <td><code>p</code></td>
+                        <td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td>
+                    </tr>
+                    <tr>
+                        <td><code>q</code></td>
+                        <td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td>
+                    </tr>
+                    <tr>
+                        <td><code>p→q</code></td>
+                        <td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td>
+                    </tr>
+                    <tr>
+                        <td><code>○(p→q)</code></td>
+                        <td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>—</td>
+                    </tr>
+                    <tr>
+                        <td><code>p∧q</code></td>
+                        <td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="inline-note">
+            Indiquer <strong>1</strong> (vrai) ou <strong>0</strong> (faux) dans chaque case.
+            Pour i=6 et ○(p→q), la trace s'arrête : la valeur est indéfinie (—).
+        </p>
+    </div>
+
+    <button class="hint-btn" data-hint="rappel-ltl-ex1" data-label="Rappel de cours — Sémantique LTL" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours — Sémantique LTL</span>
+    </button>
+    <div class="hint" id="rappel-ltl-ex1">
+        <p><strong>Propositions atomiques :</strong> σ, i ⊨ p &nbsp;⟺&nbsp; p ∈ σ(i)</p>
+        <p><strong>Négation :</strong> σ, i ⊨ ¬φ &nbsp;⟺&nbsp; σ, i ⊭ φ</p>
+        <p><strong>Conjonction :</strong> σ, i ⊨ φ ∧ ψ &nbsp;⟺&nbsp; σ, i ⊨ φ &nbsp;et&nbsp; σ, i ⊨ ψ</p>
+        <p><strong>Implication :</strong> σ, i ⊨ φ → ψ &nbsp;⟺&nbsp; σ, i ⊭ φ &nbsp;ou&nbsp; σ, i ⊨ ψ &nbsp;(équivaut à ¬φ ∨ ψ)</p>
+        <p><strong>Opérateur Suivant (○) :</strong> σ, i ⊨ ○φ &nbsp;⟺&nbsp; σ, i+1 ⊨ φ</p>
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Repère</span></p>
+            <p>○(p→q) à l'instant i se calcule en évaluant <code>p→q</code> à l'instant <strong>i+1</strong>, puis en reportant cette valeur à la ligne i.</p>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple</span></p>
+            <p>Pour i=2 : σ(2)={p,q}.<br>
+            p ∈ σ(2) → <strong>p = 1</strong><br>
+            q ∈ σ(2) → <strong>q = 1</strong><br>
+            p→q = ¬p∨q = 0∨1 = <strong>1</strong><br>
+            p∧q = 1∧1 = <strong>1</strong></p>
+        </div>
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Analogie</span></p>
+            <p><strong>Intuition :</strong> σ(i) joue le rôle d'un "instantané" du monde à l'instant i. Une proposition atomique p est vraie à cet instant si et seulement si elle figure dans l'instantané.</p>
+        </div>
+    </div>
+
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">8 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>
+            Compléter le tableau ci-dessus en évaluant chaque formule à chaque instant i (0 à 6).
+            Justifier brièvement votre calcul pour <code>○(p→q)</code>.
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Confondre <code>p→q</code> évalué à l'instant i avec <code>○(p→q)</code>.
+            L'opérateur ○ décale d'un cran : <code>○(p→q)</code> à l'instant i vaut ce que vaut <code>p→q</code> à l'instant i+1.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            Pour remplir la ligne <code>p</code> : regardez pour chaque colonne si p appartient à σ(i).
+            <code>p ∈ {p}</code> → 1. <code>p ∉ {q}</code> → 0. <code>p ∉ ∅</code> → 0.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            Pour la ligne <code>○(p→q)</code> à l'instant i : calculez d'abord la valeur de <code>p→q</code>
+            sur toute la ligne, puis décalez d'une colonne vers la gauche.
+            Autrement dit, la valeur de ○(p→q) en i est la valeur de (p→q) en i+1.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Recopiez le tableau complété avec vos valeurs 0/1, et justifiez le calcul de ○(p→q)…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <div class="table-glass">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>i</th>
+                            <th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>σ(i)</strong></td>
+                            <td>∅</td><td>{p}</td><td>{p,q}</td><td>{q}</td><td>{p}</td><td>∅</td><td>{p,q}</td>
+                        </tr>
+                        <tr>
+                            <td><code>p</code></td>
+                            <td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td>
+                        </tr>
+                        <tr>
+                            <td><code>q</code></td>
+                            <td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td>
+                        </tr>
+                        <tr>
+                            <td><code>p→q</code></td>
+                            <td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>1</td>
+                        </tr>
+                        <tr>
+                            <td><code>○(p→q)</code></td>
+                            <td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>1</td><td>—</td>
+                        </tr>
+                        <tr>
+                            <td><code>p∧q</code></td>
+                            <td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p><strong>Justification de ○(p→q) :</strong></p>
+            <ul>
+                <li>i=0 : ○(p→q) = valeur de (p→q) en i=1 = (p=1, q=0) → 1→0 = <strong>0</strong></li>
+                <li>i=1 : valeur de (p→q) en i=2 = (1,1) → 1→1 = <strong>1</strong></li>
+                <li>i=2 : valeur en i=3 = (0,1) → 0→1 = <strong>1</strong></li>
+                <li>i=3 : valeur en i=4 = (1,0) → 1→0 = <strong>0</strong></li>
+                <li>i=4 : valeur en i=5 = (0,0) → 0→0 = <strong>1</strong></li>
+                <li>i=5 : valeur en i=6 = (1,1) → 1→1 = <strong>1</strong></li>
+                <li>i=6 : i+1=7 est hors de la trace — valeur <strong>indéfinie (—)</strong></li>
+            </ul>
+            <p class="inline-note">Rappel : p→q = ¬p∨q. Vrai sauf quand p=1 et q=0.</p>
+        </div>
+    </div>
+
+
+    <div class="bareme">
+        <span class="bareme-pts">5</span>
+        <span class="bareme-label">Lignes p, q, p→q, p∧q complètes et correctes</span>
+        <span class="bareme-desc">0,5 pt par cellule correcte (10 cellules non triviales)</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Ligne ○(p→q) avec justification</span>
+        <span class="bareme-desc">2 pts valeurs correctes · 1 pt justification du décalage explicitée</span>
+
+        <div class="bareme-total">Total : <strong>8 pts</strong></div>
+    </div>
+
+
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Évaluer <code>○○p</code> sur la même trace. Combien de positions sont définies ?</li>
+            <li>Construire une trace pour laquelle <code>p U q</code> est vraie depuis i=0 mais fausse depuis i=3.</li>
+            <li>Que vaut <code>□p</code> sur cette trace ? Et <code>◇(p∧q)</code> ?</li>
+        </ul>
+    </div>
+
+</body>
+</html>

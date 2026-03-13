@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+    <h2>Exercice 8 — Machine Abstraite (Méthode B)</h2>
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-avance">Avancé</span>
+            <span class="exo-points">◎ 15 pts</span>
+            <span class="exo-time">⏱ 25 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Analyser une machine abstraite.</li>
+                <li>Vérifier la préservation d'un invariant.</li>
+                <li>Tracer l'évolution de l'état suite à des opérations.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="context-block">
+        <h3 style="margin-top:0;">Contexte</h3>
+        <p>Soit la machine abstraite suivante :</p>
+        <pre><code>MACHINE q2
+VARIABLES v1
+INVARIANT v1 &isin; 0..4
+INITIALISATION v1 := 0
+
+OPERATIONS
+  res &lt;-- op1 =
+  PRE v1 &lt;= 2 THEN
+    ANY x1 WHERE x1 &isin; NAT &amp; x1 &isin; 0..2 THEN 
+      res := x1 || v1 := v1 + x1 
+    END
+  END;
+
+  res &lt;-- op2 =
+  PRE v1 &isin; NAT THEN
+    ANY x1 WHERE x1 &isin; NAT &amp; x1 &isin; 0..2 THEN 
+      res := x1 || v1 := v1 + x1 
+    END
+  END;
+
+  op3 =
+  PRE v1 &isin; 0..2 THEN
+    SELECT v1 = 0 THEN v1 := v1 + 1
+    WHEN v1 = 1 THEN v1 := 0
+    WHEN v1 = 2 THEN v1 := 1
+    ELSE v1 := 3 END
+  END
+END</code></pre>
+    </div>
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">8 pts</span>
+        </div>
+        <p>(a) Indiquer si l'invariant est préservé. Justifier votre réponse.</p>
+        
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Il ne suffit pas de vérifier l'invariant pour l'état initial, il faut s'assurer qu'aucune opération ne peut amener la machine dans un état violant l'invariant (<code>v1 &isin; 0..4</code>).
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">Regardez les préconditions et le comportement de chaque opération. Par exemple, pour <code>op2</code>, <code>v1</code> peut valoir n'importe quel naturel selon la précondition, mais est-ce que ça préserve l'invariant ?</div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">Dans <code>op2</code>, si <code>v1 = 4</code> (ce qui respecte l'invariant), et qu'on choisit <code>x1 = 2</code>, alors la nouvelle valeur de <code>v1</code> sera <code>4 + 2 = 6</code>.</div>
+
+        <div class="reponse-zone" contenteditable="true" data-placeholder="Votre réponse…"></div>
+        <button class="solution-btn" aria-expanded="false"><span class="btn-arrow">▶</span><span class="btn-label">Voir la solution</span></button>
+        <div class="solution">
+            <div class="solution-inner">
+                <h4 style="margin-top:0;">Solution — Q1</h4>
+                <p>L'invariant <strong>n'est pas préservé</strong>.</p>
+                <p>L'opération <code>op2</code> a pour précondition <code>v1 &isin; NAT</code>, qui est très large et n'empêche pas <code>v1</code> de valoir 4 (ce qui est valide selon l'invariant). Or, <code>op2</code> choisit un entier <code>x1 &isin; 0..2</code> et fait <code>v1 := v1 + x1</code>.</p>
+                <p>Si la machine est dans un état où <code>v1 = 4</code> (état valide), l'appel de <code>op2</code> peut choisir <code>x1 = 2</code>. La nouvelle valeur de <code>v1</code> devient alors <code>4 + 2 = 6</code>.<br>
+                La valeur 6 n'appartient pas à l'intervalle <code>0..4</code> défini par l'invariant. L'invariant est donc violé.</p>
+                <p><em>Remarque : <code>op1</code> préserve l'invariant car sa précondition exige <code>v1 &lt;= 2</code>, et <code>x1</code> vaut au maximum 2, donc <code>v1 + x1 &lt;= 4</code>.</em></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">7 pts</span>
+        </div>
+        <p>(b) Quel est l'état de la machine après avoir exécuté les 3 opérations suivantes :<br>
+        <code>1 &lt;-- op1 ; 2 &lt;-- op1 ; 2 &lt;-- op2</code>.</p>
+        <p><em>(Rappel : <code>1 &lt;-- op1</code> signifie que l'opération a retourné la valeur 1 dans <code>res</code>)</em></p>
+        
+        <div class="reponse-zone" contenteditable="true" data-placeholder="Votre réponse…"></div>
+        <button class="solution-btn" aria-expanded="false"><span class="btn-arrow">▶</span><span class="btn-label">Voir la solution</span></button>
+        <div class="solution">
+            <div class="solution-inner">
+                <h4 style="margin-top:0;">Solution — Q2</h4>
+                <p>L'état initial est <code>v1 = 0</code>.</p>
+                <ol>
+                    <li><code>1 &lt;-- op1</code> :
+                        <ul>
+                            <li>La précondition (<code>v1 &lt;= 2</code>, soit <code>0 &lt;= 2</code>) est respectée.</li>
+                            <li>L'opération retourne <code>res = 1</code>, ce qui signifie que <code>x1 = 1</code> a été choisi.</li>
+                            <li>L'état devient : <code>v1 = v1 + x1 = 0 + 1 = 1</code>.</li>
+                        </ul>
+                    </li>
+                    <li><code>2 &lt;-- op1</code> :
+                        <ul>
+                            <li>La précondition (<code>1 &lt;= 2</code>) est respectée.</li>
+                            <li>L'opération retourne <code>res = 2</code>, ce qui signifie que <code>x1 = 2</code> a été choisi.</li>
+                            <li>L'état devient : <code>v1 = 1 + 2 = 3</code>.</li>
+                        </ul>
+                    </li>
+                    <li><code>2 &lt;-- op2</code> :
+                        <ul>
+                            <li>La précondition (<code>v1 &isin; NAT</code>) est respectée (3 est un entier naturel).</li>
+                            <li>L'opération retourne <code>res = 2</code>, ce qui signifie que <code>x1 = 2</code> a été choisi.</li>
+                            <li>L'état devient : <code>v1 = 3 + 2 = 5</code>.</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p>L'état final de la machine est donc <strong>v1 = 5</strong>.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 1 — Évaluation d'expression</h2>
+
+    <!-- ── EN-TÊTE ── -->
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+            <span class="exo-points">◎ 5 pts</span>
+            <span class="exo-time">⏱ 5–10 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Construire un arbre de dérivation pour évaluer une expression arithmétique</li>
+                <li>Maîtriser la notation sémantique <code>⟨E, s⟩ → v</code> et l'appliquer pas à pas</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours 1 — Sémantique opérationnelle des expressions arithmétiques</em></p>
+    </div>
+
+    <!-- ── RAPPEL DE COURS ── -->
+    <button class="hint-btn" data-hint="rappel-semantique" data-label="Rappel de cours : sémantique formelle" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours : sémantique formelle</span>
+    </button>
+    <div class="hint" id="rappel-semantique">
+        <p><strong>La sémantique opérationnelle à grands pas</strong> décrit mathématiquement comment une expression s'évalue en une valeur, en fonction d'un état mémoire donné.</p>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Vocabulaire clé</span></p>
+            <ul>
+                <li>
+                    <strong>État s :</strong> fonction mathématique qui associe à chaque variable sa valeur courante. <code>s(x) = 7</code> signifie "x vaut 7 dans cet état".
+                    <br><small>Formellement : <code>s : Variables → Valeurs</code>. On peut l'imaginer comme un dictionnaire, par exemple <code>s = { x → 7, y → 8 }</code>.
+                    <strong>L'état courant</strong> désigne cet état au moment précis où une expression est évaluée. Dans un programme séquentiel, l'état évolue à chaque affectation :
+                    <code>x := 3</code> fait passer l'état courant de <code>s</code> à <code>s[x ↦ 3]</code>, puis <code>x := x + 1</code> le fait passer à <code>s[x ↦ 4]</code>, etc.
+                    Quand on écrit <code>⟨E, s⟩ → v</code>, le <code>s</code> est toujours l'état courant valide au moment de l'évaluation de E.</small>
+                </li>
+                <li>
+                    <strong>Mise à jour :</strong> <code>s[x ↦ 3]</code> désigne le même état que s, sauf que x vaut maintenant 3.
+                    <br><small>Formellement, c'est une nouvelle fonction d'état définie par :
+                    <code>s[x ↦ 3](x) = 3</code> et <code>s[x ↦ 3](y) = s(y)</code> pour toute variable <code>y ≠ x</code>.
+                    Autrement dit, toutes les autres variables gardent leur ancienne valeur — seule x est écrasée.
+                    Cette notation est utilisée pour modéliser l'affectation (<code>x := 3</code>) : après l'affectation, l'état courant devient <code>s[x ↦ 3]</code>.</small>
+                </li>
+                <li><strong>Jugement :</strong> <code>⟨E, s⟩ → v</code> se lit "l'expression E, évaluée dans l'état s, produit la valeur v".</li>
+            </ul>
+        </div>
+
+        <p>Trois règles fondamentales pour les expressions arithmétiques :</p>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>Règle</th><th>Forme</th><th>Signification</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Entier</strong></td>
+                        <td><code>⟨n, s⟩ → n</code></td>
+                        <td>Un entier littéral s'évalue à lui-même (aucune prémisse)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Variable</strong></td>
+                        <td><code>⟨x, s⟩ → s(x)</code></td>
+                        <td>Une variable s'évalue à sa valeur dans l'état (aucune prémisse)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Opération binaire</strong></td>
+                        <td>
+                            Si <code>⟨E₁, s⟩ → v₁</code> et <code>⟨E₂, s⟩ → v₂</code><br>
+                            alors <code>⟨E₁ ⊕ E₂, s⟩ → v₁ ⊕ v₂</code>
+                        </td>
+                        <td>Évaluer indépendamment chaque sous-expression, combiner les résultats</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Arbre de dérivation</span></p>
+            <p><strong>Comment lire la barre horizontale :</strong> ce qui est au-dessus constitue les <em>prémisses</em> (ce qu'on doit établir d'abord) ; ce qui est en dessous est la <em>conclusion</em> (ce qu'on peut alors déduire). Une règle sans prémisses (Variable, Entier) s'appelle un <em>axiome</em> : la barre s'écrit sans rien au-dessus.</p>
+        </div>
+    </div>
+
+    <!-- ── SCAFFOLDING ── -->
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple guidé</span></p>
+            <p>Évaluer <code>x + 1</code> dans l'état s avec <code>s(x) = 3</code>.</p>
+            <ul>
+                <li>Feuille gauche — règle <em>Variable</em> : <code>⟨x, s⟩ → 3</code></li>
+                <li>Feuille droite — règle <em>Entier</em> : <code>⟨1, s⟩ → 1</code></li>
+                <li>Racine — règle <em>Op. binaire</em> : <code>⟨x + 1, s⟩ → 4</code></li>
+            </ul>
+            <p class="inline-note">On construit toujours de bas en haut pour raisonner, et on lit l'arbre de haut en bas pour justifier.</p>
+        </div>
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Analogie</span></p>
+            <p><strong>L'état s comme dictionnaire :</strong> imaginez <code>s = {"x": 3, "y": 8}</code>. Lire <code>s(x)</code>, c'est faire <code>s["x"]</code>. Évaluer une expression dans un état, c'est parcourir ce dictionnaire pour substituer chaque variable par sa valeur, opération par opération.</p>
+        </div>
+    </div>
+
+    <!-- ── QUESTION ── -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">5 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>
+            Évaluez l'expression <code>(x + y) − 14</code> dans l'état <code>s</code>
+            tel que <code>s(x) = 7</code> et <code>s(y) = 8</code>.
+            Construisez l'arbre de dérivation complet, en appliquant et nommant chaque règle.
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Écrire directement le résultat numérique sans construire l'arbre.
+            La sémantique formelle exige que chaque règle soit appliquée explicitement — y compris pour les variables et les constantes. Écrire "7 + 8 − 14 = 1" n'est pas une réponse valide.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            Commencez par les <strong>feuilles</strong> de l'arbre.
+            x et y sont des variables : appliquez la règle <em>Variable</em> pour obtenir <code>⟨x, s⟩ → ?</code> et <code>⟨y, s⟩ → ?</code>.
+            Le littéral 14 est un entier : appliquez la règle <em>Entier</em>.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            L'expression contient deux opérations. Appliquez d'abord la règle <em>Op. binaire</em> pour
+            calculer <code>⟨x + y, s⟩ → 15</code>, puis une seconde fois pour
+            <code>⟨(x + y) − 14, s⟩ → ?</code>. L'arbre final comporte <strong>deux barres horizontales</strong>.
+        </div>
+    </div>
+
+    <!-- Zone de réponse -->
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Construisez ici votre arbre de dérivation…"></div>
+
+    <!-- Solution -->
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+            <p>Arbre de dérivation complet, avec annotation des règles appliquées :</p>
+
+            <!-- Arbre de dérivation -->
+            <div style="display: flex; justify-content: center; margin: 2rem 0; overflow-x: auto;">
+                <div style="display: inline-flex; flex-direction: column; align-items: center; font-family: 'Courier New', monospace; white-space: nowrap; color: var(--text-primary);">
+
+                    <!-- Prémisses des deux sous-arbres -->
+                    <div style="display: flex; gap: 3rem; align-items: flex-end; padding-bottom: 0.4rem;">
+
+                        <!-- Sous-arbre gauche : x + y -->
+                        <div style="display: inline-flex; flex-direction: column; align-items: center;">
+                            <div style="display: flex; gap: 1.5rem; padding-bottom: 0.4rem;">
+                                <span>⟨x, s⟩ → 7</span>
+                                <span>⟨y, s⟩ → 8</span>
+                            </div>
+                            <div style="border-top: 1px solid currentColor; width: 100%; text-align: center; padding-top: 0.4rem;">
+                                ⟨x + y, s⟩ → 15
+                            </div>
+                        </div>
+
+                        <!-- Sous-arbre droit : 14 (axiome) -->
+                        <div style="display: inline-flex; flex-direction: column; align-items: center;">
+                            <div style="width: 100%; text-align: center; padding-bottom: 0.4rem;">
+                                ⟨14, s⟩ → 14
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Barre de dérivation principale -->
+                    <div style="border-top: 1px solid currentColor; width: 100%; text-align: center; padding-top: 0.4rem;">
+                        ⟨(x + y) − 14, s⟩ → 1
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="callout-info">
+                <strong>Règles appliquées, de haut en bas</strong>
+                <ul>
+                    <li><code>⟨x, s⟩ → 7</code> — règle <em>Variable</em> : s(x) = 7</li>
+                    <li><code>⟨y, s⟩ → 8</code> — règle <em>Variable</em> : s(y) = 8</li>
+                    <li><code>⟨14, s⟩ → 14</code> — règle <em>Entier</em> : axiome</li>
+                    <li><code>⟨x + y, s⟩ → 15</code> — règle <em>Op. binaire (+)</em> : 7 + 8 = 15</li>
+                    <li><code>⟨(x + y) − 14, s⟩ → 1</code> — règle <em>Op. binaire (−)</em> : 15 − 14 = 1</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Feuilles de l'arbre</span>
+        <span class="bareme-desc">⟨x,s⟩→7, ⟨y,s⟩→8 et ⟨14,s⟩→14 posés correctement avec la règle nommée</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Sous-arbre intermédiaire</span>
+        <span class="bareme-desc">⟨x+y,s⟩→15 avec les deux prémisses reliées et règle op. binaire appliquée</span>
+
+        <span class="bareme-pts">1</span>
+        <span class="bareme-label">Conclusion finale</span>
+        <span class="bareme-desc">⟨(x+y)−14,s⟩→1 correctement déduit des deux sous-arbres</span>
+
+        <div class="bareme-total">Total : <strong>5 pts</strong></div>
+    </div>
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Évaluez <code>(x &gt; y)</code> dans le même état. Quelle règle sémantique s'applique pour les comparaisons ? Quel est le type du résultat ?</li>
+            <li>Que se passe-t-il formellement si on évalue <code>z + 1</code> dans un état où z n'est pas défini ? Le jugement <code>⟨z+1, s⟩ → ?</code> est-il valide ?</li>
+            <li>Construisez l'arbre de dérivation pour <code>x * (y + 2)</code> avec le même état s. Combien de barres horizontales comporte-t-il ?</li>
+        </ul>
+    </div>
+
+</body>
+</html>

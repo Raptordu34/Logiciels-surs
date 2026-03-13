@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+</head>
+<body>
+
+    <h2>Exercice 4 : Multiplication égyptienne</h2>
+
+    <div class="question">
+        <h3 style="margin-top:0;">Énoncé</h3>
+        <p>L'algorithme proposé effectue la multiplication <code>a * b</code> en utilisant des additions, des multiplications par 2 et des divisions par 2.</p>
+        <code>
+x := a;<br>
+y := b;<br>
+total := 0;<br>
+while x > 0 do<br>
+&nbsp;&nbsp;if x mod 2 = 1 then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;total := total + y ; x := x - 1;<br>
+&nbsp;&nbsp;end;<br>
+&nbsp;&nbsp;x := x/2;<br>
+&nbsp;&nbsp;y := y*2;<br>
+&nbsp;&nbsp;INVARIANT x &isin; IN &and; total + x * y = a * b<br>
+&nbsp;&nbsp;VARIANT x<br>
+end<br>
+Postcondition : total = a * b
+        </code>
+        <p>Prouver la correction de cet algorithme (Initialisation, Préservation, Terminaison).</p>
+    </div>
+
+    <div class="solution">
+        <h3 style="margin-top:0;">Solution</h3>
+        
+        <h4>1. Initialisation</h4>
+        <p>Avant la boucle, on a <code>x = a</code>, <code>y = b</code>, et <code>total = 0</code>.</p>
+        <p>On remplace dans l'invariant : <code>0 + a * b = a * b</code>. L'égalité est vraie, donc l'invariant est établi au démarrage de la boucle.</p>
+        
+        <h4>2. Préservation de l'invariant</h4>
+        <p>Supposons l'invariant vrai au début d'une itération. On distingue deux cas selon la parité de <code>x</code> :</p>
+        <ul>
+            <li><strong>Cas où x est impair (x mod 2 = 1) :</strong><br>
+                Nouvelles valeurs en fin d'itération : <code>x' = (x-1)/2</code>, <code>y' = y * 2</code>, <code>total' = total + y</code>.<br>
+                Vérifions : <code>total' + x' * y' = (total + y) + ((x-1)/2) * (y * 2) = total + y + (x-1)y = total + y + xy - y = total + xy = a * b</code>.<br>
+                L'invariant est préservé.
+            </li>
+            <li><strong>Cas où x est pair (x mod 2 = 0) :</strong><br>
+                Nouvelles valeurs : <code>x' = x/2</code>, <code>y' = y * 2</code>, <code>total' = total</code>.<br>
+                Vérifions : <code>total' + x' * y' = total + (x/2) * (y * 2) = total + xy = a * b</code>.<br>
+                L'invariant est également préservé.
+            </li>
+        </ul>
+
+        <h4>3. Terminaison et Postcondition</h4>
+        <p>Le variant <code>V = x</code> décroît strictement car à chaque itération <code>x</code> devient soit <code>x/2</code> soit <code>(x-1)/2</code>. Puisque la boucle tourne tant que <code>x > 0</code>, la valeur finira obligatoirement par atteindre 0.</p>
+        <p>En sortie de boucle, la condition <code>x > 0</code> est fausse. Sachant par l'invariant que <code>x &isin; IN</code>, cela implique que <code>x = 0</code>.</p>
+        <p>Si on remplace <code>x = 0</code> dans l'invariant : <code>total + 0 * y = a * b</code> &implies; <code>total = a * b</code>. La postcondition est prouvée avec succès !</p>
+
+        <div class="compare-grid">
+            <div class="compare-item neutral" data-label="Concept Formel">
+                <p>Ceci illustre la démarche complète des <strong>Obligations de Preuve (OP)</strong> en méthode B : on démontre mathématiquement que l'initialisation établit l'invariant, que chaque opération le préserve, et que le système atteint bien le but fixé (postcondition).</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

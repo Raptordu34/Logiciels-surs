@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/katex.min.css" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.35/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: "$$", right: "$$", display: true },
+                    { left: "$",  right: "$",  display: false }
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+    <script src="./section-utils.js" defer></script>
+</head>
+<body class="mode-detailed">
+
+    <h2>Chap 5 — Model-Checking & Logiques Temporelles</h2>
+
+    <!-- MODE RÉSUMÉ -->
+    <div class="compact-content">
+        <h3 style="margin-top: 0;">Synthèse</h3>
+        <ul>
+            <li><strong>Systèmes réactifs</strong> — interagissent continuellement avec leur environnement (sans fin définie), justifiant l'utilisation d'automates d'états.</li>
+            <li><strong>Model-Checking</strong> — technique de vérification exhaustive explorant tous les états d'un modèle pour s'assurer qu'il respecte une propriété.</li>
+            <li><strong>LTL (Linéaire)</strong> — vérifie des séquences linéaires d'états avec des opérateurs : $\bigcirc$ (Next), $\lozenge$ (Future/F), $\square$ (Always/G), $U$ (Until).</li>
+            <li><strong>CTL (Arborescente)</strong> — vérifie des arbres de calculs via des quantificateurs : $A$ (Tous les chemins) ou $E$ (Au moins un chemin), combinés aux opérateurs temporels.</li>
+            <li><strong>Relation de satisfaction</strong> — notée $M \models \varphi$, indique si le modèle $M$ respecte la formule $\varphi$.</li>
+        </ul>
+    </div>
+
+    <!-- MODE DÉTAILLÉ -->
+    <div class="detailed-content">
+
+        <!-- ── 1. Systèmes Réactifs ── -->
+        <h3>1. Systèmes réactifs et propriétés temporelles</h3>
+
+        <div class="compare-grid">
+            <div class="compare-item neutral" data-label="Programme Standard">
+                <ul>
+                    <li>Prend une entrée, calcule, et s'arrête (terminaison).</li>
+                    <li>Données complexes, contrôle simple.</li>
+                    <li>Vérifié par triples de Hoare (Sémantique axiomatique).</li>
+                </ul>
+            </div>
+            <div class="compare-item neutral" data-label="Système Réactif">
+                <ul>
+                    <li>Ne se termine pas, maintient une interaction (OS, protocoles).</li>
+                    <li>Données simples, contrôle complexe (concurrence).</li>
+                    <li>Nécessite de vérifier des propriétés dans le temps (Model-Checking).</li>
+                </ul>
+            </div>
+        </div>
+
+        <p>Les <strong>propriétés temporelles</strong> que l'on souhaite vérifier sont :</p>
+        <ul>
+            <li><strong>Sûreté (Safety) :</strong> Quelque chose de mauvais n'arrive jamais (ex: <em>pas de division par 0</em>).</li>
+            <li><strong>Vivacité (Liveness) :</strong> Quelque chose de bon finit par arriver (ex: <em>le message finit par être transmis</em>).</li>
+            <li><strong>Accessibilité :</strong> Un certain état peut être atteint.</li>
+        </ul>
+
+        <!-- ── 2. Systèmes de transitions ── -->
+        <h3>2. Systèmes de transitions (Automates)</h3>
+
+        <p>Un système de transitions (ST) modélise le comportement du système. Il est défini par un quadruplet $S = (Q, E, T, q_0)$ :</p>
+        <ul>
+            <li>$Q$ : ensemble fini d'états.</li>
+            <li>$E$ : ensemble fini d'étiquettes de transitions.</li>
+            <li>$T \subseteq Q \times E \times Q$ : ensemble de transitions.</li>
+            <li>$q_0$ : état initial.</li>
+        </ul>
+        <p>Pour le Model-Checking, on l'étend en <strong>Structure de Kripke</strong> avec une fonction d'étiquetage qui indique quelles propositions atomiques sont vraies dans chaque état.</p>
+
+        <!-- ── 3. Logiques Temporelles ── -->
+        <h3>3. Logiques Temporelles (LTL, CTL)</h3>
+
+        <p>Les logiques temporelles ajoutent à la logique propositionnelle des opérateurs permettant de parler du futur.</p>
+
+        <h4>LTL (Logique Temporelle Linéaire)</h4>
+        <p>En LTL, le temps est vu comme une séquence linéaire (un chemin $\sigma$). Les opérateurs temporels de base sont :</p>
+        
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Symbole</th>
+                        <th>Nom</th>
+                        <th>Signification</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>$\bigcirc$ ou $\mathbf{X}$</td><td>Next</td><td>Vrai à l'instant (ou état) suivant.</td></tr>
+                    <tr><td>$\lozenge$ ou $\mathbf{F}$</td><td>Future</td><td>Finit par être vrai dans le futur.</td></tr>
+                    <tr><td>$\square$ ou $\mathbf{G}$</td><td>Globally / Always</td><td>Toujours vrai, à partir de maintenant.</td></tr>
+                    <tr><td>$\mathbf{U}$</td><td>Until</td><td>$p \mathbf{U} q$ : $p$ reste vrai jusqu'à ce que $q$ devienne vrai.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="formula-box">
+            $$\square(p \implies \lozenge q)$$
+            <span class="formula-label">Exemple LTL : Si $p$ est vrai, alors $q$ le sera dans le futur (Vivacité)</span>
+        </div>
+
+        <h4>CTL (Computation Tree Logic - Logique Arborescente)</h4>
+        <p>En CTL, le temps est branchant : à partir d'un état, plusieurs futurs sont possibles. On introduit les <strong>quantificateurs de chemins</strong> :</p>
+        <ul>
+            <li>$\mathbf{A}$ (All) : Sur <em>tous</em> les chemins d'exécution partant de l'état courant.</li>
+            <li>$\mathbf{E}$ (Exists) : Il existe <em>au moins un</em> chemin d'exécution partant de l'état courant.</li>
+        </ul>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Formule</th>
+                        <th>Sémantique</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>$\mathbf{AG} \; p$</td><td>$p$ est <strong>toujours</strong> vrai sur <strong>tous</strong> les chemins (Invariant fort).</td></tr>
+                    <tr><td>$\mathbf{AF} \; p$</td><td>Sur <strong>tous</strong> les chemins, on finit <strong>toujours</strong> par atteindre $p$.</td></tr>
+                    <tr><td>$\mathbf{EF} \; p$</td><td>Il existe <strong>au moins un</strong> chemin qui atteint $p$ (Accessibilité).</td></tr>
+                    <tr><td>$\mathbf{EG} \; p$</td><td>Il existe <strong>au moins un</strong> chemin où $p$ reste toujours vrai.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout-info">
+            <strong>CTL* :</strong> C'est la logique la plus expressive qui combine librement quantificateurs de chemins ($A, E$) et opérateurs temporels ($X, F, G, U$). LTL et CTL sont des sous-ensembles de CTL* qui ne se recouvrent pas complètement.
+        </div>
+
+        <!-- ── 4. Relation de satisfaction ── -->
+        <h3>4. Relation de satisfaction ($M \models \varphi$)</h3>
+
+        <p>La question centrale du Model-Checking est : <em>Est-ce que le modèle $M$ valide (satisfait) la formule $\varphi$ ?</em></p>
+
+        <div class="highlight-box">
+            <strong>$M \models \varphi$</strong><br>
+            Signifie que la formule $\varphi$ est vraie pour toutes les exécutions (ou dans l'état initial) de la structure de Kripke $M$.
+        </div>
+
+        <p>Si la réponse est <em>Non</em> ($M \not\models \varphi$), l'outil de Model-Checking fournit un <strong>contre-exemple</strong> (une trace d'exécution menant à l'erreur), ce qui est extrêmement précieux pour le débogage.</p>
+
+    </div>
+
+</body>
+</html>
