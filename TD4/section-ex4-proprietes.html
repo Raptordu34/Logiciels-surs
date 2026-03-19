@@ -76,11 +76,16 @@
     <div class="solution">
         <div class="solution-inner">
             <h4 style="margin-top:0;">Solution — Q1</h4>
-            <pre><code>□p</code></pre>
+            <pre><code>A□p</code></pre>
             <p>
-                Se lit : "p est vrai à cet instant et restera vrai à tout instant futur."
-                C'est la propriété de sûreté la plus simple : p est un invariant global.
+                Se lit : "Pour tous les chemins d'exécution, p est vrai à cet instant et restera vrai à tout instant futur."
+                C'est la propriété de sûreté la plus simple : p est un invariant global sur tous les chemins.
             </p>
+            <p><strong>Décomposition :</strong></p>
+            <ul>
+                <li><code>A</code> : pour tous les chemins…</li>
+                <li><code>□p</code> : p est vrai à tout instant</li>
+            </ul>
         </div>
     </div>
 
@@ -95,9 +100,11 @@
         <p><strong>Propriété :</strong> On peut atteindre p par un chemin où q est toujours vrai.</p>
 
         <div class="erreur-freq">
-            <strong>Piège courant :</strong> Écrire <code>□(q → ◇p)</code> — cela dit "partout où q est vrai, p
-            finira par arriver", ce qui est différent. La propriété voulue décrit une progression simultanée :
-            q reste vrai pendant tout le chemin menant à p.
+            <strong>Pièges courants :</strong>
+            <ul>
+                <li><code>A□(q → ◇p)</code> — dit "sur tout chemin, partout où q est vrai, p finira par arriver" : mauvais quantificateur (A au lieu de E) et mauvaise structure.</li>
+                <li><code>E(q U p)</code> — plausible mais insuffisant : le Until n'exige q que jusqu'à p ; ici q doit rester vrai <em>tout le temps</em> (<code>□q</code>), même après p.</li>
+            </ul>
         </div>
 
         <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/2" aria-expanded="false">
@@ -127,20 +134,20 @@
     <div class="solution">
         <div class="solution-inner">
             <h4 style="margin-top:0;">Solution — Q2</h4>
-            <pre><code>q U p</code></pre>
+            <pre><code>E(◇p ∧ □q)</code></pre>
             <p>
-                Se lit : "q est vrai à chaque instant jusqu'à un instant où p devient vrai, et p finit par devenir vrai."
+                Se lit : "<strong>Il existe</strong> un chemin sur lequel q est toujours vrai et p est finalement atteint."
             </p>
-            <p>
-                La formule capture simultanément deux idées :
-            </p>
+            <p><strong>Décomposition :</strong></p>
             <ul>
-                <li>le chemin est "gardé" par q (invariant local)</li>
-                <li>p est finalement atteint (vivacité)</li>
+                <li><code>E</code> : il existe un chemin… (quantificateur existentiel — "on peut atteindre")</li>
+                <li><code>□q</code> : q est vrai à tout instant sur ce chemin (même après p)</li>
+                <li><code>◇p</code> : p est finalement atteint sur ce chemin</li>
             </ul>
             <p class="inline-note">
-                Note : en LTL, "chemin" signifie le préfixe de la trace depuis le moment présent.
-                <code>q U p</code> est bien une propriété de chemin, pas d'état.
+                Différence avec <code>E(q U p)</code> : le Until n'exige q que jusqu'à p ; ici <code>□q</code> impose
+                que q reste vrai <em>même après</em> l'occurrence de p, ce qui est plus fort et correspond mieux
+                à "un chemin où q est <em>toujours</em> vrai".
             </p>
         </div>
     </div>
@@ -188,13 +195,14 @@
     <div class="solution">
         <div class="solution-inner">
             <h4 style="margin-top:0;">Solution — Q3</h4>
-            <pre><code>□(p → ○□¬p)</code></pre>
+            <pre><code>A□(p → ○□¬p)</code></pre>
             <p>
-                Se lit : "À tout instant, si p est vrai maintenant, alors p sera faux à l'instant suivant et
+                Se lit : "Pour tous les chemins, à tout instant, si p est vrai maintenant, alors p sera faux à l'instant suivant et
                 restera faux pour toujours."
             </p>
             <p><strong>Décomposition :</strong></p>
             <ul>
+                <li><code>A</code> : pour tous les chemins…</li>
                 <li><code>□(…)</code> : à tout instant i…</li>
                 <li><code>p →</code> : si p est vrai en i…</li>
                 <li><code>○□¬p</code> : alors dès i+1 et pour toujours, p est faux</li>
@@ -209,16 +217,16 @@
 
     <div class="bareme">
         <span class="bareme-pts">3</span>
-        <span class="bareme-label">Q1 — □p</span>
-        <span class="bareme-desc">2 pts formule correcte · 1 pt justification ("invariant global")</span>
+        <span class="bareme-label">Q1 — A□p</span>
+        <span class="bareme-desc">1 pt quantificateur A · 1 pt □p · 1 pt justification ("invariant global sur tous les chemins")</span>
 
         <span class="bareme-pts">3</span>
-        <span class="bareme-label">Q2 — q U p</span>
-        <span class="bareme-desc">2 pts formule correcte · 1 pt explication du Until (persistance + vivacité)</span>
+        <span class="bareme-label">Q2 — E(◇p ∧ □q)</span>
+        <span class="bareme-desc">1 pt quantificateur E (existentiel) · 1 pt ◇p · 1 pt □q (q toujours vrai, pas seulement jusqu'à p)</span>
 
         <span class="bareme-pts">3</span>
-        <span class="bareme-label">Q3 — □(p → ○□¬p)</span>
-        <span class="bareme-desc">1 pt □ extérieur · 1 pt implication p→ · 1 pt ○□¬p correctement construit</span>
+        <span class="bareme-label">Q3 — A□(p → ○□¬p)</span>
+        <span class="bareme-desc">1 pt quantificateur A + □ extérieur · 1 pt implication p→ · 1 pt ○□¬p correctement construit</span>
 
         <div class="bareme-total">Total : <strong>9 pts</strong></div>
     </div>
