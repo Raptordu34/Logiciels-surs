@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 3 — Invariant et Opérations</h2>
+
+    <!-- ── EN-TÊTE ── -->
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 3 pts</span>
+            <span class="exo-time">⏱ 15–20 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Évaluer une substitution parallèle dans le formalisme B</li>
+                <li>Vérifier la préservation d'un invariant par une opération</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours — Substitutions généralisées en B, invariant de machine</em></p>
+    </div>
+
+    <!-- ── Rappel de cours ── -->
+    <button class="hint-btn" data-hint="rappel-subst" data-label="Rappel de cours" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours</span>
+    </button>
+    <div class="hint" id="rappel-subst">
+        <p><strong>Substitution parallèle (<code>||</code>) :</strong> toutes les affectations sont évaluées <em>simultanément</em> avec les valeurs <strong>avant</strong> l'exécution. L'ordre d'écriture n'a pas d'importance.</p>
+        <p><strong>Préservation d'invariant :</strong> une opération préserve l'invariant I si, pour tout état satisfaisant I et la précondition PRE, l'état après exécution satisfait encore I.</p>
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Formellement</span></p>
+            <p><code>I ∧ PRE ⇒ [S]I</code> — où [S]I est la plus faible précondition de I par la substitution S.</p>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- PARTIE (i) -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">1.5 pt</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Donner le résultat de l'opération suivante pour l'appel <code>op(2, 1)</code> avec <code>v1 = 1</code> et <code>v2 = 4</code>.</p>
+
+        <pre><code>sortie ← op(x, y) =
+PRE x ∈ ℕ ∧ y ∈ ℕ
+THEN
+    v1 := v1 + x ||
+    v2 := v2 + y ||
+    sortie := v1 * v2
+END</code></pre>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> La substitution est <strong>parallèle</strong> (<code>||</code>). L'affectation <code>sortie := v1 * v2</code> utilise les valeurs de v1 et v2 <em>avant</em> modification, pas les nouvelles valeurs.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            Avec la substitution parallèle, calculez d'abord toutes les expressions avec les valeurs initiales (v1=1, v2=4), puis affectez les résultats simultanément.
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="Valeurs de v1, v2 et sortie après exécution…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+            <p>Les trois affectations sont évaluées <strong>simultanément</strong> avec les valeurs initiales v1 = 1, v2 = 4 :</p>
+            <div class="table-glass">
+                <table>
+                    <thead>
+                        <tr><th>Variable</th><th>Expression</th><th>Calcul</th><th>Résultat</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>v1</td><td>v1 + x</td><td>1 + 2</td><td><strong>3</strong></td></tr>
+                        <tr><td>v2</td><td>v2 + y</td><td>4 + 1</td><td><strong>5</strong></td></tr>
+                        <tr><td>sortie</td><td>v1 * v2</td><td>1 × 4</td><td><strong>4</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p>Résultat : <code>v1 = 3</code>, <code>v2 = 5</code>, <code>sortie = 4</code>.</p>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- PARTIE (ii) -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">1.5 pt</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Déterminer si l'opération suivante préserve l'invariant <code>y ∈ {1, 2, 3, 4, 5}</code>. Justifier.</p>
+
+        <pre><code>op(x) = PRE x ∈ {1, 2} ∧ y ∈ {1, 2} THEN y := y + (2 * x) END</code></pre>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Il ne suffit pas de tester un seul cas. Il faut vérifier <em>toutes</em> les combinaisons possibles de x et y autorisées par la précondition.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            Énumérez toutes les combinaisons : x ∈ {1, 2} et y ∈ {1, 2}, soit 4 cas au total.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q2-h2">
+            Calculez y + 2x pour chaque combinaison et vérifiez si le résultat appartient toujours à {1, 2, 3, 4, 5}.
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="L'invariant est-il préservé ? Justification…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+            <p><strong>L'invariant n'est PAS préservé.</strong></p>
+            <p>Énumération de tous les cas :</p>
+            <div class="table-glass">
+                <table>
+                    <thead>
+                        <tr><th>x</th><th>y</th><th>y' = y + 2x</th><th>y' ∈ {1,2,3,4,5} ?</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>1</td><td>3</td><td>✓</td></tr>
+                        <tr><td>1</td><td>2</td><td>4</td><td>✓</td></tr>
+                        <tr><td>2</td><td>1</td><td>5</td><td>✓</td></tr>
+                        <tr><td style="color:#fca5a5;">2</td><td style="color:#fca5a5;">2</td><td style="color:#fca5a5;">6</td><td style="color:#fca5a5;">✗</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p>Pour <code>x = 2</code> et <code>y = 2</code> : y' = 2 + 4 = <strong>6</strong>, qui n'appartient pas à {1, 2, 3, 4, 5}.</p>
+            <p>L'invariant est donc <strong>violé</strong> par ce contre-exemple.</p>
+        </div>
+    </div>
+
+</body>
+</html>

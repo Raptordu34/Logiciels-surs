@@ -35,6 +35,13 @@
         <div class="callout-info">
             <strong>Rappel de notation :</strong>
 
+            <p style="margin:0.6rem 0 0.3rem;"><span class="badge badge-red">Relation de satisfaction</span></p>
+            <ul>
+                <li><code>σ ⊨ φ</code> — la trace σ <strong>satisfait</strong> la formule φ ("σ est un modèle de φ")</li>
+                <li><code>ST ⊨ φ</code> — le système de transitions ST <strong>satisfait</strong> φ</li>
+                <li><code>ST ⊭ φ</code> — le système ST <strong>ne satisfait pas</strong> φ</li>
+            </ul>
+
             <p style="margin:0.6rem 0 0.3rem;"><span class="badge badge-blue">Quantificateurs de chemins (CTL)</span></p>
             <ul>
                 <li><code>A</code> — <strong>pour tous</strong> les chemins d'exécution (All paths)</li>
@@ -42,23 +49,31 @@
             </ul>
 
             <p style="margin:0.6rem 0 0.3rem;"><span class="badge badge-orange">Opérateurs temporels (LTL)</span></p>
-            <ul>
-                <li><code>□φ</code> — φ est vraie à tout instant (G, globally)</li>
-                <li><code>◇φ</code> — φ sera vraie à un instant (F, finally)</li>
-                <li><code>○φ</code> — φ est vraie à l'instant suivant (X, next)</li>
-                <li><code>φ U ψ</code> — φ tient jusqu'à ce que ψ soit vrai (Until)</li>
-            </ul>
+            <div class="table-glass" style="margin:0.4rem 0;">
+                <table>
+                    <thead>
+                        <tr><th>Symbole</th><th>Lettre</th><th>Nom</th><th>Sémantique</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>□φ</code></td><td><strong>G</strong>φ</td><td>Globally (Toujours)</td><td>φ est vraie à cet instant et à tous les instants futurs</td></tr>
+                        <tr><td><code>◇φ</code></td><td><strong>F</strong>φ</td><td>Finally (Un jour)</td><td>φ sera vraie à cet instant ou à un instant futur</td></tr>
+                        <tr><td><code>○φ</code></td><td><strong>X</strong>φ</td><td>neXt (Suivant)</td><td>φ est vraie à l'instant immédiatement suivant</td></tr>
+                        <tr><td><code>φ U ψ</code></td><td>φ <strong>U</strong> ψ</td><td>Until (Jusqu'à)</td><td>φ reste vraie jusqu'à ce que ψ devienne vraie (et ψ finit par l'être)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="inline-note">Les deux notations (symboles □◇○ et lettres G, F, X) sont équivalentes et interchangeables.</p>
 
             <p style="margin:0.6rem 0 0.3rem;"><span class="badge badge-green">Lecture d'une formule CTL</span></p>
             <p>
                 Une formule CTL combine toujours un <strong>quantificateur de chemin</strong> (A ou E)
-                suivi d'un <strong>opérateur temporel</strong> (□, ◇, ○, U). Exemples :
+                suivi d'un <strong>opérateur temporel</strong> (G/□, F/◇, X/○, U). Exemples :
             </p>
             <ul>
-                <li><code>A□p</code> — sur <em>tous</em> les chemins, p est <em>toujours</em> vrai</li>
-                <li><code>E◇p</code> — il <em>existe</em> un chemin où p est vrai <em>un jour</em></li>
+                <li><code>A□p</code> = <code>AGp</code> — sur <em>tous</em> les chemins, p est <em>toujours</em> vrai</li>
+                <li><code>E◇p</code> = <code>EFp</code> — il <em>existe</em> un chemin où p est vrai <em>un jour</em></li>
                 <li><code>A(p U q)</code> — sur <em>tous</em> les chemins, p tient <em>jusqu'à</em> q</li>
-                <li><code>E○p</code> — il <em>existe</em> un chemin où p est vrai à l'instant <em>suivant</em></li>
+                <li><code>E○p</code> = <code>EXp</code> — il <em>existe</em> un chemin où p est vrai à l'instant <em>suivant</em></li>
             </ul>
         </div>
     </div>

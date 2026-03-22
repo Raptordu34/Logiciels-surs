@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 1 — LTL & CTL</h2>
+
+    <!-- ── EN-TÊTE ── -->
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+            <span class="exo-points">◎ 2 pts</span>
+            <span class="exo-time">⏱ 10–15 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Comprendre la relation entre les fragments LTL et CTL</li>
+                <li>Identifier les critères de choix entre LTL et CTL pour la vérification</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours — Logiques temporelles LTL et CTL</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3>Contexte</h3>
+        <p>
+            Soit la figure suivante représentant les fragments LTL et CTL de la logique temporelle.
+            Les deux ensembles se chevauchent partiellement, formant un diagramme de Venn.
+        </p>
+
+        <!-- Diagramme de Venn LTL / CTL -->
+        <div style="text-align: center; margin: 1.5rem 0;">
+            <svg width="360" height="180" viewBox="0 0 360 180" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cercle LTL -->
+                <ellipse cx="140" cy="90" rx="110" ry="70" fill="rgba(59,130,246,0.12)" stroke="rgba(59,130,246,0.5)" stroke-width="2"/>
+                <!-- Cercle CTL -->
+                <ellipse cx="220" cy="90" rx="110" ry="70" fill="rgba(249,115,22,0.12)" stroke="rgba(249,115,22,0.5)" stroke-width="2"/>
+                <!-- Labels -->
+                <text x="90" y="95" fill="#93c5fd" font-size="18" font-weight="700" text-anchor="middle" font-family="system-ui">LTL</text>
+                <text x="270" y="95" fill="#fdba74" font-size="18" font-weight="700" text-anchor="middle" font-family="system-ui">CTL</text>
+            </svg>
+        </div>
+    </div>
+
+    <!-- ── Rappel de cours ── -->
+    <button class="hint-btn" data-hint="rappel-ltl-ctl" data-label="Rappel de cours" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours</span>
+    </button>
+    <div class="hint" id="rappel-ltl-ctl">
+        <p><strong>LTL (Linear Temporal Logic) :</strong> raisonne sur des chemins linéaires (séquences infinies d'états). Les opérateurs temporels (G, F, X, U) s'appliquent implicitement à <em>tous les chemins</em>.</p>
+        <p><strong>CTL (Computation Tree Logic) :</strong> raisonne sur un arbre de calcul. Chaque opérateur temporel est précédé d'un quantificateur de chemin (A = tous les chemins, E = il existe un chemin).</p>
+        <ul>
+            <li><strong>LTL seul :</strong> certaines propriétés ne sont exprimables qu'en LTL (ex : équité forte).</li>
+            <li><strong>CTL seul :</strong> certaines propriétés ne sont exprimables qu'en CTL (ex : <code>AG EF p</code> — depuis tout état, il existe un chemin atteignant p).</li>
+            <li><strong>Intersection :</strong> les propriétés exprimables dans les deux logiques (ex : <code>AG p</code> en CTL correspond à <code>G p</code> en LTL).</li>
+        </ul>
+    </div>
+
+    <!-- ── QUESTION 1 ── -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">1 pt</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Interpréter cette représentation (diagramme de Venn LTL / CTL).</p>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            Pensez à ce que signifie l'intersection et les zones exclusives de chaque cercle en termes de formules exprimables.
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="Votre interprétation du diagramme…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+            <p>Le diagramme de Venn montre que <strong>LTL et CTL ne sont pas comparables</strong> : ni l'un ni l'autre n'est un sous-ensemble de l'autre.</p>
+            <ul>
+                <li><strong>Zone LTL seule :</strong> propriétés exprimables uniquement en LTL (ex : propriétés d'équité, formules avec l'opérateur U sans quantificateur de chemin explicite).</li>
+                <li><strong>Zone CTL seule :</strong> propriétés exprimables uniquement en CTL (ex : <code>AG EF p</code> — réinitialisabilité).</li>
+                <li><strong>Intersection :</strong> propriétés exprimables dans les deux logiques (ex : les propriétés de sûreté simples comme <code>G p</code> / <code>AG p</code>).</li>
+            </ul>
+            <p>Les deux logiques sont des fragments de <strong>CTL*</strong>, qui les englobe toutes les deux.</p>
+        </div>
+    </div>
+
+    <!-- ── QUESTION 2 ── -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">1 pt</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Selon vous, le choix entre LTL et CTL dépend de quels facteurs ?</p>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            Pensez à la nature de la propriété à vérifier, à la complexité algorithmique du model checking, et au type de système modélisé.
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="Votre réponse…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+            <p>Le choix dépend de plusieurs facteurs :</p>
+            <ul>
+                <li><strong>Nature de la propriété :</strong> si la propriété nécessite de quantifier existentiellement sur des chemins (ex : « il existe un chemin tel que… »), CTL est nécessaire. Si elle porte sur tous les chemins de manière linéaire, LTL est plus naturel.</li>
+                <li><strong>Expressivité :</strong> certaines propriétés ne sont exprimables que dans l'une des deux logiques (équité en LTL, réinitialisabilité en CTL).</li>
+                <li><strong>Complexité du model checking :</strong> le model checking CTL est polynomial en la taille de la formule et du système, tandis que LTL est PSPACE-complet en la taille de la formule.</li>
+                <li><strong>Outils disponibles :</strong> certains model checkers supportent mieux l'une ou l'autre logique (ex : SMV pour CTL, SPIN pour LTL).</li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+</html>

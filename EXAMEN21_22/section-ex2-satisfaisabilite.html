@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 2 — Satisfaisabilité</h2>
+
+    <!-- ── EN-TÊTE ── -->
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 5 pts</span>
+            <span class="exo-time">⏱ 20–30 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Vérifier des propriétés temporelles sur un système de transition</li>
+                <li>Analyser les chemins d'exécution et les états satisfaisant des propriétés</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours — Systèmes de transition, propriétés de sûreté et vivacité</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3>Contexte</h3>
+        <p>Soit le système de transition ST suivant :</p>
+
+        <!-- Système de transition SVG -->
+        <div style="text-align: center; margin: 1.5rem 0;">
+            <svg width="420" height="320" viewBox="0 0 420 320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui">
+                <defs>
+                    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto" fill="#9e9a94">
+                        <polygon points="0 0, 10 3.5, 0 7"/>
+                    </marker>
+                </defs>
+
+                <!-- États -->
+                <!-- s0 -->
+                <circle cx="100" cy="80" r="40" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.5)" stroke-width="2"/>
+                <text x="100" y="72" text-anchor="middle" fill="#93c5fd" font-size="15" font-weight="700">s₀</text>
+                <text x="100" y="94" text-anchor="middle" fill="#fdba74" font-size="13">p</text>
+                <!-- Flèche initiale s0 -->
+                <line x1="100" y1="20" x2="100" y2="38" stroke="#6ee7b7" stroke-width="2" marker-end="url(#arrow)"/>
+
+                <!-- s1 -->
+                <circle cx="300" cy="80" r="40" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.5)" stroke-width="2"/>
+                <text x="300" y="72" text-anchor="middle" fill="#93c5fd" font-size="15" font-weight="700">s₁</text>
+                <text x="300" y="94" text-anchor="middle" fill="#fdba74" font-size="13">q</text>
+                <!-- Flèche initiale s1 -->
+                <line x1="300" y1="20" x2="300" y2="38" stroke="#6ee7b7" stroke-width="2" marker-end="url(#arrow)"/>
+
+                <!-- s2 -->
+                <circle cx="100" cy="240" r="40" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.5)" stroke-width="2"/>
+                <text x="100" y="232" text-anchor="middle" fill="#93c5fd" font-size="15" font-weight="700">s₂</text>
+                <text x="100" y="254" text-anchor="middle" fill="#fdba74" font-size="13">p, r</text>
+
+                <!-- s3 -->
+                <circle cx="300" cy="240" r="40" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.5)" stroke-width="2"/>
+                <text x="300" y="232" text-anchor="middle" fill="#93c5fd" font-size="15" font-weight="700">s₃</text>
+                <text x="300" y="254" text-anchor="middle" fill="#fdba74" font-size="13">q, r</text>
+
+                <!-- Transitions -->
+                <!-- s0 → s1 -->
+                <line x1="142" y1="72" x2="258" y2="72" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
+                <!-- s0 → s2 -->
+                <line x1="92" y1="122" x2="92" y2="198" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
+                <!-- s1 → s3 -->
+                <line x1="308" y1="122" x2="308" y2="198" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
+                <!-- s1 → s0 -->
+                <line x1="258" y1="88" x2="142" y2="88" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
+                <!-- s2 → s3 -->
+                <line x1="142" y1="248" x2="258" y2="248" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
+                <!-- s2 → s1 -->
+                <line x1="125" y1="205" x2="275" y2="115" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
+                <!-- s3 → s2 -->
+                <line x1="258" y1="255" x2="142" y2="255" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
+                <!-- s3 → s0 -->
+                <line x1="265" y1="215" x2="135" y2="115" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
+            </svg>
+        </div>
+
+        <p>S = {s₀, s₁, s₂, s₃} est l'ensemble des états, P = {p, q, r} est l'ensemble des propriétés atomiques.</p>
+        <p>Par exemple, dans l'état s₂ les propriétés p et r sont vraies.</p>
+
+        <div class="callout-info">
+            <strong>Note :</strong> s₀ et s₁ sont les <strong>deux états initiaux</strong> du système (indiqués par les flèches entrantes).
+        </div>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>État</th><th>Propriétés atomiques</th><th>Successeurs</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>s₀ (initial)</td><td>{p}</td><td>s₁, s₂</td></tr>
+                    <tr><td>s₁ (initial)</td><td>{q}</td><td>s₀, s₃</td></tr>
+                    <tr><td>s₂</td><td>{p, r}</td><td>s₁, s₃</td></tr>
+                    <tr><td>s₃</td><td>{q, r}</td><td>s₀, s₂</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ── Rappel de cours ── -->
+    <button class="hint-btn" data-hint="rappel-satisf" data-label="Rappel de cours" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours</span>
+    </button>
+    <div class="hint" id="rappel-satisf">
+        <p><strong>Satisfaction d'une propriété :</strong> un système de transition satisfait une propriété si elle est vraie pour <em>tous les états initiaux</em> et <em>tous les chemins</em> partant de ces états.</p>
+        <p><strong>Méthode :</strong> pour réfuter une propriété, il suffit de trouver <em>un seul</em> contre-exemple (un chemin ou un état qui la viole).</p>
+        <ul>
+            <li><strong>Propriété de sûreté</strong> (« jamais… », « toujours… ») : vérifier tous les états accessibles.</li>
+            <li><strong>Propriété de vivacité</strong> (« finalement… ») : vérifier qu'aucun cycle n'évite indéfiniment la propriété.</li>
+            <li><strong>« immédiatement suivi »</strong> : dans tout état satisfaisant la propriété source, <em>tous les successeurs</em> doivent satisfaire la propriété cible.</li>
+        </ul>
+    </div>
+
+    <!-- ── QUESTION : 5 propriétés ── -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">5 pts (1 pt chacune)</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Dire si ST satisfait ou non les propriétés suivantes :</p>
+
+        <!-- φ1 -->
+        <div class="sub-question">
+            <p><strong>φ₁ :</strong> p et q ne sont jamais vraies en même temps.</p>
+        </div>
+
+        <!-- φ2 -->
+        <div class="sub-question">
+            <p><strong>φ₂ :</strong> tout q est immédiatement suivi d'un r.</p>
+        </div>
+
+        <!-- φ3 -->
+        <div class="sub-question">
+            <p><strong>φ₃ :</strong> tout p est immédiatement suivi d'un q.</p>
+        </div>
+
+        <!-- φ4 -->
+        <div class="sub-question">
+            <p><strong>φ₄ :</strong> tout chemin infini depuis un état initial atteint r.</p>
+        </div>
+
+        <!-- φ5 -->
+        <div class="sub-question">
+            <p><strong>φ₅ :</strong> tout chemin infini depuis un état initial atteint p.</p>
+        </div>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Ne pas oublier qu'il y a <strong>deux états initiaux</strong> (s₀ et s₁). Une propriété doit être vérifiée depuis <em>tous</em> les états initiaux. De plus, « immédiatement suivi » signifie que <em>tous</em> les successeurs doivent satisfaire la condition, pas seulement certains.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            Pour chaque propriété, listez les étiquetages de chaque état et vérifiez si la condition est respectée. Pour φ₁, vérifiez qu'aucun état ne contient à la fois p et q.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            Pour φ₃, examinez les successeurs des états où p est vrai (s₀ et s₂). Tous les successeurs doivent contenir q. Pour φ₅, cherchez un cycle ne passant jamais par un état contenant p.
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="Vos réponses pour φ₁ à φ₅…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <div class="table-glass">
+                <table>
+                    <thead>
+                        <tr><th>Propriété</th><th>Résultat</th><th>Justification</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>φ₁</strong></td>
+                            <td style="color:#6ee7b7;"><strong>VRAIE ✓</strong></td>
+                            <td>Aucun état ne contient à la fois p et q : s₀={p}, s₁={q}, s₂={p,r}, s₃={q,r}.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>φ₂</strong></td>
+                            <td style="color:#6ee7b7;"><strong>VRAIE ✓</strong></td>
+                            <td>Les états avec q sont s₁ et s₃. Successeurs de s₁ : {s₀, s₃} — s₃ contient r. Successeurs de s₃ : {s₀, s₂} — s₂ contient r. Dans tout chemin, après un état contenant q, l'état suivant contient r.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>φ₃</strong></td>
+                            <td style="color:#fca5a5;"><strong>FAUSSE ✗</strong></td>
+                            <td>s₀ contient p. Successeur s₂ contient {p, r} mais <strong>pas q</strong>. Contre-exemple : s₀ → s₂.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>φ₄</strong></td>
+                            <td style="color:#6ee7b7;"><strong>VRAIE ✓</strong></td>
+                            <td>Tout chemin infini finit par atteindre s₂ ou s₃ (qui contiennent r). Il n'existe pas de cycle évitant indéfiniment les états contenant r.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>φ₅</strong></td>
+                            <td style="color:#fca5a5;"><strong>FAUSSE ✗</strong></td>
+                            <td>Depuis s₁ (état initial), il existe un chemin infini évitant p : le cycle s₁ → s₃ → … qui ne passe que par des états contenant q (sans p).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4>Analyse détaillée</h4>
+
+            <p><strong>φ₁ — Vérification par inspection des états :</strong></p>
+            <p>On examine chaque état : s₀={p}, s₁={q}, s₂={p,r}, s₃={q,r}. Dans aucun état p et q ne coexistent.</p>
+
+            <p><strong>φ₂ — « tout q est immédiatement suivi d'un r » :</strong></p>
+            <p>On vérifie que dans tout chemin, chaque occurrence de q est suivie d'un état contenant r. En examinant tous les chemins possibles depuis les états contenant q, on constate que la propriété est satisfaite.</p>
+
+            <p><strong>φ₃ — Contre-exemple :</strong></p>
+            <p>s₀ contient p, et parmi ses successeurs, s₂ = {p, r} ne contient pas q. Le chemin s₀ → s₂ montre que p n'est pas toujours immédiatement suivi de q.</p>
+
+            <p><strong>φ₄ — Absence de cycle évitant r :</strong></p>
+            <p>Les états sans r sont s₀ et s₁. Les successeurs de s₀ sont {s₁, s₂}, ceux de s₁ sont {s₀, s₃}. Le seul cycle possible entre états sans r serait s₀ → s₁ → s₀ → …, mais depuis s₀ on peut aussi aller vers s₂ (qui a r) et depuis s₁ vers s₃ (qui a r). Tout chemin infini finit nécessairement par atteindre un état avec r.</p>
+
+            <p><strong>φ₅ — Contre-exemple :</strong></p>
+            <p>Depuis l'état initial s₁, il existe un chemin infini qui ne passe jamais par un état contenant p. Les états sans p sont s₁ = {q} et s₃ = {q, r}. Un cycle entre ces états permet d'éviter indéfiniment p.</p>
+        </div>
+    </div>
+
+</body>
+</html>

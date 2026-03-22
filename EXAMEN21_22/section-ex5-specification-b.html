@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 5 — Spécification en B</h2>
+
+    <!-- ── EN-TÊTE ── -->
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-avance">Avancé</span>
+            <span class="exo-points">◎ 6 pts</span>
+            <span class="exo-time">⏱ 30–40 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Modéliser un domaine métier en machine abstraite B</li>
+                <li>Définir les invariants de typage et les contraintes d'intégrité</li>
+                <li>Spécifier des opérations avec préconditions et substitutions</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours — Machines abstraites B, séquences, fonctions</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3>Contexte — Gestion d'équipes de hockey</h3>
+        <p>Le système doit permettre de gérer des équipes de hockey :</p>
+        <ul>
+            <li>Une <strong>équipe</strong> a les attributs : <code>idEquipe</code> et <code>nomEquipe</code>.</li>
+            <li>Un <strong>joueur</strong> a les attributs : <code>idJoueur</code> et <code>nomJoueur</code>.</li>
+            <li>Une équipe embauche un joueur en signant un <strong>contrat</strong> qui spécifie seulement le <strong>salaire</strong>.</li>
+            <li>Un joueur peut faire partie de <strong>plusieurs équipes</strong> au cours de sa carrière, y compris revenir dans une équipe précédente.</li>
+            <li>Chaque embauche ou échange crée un nouveau contrat.</li>
+            <li>On doit pouvoir afficher en <strong>ordre chronologique</strong> les contrats successifs d'un joueur.</li>
+        </ul>
+
+        <p>Machine abstraite à compléter :</p>
+        <pre><code>MACHINE hockey
+SETS
+    JOUEUR;
+    EQUIPE
+VARIABLES
+    joueur, nomJoueur, contrats,
+    equipe, nomEquipe
+INVARIANT
+    ……………………………
+INITIALISATION
+    ……………………………
+OPERATIONS
+    ajoJoueur(idJoueur, pNomJoueur) = ………
+    supJoueur(idJoueur) = ………
+    engager(idEquipe, idJoueur, salaire) = ………
+END</code></pre>
+    </div>
+
+    <!-- ── Rappel de cours ── -->
+    <button class="hint-btn" data-hint="rappel-machine-b" data-label="Rappel de cours" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours</span>
+    </button>
+    <div class="hint" id="rappel-machine-b">
+        <p><strong>Notations B utiles :</strong></p>
+        <ul>
+            <li><code>joueur ⊆ JOUEUR</code> — sous-ensemble du type abstrait</li>
+            <li><code>nomJoueur ∈ joueur → STRING</code> — fonction totale (chaque joueur a un nom)</li>
+            <li><code>contrats ∈ joueur → seq(T)</code> — chaque joueur a une séquence (ordonnée) de contrats</li>
+            <li><code>seq(T)</code> — séquence finie d'éléments de type T</li>
+            <li><code>s ← e</code> — ajout d'un élément e en fin de séquence s (append)</li>
+            <li><code>{x} ⩤ f</code> — anti-restriction de domaine : retire x du domaine de la fonction f</li>
+        </ul>
+    </div>
+
+    <!-- ── Analogie ── -->
+    <div class="callout-info">
+        <p><span class="badge badge-blue">Analogie</span></p>
+        <p><strong>Intuition :</strong> Pensez à <code>contrats</code> comme un dictionnaire où chaque joueur a une liste chronologique de fiches de contrat. Chaque fiche contient le couple (équipe, salaire). Quand un joueur est engagé, on ajoute une fiche à la fin de sa liste.</p>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- PARTIE : Invariant + Initialisation + Opérations -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">2 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Compléter l'<strong>invariant</strong> et l'<strong>initialisation</strong> de la machine.</p>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            L'invariant doit typer chaque variable : <code>joueur</code> est un sous-ensemble de JOUEUR, <code>nomJoueur</code> est une fonction de joueur vers STRING, etc. Quel est le type de <code>contrats</code> sachant qu'un contrat est un couple (équipe, salaire) ?
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            <code>contrats ∈ joueur → seq(equipe × NAT)</code> : chaque joueur a une séquence de couples (équipe, salaire). L'initialisation met tous les ensembles à ∅.
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="Invariant et initialisation…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1 : Invariant & Initialisation</h4>
+
+            <p><strong>Invariant :</strong></p>
+            <pre><code>INVARIANT
+    joueur ⊆ JOUEUR ∧
+    nomJoueur ∈ joueur → STRING ∧
+    equipe ⊆ EQUIPE ∧
+    nomEquipe ∈ equipe → STRING ∧
+    contrats ∈ joueur → seq(equipe × NAT)</code></pre>
+
+            <p><strong>Initialisation :</strong></p>
+            <pre><code>INITIALISATION
+    joueur, nomJoueur, contrats,
+    equipe, nomEquipe := ∅, ∅, ∅, ∅, ∅</code></pre>
+        </div>
+    </div>
+
+    <!-- ── Opération ajoJoueur ── -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">1.5 pt</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Spécifier l'opération <code>ajoJoueur(idJoueur, pNomJoueur)</code> qui ajoute un joueur dans le système.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Ne pas oublier d'initialiser la séquence de contrats du nouveau joueur à la séquence vide <code>[]</code>.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            La précondition doit vérifier que le joueur n'existe pas déjà (<code>idJoueur ∈ JOUEUR - joueur</code>) et que le nom est une chaîne. L'opération ajoute le joueur à l'ensemble, associe son nom et crée une séquence vide de contrats.
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="Spécification de ajoJoueur…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2 : ajoJoueur</h4>
+            <pre><code>ajoJoueur(idJoueur, pNomJoueur) =
+PRE
+    idJoueur ∈ JOUEUR - joueur ∧
+    pNomJoueur ∈ STRING
+THEN
+    joueur := joueur ∪ {idJoueur} ||
+    nomJoueur(idJoueur) := pNomJoueur ||
+    contrats(idJoueur) := []
+END</code></pre>
+        </div>
+    </div>
+
+    <!-- ── Opération supJoueur ── -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q3</span>
+            <span class="question-pts">1.5 pt</span>
+            <span class="diff-badge diff-avance">Avancé</span>
+        </div>
+        <p>Spécifier l'opération <code>supJoueur(idJoueur)</code> qui supprime un joueur et tout son historique de contrats.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Supprimer le joueur de l'ensemble ne suffit pas. Il faut aussi retirer ses entrées dans <code>nomJoueur</code> et <code>contrats</code> avec l'anti-restriction de domaine <code>⩤</code>.
+        </div>
+
+        <button class="hint-btn" data-hint="q3-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q3-h1">
+            <code>{idJoueur} ⩤ nomJoueur</code> retire idJoueur du domaine de la fonction nomJoueur. Appliquez la même technique pour contrats.
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="Spécification de supJoueur…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q3 : supJoueur</h4>
+            <pre><code>supJoueur(idJoueur) =
+PRE
+    idJoueur ∈ joueur
+THEN
+    joueur := joueur - {idJoueur} ||
+    nomJoueur := {idJoueur} ⩤ nomJoueur ||
+    contrats := {idJoueur} ⩤ contrats
+END</code></pre>
+        </div>
+    </div>
+
+    <!-- ── Opération engager ── -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q4</span>
+            <span class="question-pts">1 pt</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Spécifier l'opération <code>engager(idEquipe, idJoueur, salaire)</code> qui crée un contrat entre un joueur et une équipe.</p>
+
+        <button class="hint-btn" data-hint="q4-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q4-h1">
+            Le contrat est un couple (équipe, salaire). On l'ajoute en fin de séquence avec l'opérateur <code>←</code> (append). L'expression <code>contrats(idJoueur) ← (idEquipe ⟼ salaire)</code> ajoute le couple à la fin de la séquence.
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="Spécification de engager…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q4 : engager</h4>
+            <pre><code>engager(idEquipe, idJoueur, salaire) =
+PRE
+    idEquipe ∈ equipe ∧
+    idJoueur ∈ joueur ∧
+    salaire ∈ NAT
+THEN
+    contrats(idJoueur) := contrats(idJoueur) ← (idEquipe ⟼ salaire)
+END</code></pre>
+            <div class="callout-info">
+                <strong>Explication :</strong> <code>contrats(idJoueur) ← (idEquipe ⟼ salaire)</code> ajoute le couple (idEquipe, salaire) à la fin de la séquence de contrats du joueur, ce qui préserve l'ordre chronologique.
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

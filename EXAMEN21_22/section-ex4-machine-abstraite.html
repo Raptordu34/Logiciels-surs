@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 4 — Machine Abstraite</h2>
+
+    <!-- ── EN-TÊTE ── -->
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-avance">Avancé</span>
+            <span class="exo-points">◎ 4 pts</span>
+            <span class="exo-time">⏱ 20–30 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Analyser la préservation d'un invariant dans une machine B complète</li>
+                <li>Simuler l'exécution séquentielle d'opérations non déterministes</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours — Machines abstraites B, substitution ANY, SELECT</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3>Contexte — Machine q2</h3>
+        <p>Soit la machine abstraite suivante :</p>
+
+        <pre><code>MACHINE q2
+VARIABLES v1
+INVARIANT v1 ∈ 0..4
+INITIALISATION v1 := 0
+OPERATIONS
+
+res ← op1 =
+  PRE v1 ≤ 2 THEN
+    ANY x1 WHERE x1 ∈ NAT ∧ x1 ∈ 0..2
+    THEN res := x1 || v1 := v1 + x1 END
+  END;
+
+res ← op2 =
+  PRE v1 ∈ NAT THEN
+    ANY x1 WHERE x1 ∈ NAT ∧ x1 ∈ 0..2
+    THEN res := x1 || v1 := v1 + x1 END
+  END;
+
+op3 =
+  PRE v1 ∈ 0..2 THEN
+    SELECT v1 = 0 THEN v1 := v1 + 1
+    WHEN v1 = 1 THEN v1 := 0
+    WHEN v1 = 2 THEN v1 := 1
+    ELSE v1 := 3 END
+  END
+
+END</code></pre>
+
+        <div class="callout-info">
+            <strong>Note :</strong> NAT désigne l'ensemble des naturels (ℕ). L'invariant impose <code>v1 ∈ 0..4</code>, c'est-à-dire v1 ∈ {0, 1, 2, 3, 4}.
+        </div>
+    </div>
+
+    <!-- ── Rappel de cours ── -->
+    <button class="hint-btn" data-hint="rappel-any-select" data-label="Rappel de cours" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours</span>
+    </button>
+    <div class="hint" id="rappel-any-select">
+        <p><strong>ANY x WHERE P THEN S END :</strong> choisit non-déterministiquement un x satisfaisant P, puis exécute S. Pour prouver la préservation de l'invariant, il faut que S préserve l'invariant pour <em>tout</em> x satisfaisant P.</p>
+        <p><strong>SELECT c₁ THEN S₁ WHEN c₂ THEN S₂ … ELSE S END :</strong> exécute la branche dont la garde est vraie. La clause ELSE ne s'exécute que si aucune garde n'est vraie.</p>
+        <p><strong>PRE P THEN S END :</strong> la précondition P est une <em>obligation pour l'appelant</em>. Si l'appelant ne la respecte pas, le comportement est indéfini. Cependant, pour la préservation de l'invariant, on doit prouver : <code>I ∧ PRE ⇒ [S]I</code>.</p>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- PARTIE (a) -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">2 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Indiquer si l'invariant <code>v1 ∈ 0..4</code> est préservé par chaque opération. Justifier votre réponse.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Ne pas confondre la précondition (obligation de l'appelant) avec la vérification de l'invariant. Même si la PRE est faible, il faut vérifier que l'invariant est préservé sous <code>I ∧ PRE</code>.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            Pour chaque opération, identifiez les valeurs maximales de v1 autorisées par I ∧ PRE, puis les valeurs maximales de x1 autorisées par le ANY. Calculez la valeur maximale de v1 après exécution.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            Attention à op2 : sa précondition est <code>v1 ∈ NAT</code>, qui n'impose aucune borne supérieure. Sous l'invariant, v1 peut valoir jusqu'à 4. Que se passe-t-il si v1 = 4 et x1 = 2 ?
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="Analyse de chaque opération…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+            <p><strong>L'invariant n'est PAS préservé</strong>, à cause de l'opération op2.</p>
+
+            <p><strong>op1 :</strong> préserve l'invariant ✓</p>
+            <ul>
+                <li>PRE : v1 ≤ 2, donc v1 ∈ {0, 1, 2}</li>
+                <li>ANY : x1 ∈ 0..2, donc x1 ∈ {0, 1, 2}</li>
+                <li>Valeur max de v1' = 2 + 2 = 4 ✓</li>
+                <li>Valeur min de v1' = 0 + 0 = 0 ✓</li>
+            </ul>
+
+            <p><strong>op2 :</strong> <span style="color:#fca5a5;">viole l'invariant ✗</span></p>
+            <ul>
+                <li>PRE : v1 ∈ NAT (pas de borne supérieure)</li>
+                <li>Sous I ∧ PRE : v1 ∈ 0..4</li>
+                <li>ANY : x1 ∈ 0..2</li>
+                <li>Si v1 = 4 et x1 = 1 → v1' = 5 ∉ 0..4 ✗</li>
+                <li>Si v1 = 4 et x1 = 2 → v1' = 6 ∉ 0..4 ✗</li>
+            </ul>
+
+            <p><strong>op3 :</strong> préserve l'invariant ✓</p>
+            <ul>
+                <li>PRE : v1 ∈ 0..2</li>
+                <li>v1 = 0 → v1' = 1 ✓</li>
+                <li>v1 = 1 → v1' = 0 ✓</li>
+                <li>v1 = 2 → v1' = 1 ✓</li>
+                <li>ELSE : impossible car les 3 gardes couvrent 0..2</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- PARTIE (b) -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">2 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Quel est l'état de la machine après avoir exécuté les 3 opérations suivantes :</p>
+        <pre><code>1 ← op1 ; 2 ← op1 ; 2 ← op2</code></pre>
+        <p>Par exemple, <code>1 ← op1</code> signifie que l'opération a retourné la valeur 1 en sortie après exécution.</p>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            La valeur retournée (<code>res</code>) correspond à la valeur de x1 choisie par le ANY. Si <code>1 ← op1</code>, alors x1 = 1.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q2-h2">
+            Partez de v1 = 0 (initialisation) et appliquez séquentiellement : v1 := v1 + x1 pour chaque opération avec le x1 déduit de la valeur retournée.
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="État final de la machine…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+            <p>État initial : <code>v1 = 0</code></p>
+            <div class="table-glass">
+                <table>
+                    <thead>
+                        <tr><th>Étape</th><th>Opération</th><th>res = x1</th><th>v1 avant</th><th>v1 après (v1 + x1)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>1 ← op1</td><td>1</td><td>0</td><td>0 + 1 = <strong>1</strong></td></tr>
+                        <tr><td>2</td><td>2 ← op1</td><td>2</td><td>1</td><td>1 + 2 = <strong>3</strong></td></tr>
+                        <tr><td>3</td><td>2 ← op2</td><td>2</td><td>3</td><td>3 + 2 = <strong>5</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p>État final : <code>v1 = 5</code></p>
+            <div class="callout-info">
+                <strong>Remarque :</strong> La valeur v1 = 5 viole l'invariant v1 ∈ 0..4, ce qui confirme que op2 ne préserve pas l'invariant (comme montré en Q1).
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

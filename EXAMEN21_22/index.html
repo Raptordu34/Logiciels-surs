@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TD N°3 - Logiciels sûrs</title>
+    <title>Examen AFGL 2021–2022</title>
     <link rel="stylesheet" href="./layouts/sidebar-iframe.css">
     <style>
         /* ── Toolbar flottant en haut à droite du panel contenu ── */
@@ -242,17 +242,15 @@
     <div class="app-container">
         <nav class="sidebar glass-panel">
             <div class="sidebar-header">
-                <h1>TD N°3</h1>
-                <p>Logiciels sûrs - AFGL</p>
+                <h1>Examen AFGL</h1>
+                <p>ENSMA 2021–2022 · Master 2 Informatique UP · 2h</p>
             </div>
             <div class="nav-links" id="nav-links">
-                <button class="nav-btn active" onclick="loadSection('section-ex1.html', this)">Exercice 1</button>
-                <button class="nav-btn" onclick="loadSection('section-ex2.html', this)">Exercice 2</button>
-                <button class="nav-btn" onclick="loadSection('section-ex3.html', this)">Exercice 3</button>
-                <button class="nav-btn" onclick="loadSection('section-ex4.html', this)">Exercice 4</button>
-                <button class="nav-btn" onclick="loadSection('section-ex5.html', this)">Exercice 5</button>
-                <button class="nav-btn" onclick="loadSection('section-ex6.html', this)">Exercice 6</button>
-                <button class="nav-btn" onclick="loadSection('section-ex7.html', this)">Exercice 7</button>
+                <button class="nav-btn" onclick="loadSection('section-ex1-ltl-ctl.html', this)">Exercice 1 — LTL & CTL</button>
+                <button class="nav-btn" onclick="loadSection('section-ex2-satisfaisabilite.html', this)">Exercice 2 — Satisfaisabilité</button>
+                <button class="nav-btn" onclick="loadSection('section-ex3-invariant.html', this)">Exercice 3 — Invariant & Opérations</button>
+                <button class="nav-btn" onclick="loadSection('section-ex4-machine-abstraite.html', this)">Exercice 4 — Machine Abstraite</button>
+                <button class="nav-btn" onclick="loadSection('section-ex5-specification-b.html', this)">Exercice 5 — Spécification B</button>
             </div>
         </nav>
 
@@ -285,7 +283,7 @@
                     </button>
 
                     <!-- Fiche récap imprimable -->
-                    <button class="toolbar-btn-secondary" id="fiche-btn" onclick="toggleFichePanel()" title="Générer une fiche récap imprimable A4 portrait">
+                    <button class="toolbar-btn-secondary" id="fiche-btn" onclick="toggleFichePanel()" title="Générer une fiche récap imprimable A4 paysage">
                         ⎙ Fiche
                     </button>
 
@@ -384,7 +382,7 @@
             // Réinitialiser le toggle quand on change d'exercice
             solutionsRevealed = false;
             updateToggleBtn();
-
+            
             // Mettre à jour le bouton de validation
             updateValidateBtn(localStorage.getItem('td_done_' + url));
 
@@ -493,7 +491,7 @@
         function validateCurrentSection() {
             const sectionUrl = localStorage.getItem('td_currentSection') || '';
             const isDone = localStorage.getItem('td_done_' + sectionUrl);
-
+            
             if (isDone) {
                 // S'il est déjà validé, on donne la possibilité de l'invalider
                 localStorage.removeItem('td_done_' + sectionUrl);
