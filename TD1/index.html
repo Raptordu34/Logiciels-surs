@@ -95,6 +95,106 @@
         }
         .save-badge.visible { opacity: 1; }
 
+        /* ── Panneau de filtres fiche ────────────────────────────────── */
+        .fiche-panel {
+            position: absolute;
+            top: 68px;
+            right: 24px;
+            z-index: 200;
+            background: rgba(18, 18, 22, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 14px;
+            padding: 16px 20px;
+            width: 300px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+            display: none;
+        }
+        .fiche-panel.open { display: block; }
+        .fiche-panel-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-primary, #f5f3f0);
+            margin: 0 0 12px;
+            letter-spacing: 0.4px;
+        }
+        .fiche-presets {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+        .fiche-preset-btn {
+            flex: 1;
+            padding: 5px 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.05);
+            color: var(--text-secondary, #9e9a94);
+            font-size: 0.73rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.18s;
+        }
+        .fiche-preset-btn:hover, .fiche-preset-btn.active {
+            background: rgba(249,115,22,0.14);
+            border-color: rgba(249,115,22,0.35);
+            color: #fb923c;
+        }
+        .fiche-checks {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 7px 16px;
+            margin-bottom: 14px;
+        }
+        .fiche-check-label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.76rem;
+            color: var(--text-secondary, #9e9a94);
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.15s;
+        }
+        .fiche-check-label input[type="checkbox"] {
+            accent-color: #f97316;
+            width: 13px;
+            height: 13px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .fiche-check-label:hover { color: var(--text-primary, #f5f3f0); }
+        .fiche-gen-btn {
+            width: 100%;
+            padding: 9px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: opacity 0.18s;
+            letter-spacing: 0.3px;
+        }
+        .fiche-gen-btn:hover { opacity: 0.86; }
+
+        @media (max-width: 768px) {
+            .fiche-panel {
+                position: fixed;
+                top: auto;
+                right: 0;
+                left: 0;
+                bottom: 0;
+                width: 100%;
+                border-radius: 14px 14px 0 0;
+                padding: 20px 20px 30px;
+            }
+        }
+
         /* Progress dot sur les boutons de navigation */
         .nav-btn.nav-done::after {
             content: '';
@@ -160,10 +260,38 @@
                         ↓ Export
                     </button>
 
+                    <!-- Générer fiche récap imprimable -->
+                    <button class="toolbar-btn-secondary" id="fiche-btn" onclick="toggleFichePanel()" title="Configurer et générer une fiche récap A4 paysage imprimable">
+                        ⎙ Fiche
+                    </button>
+
                     <!-- Révéler toutes les solutions -->
                     <button class="floating-toggle-btn" id="solutions-toggle" onclick="toggleAllSolutions()">
-                        ▶ Révéler toutes les solutions
+                        <span class="btn-full">▶ Révéler toutes les solutions</span><span class="btn-short">▶ Solutions</span>
                     </button>
+                </div>
+
+                <!-- Panneau de filtres fiche récap -->
+                <div class="fiche-panel" id="fiche-panel">
+                    <p class="fiche-panel-title">⎙ Filtres de la fiche récap</p>
+                    <div class="fiche-presets">
+                        <button class="fiche-preset-btn" id="preset-all" onclick="setFichePreset('all')">Tout</button>
+                        <button class="fiche-preset-btn" id="preset-revision" onclick="setFichePreset('revision')">Révision</button>
+                        <button class="fiche-preset-btn" id="preset-entrainement" onclick="setFichePreset('entrainement')">Entraînement</button>
+                    </div>
+                    <div class="fiche-checks">
+                        <label class="fiche-check-label"><input type="checkbox" id="fc-objectifs" onchange="saveFicheFilters()"> Objectifs</label>
+                        <label class="fiche-check-label"><input type="checkbox" id="fc-ctx" onchange="saveFicheFilters()"> Contexte</label>
+                        <label class="fiche-check-label"><input type="checkbox" id="fc-rappel" onchange="saveFicheFilters()"> Rappels</label>
+                        <label class="fiche-check-label"><input type="checkbox" id="fc-exemple" onchange="saveFicheFilters()"> Exemples guidés</label>
+                        <label class="fiche-check-label"><input type="checkbox" id="fc-question" onchange="saveFicheFilters()"> Énoncés</label>
+                        <label class="fiche-check-label"><input type="checkbox" id="fc-solution" onchange="saveFicheFilters()"> Solutions</label>
+                        <label class="fiche-check-label"><input type="checkbox" id="fc-erreur" onchange="saveFicheFilters()"> Erreurs fréquentes</label>
+                        <label class="fiche-check-label"><input type="checkbox" id="fc-tip" onchange="saveFicheFilters()"> Points clés</label>
+                        <label class="fiche-check-label"><input type="checkbox" id="fc-callout" onchange="saveFicheFilters()"> Infos / Analogies</label>
+                        <label class="fiche-check-label"><input type="checkbox" id="fc-methode" onchange="saveFicheFilters()"> Méthodes</label>
+                    </div>
+                    <button class="fiche-gen-btn" onclick="launchFicheFromPanel()">⎙ Générer la fiche</button>
                 </div>
 
                 <iframe id="content-frame" src="" frameborder="0"></iframe>
@@ -245,9 +373,11 @@
 
         function updateToggleBtn() {
             const btn = document.getElementById('solutions-toggle');
-            btn.innerHTML = solutionsRevealed
-                ? '▼ Masquer les solutions'
-                : '▶ Révéler toutes les solutions';
+            if (solutionsRevealed) {
+                btn.innerHTML = '<span class="btn-full">▼ Masquer les solutions</span><span class="btn-short">▼ Masquer</span>';
+            } else {
+                btn.innerHTML = '<span class="btn-full">▶ Révéler toutes les solutions</span><span class="btn-short">▶ Solutions</span>';
+            }
         }
 
         // ── Effacer les réponses (avec confirmation) ──────────────────────
@@ -375,6 +505,94 @@
                 }
             });
         }
+
+        // ── Panneau filtres fiche ─────────────────────────────────────
+        const FICHE_FILTER_KEYS = ['objectifs','ctx','rappel','exemple','question','solution','erreur','tip','callout','methode'];
+
+        function toggleFichePanel() {
+            const panel = document.getElementById('fiche-panel');
+            const isOpen = panel.classList.contains('open');
+            if (isOpen) {
+                panel.classList.remove('open');
+            } else {
+                loadFicheFilters();
+                panel.classList.add('open');
+            }
+        }
+
+        function closeFichePanel() {
+            document.getElementById('fiche-panel').classList.remove('open');
+        }
+
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('fiche-panel');
+            const btn   = document.getElementById('fiche-btn');
+            if (panel.classList.contains('open') && !panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+                closeFichePanel();
+            }
+        });
+
+        function setFichePreset(preset) {
+            const values = {
+                objectifs: true,
+                ctx:       preset !== 'revision',
+                rappel:    preset !== 'revision',
+                exemple:   preset !== 'revision',
+                question:  true,
+                solution:  preset !== 'entrainement',
+                erreur:    preset !== 'entrainement',
+                tip:       preset !== 'entrainement',
+                callout:   preset !== 'revision',
+                methode:   preset !== 'revision',
+            };
+            FICHE_FILTER_KEYS.forEach(k => {
+                const el = document.getElementById('fc-' + k);
+                if (el) el.checked = values[k];
+            });
+            updateFichePresetBtns(preset);
+            saveFicheFilters();
+        }
+
+        function updateFichePresetBtns(active) {
+            ['all','revision','entrainement'].forEach(p => {
+                const btn = document.getElementById('preset-' + p);
+                if (btn) btn.classList.toggle('active', p === active);
+            });
+        }
+
+        function saveFicheFilters() {
+            const data = {};
+            FICHE_FILTER_KEYS.forEach(k => {
+                const el = document.getElementById('fc-' + k);
+                if (el) data[k] = el.checked;
+            });
+            localStorage.setItem('td_fiche_filters', JSON.stringify(data));
+            updateFichePresetBtns(null);
+        }
+
+        function loadFicheFilters() {
+            const saved = localStorage.getItem('td_fiche_filters');
+            if (!saved) { setFichePreset('all'); return; }
+            try {
+                const data = JSON.parse(saved);
+                FICHE_FILTER_KEYS.forEach(k => {
+                    const el = document.getElementById('fc-' + k);
+                    if (el && k in data) el.checked = data[k];
+                });
+            } catch(e) { setFichePreset('all'); }
+        }
+
+        function launchFicheFromPanel() {
+            saveFicheFilters();
+            const filters = {};
+            FICHE_FILTER_KEYS.forEach(k => {
+                const el = document.getElementById('fc-' + k);
+                filters[k] = el ? el.checked : true;
+            });
+            closeFichePanel();
+            generatePrintSheet(filters);
+        }
     </script>
+    <script src="./print-utils.js"></script>
 </body>
 </html>

@@ -1,9 +1,10 @@
 {
   "templateName": "td-exercice",
-  "templateVersion": "1.0.0",
+  "templateVersion": "1.4.0",
   "createdAt": "2026-03-21T21:32:25.958Z",
   "fileHashes": {
-    "components.css": "23f6972ae226d12514a80b06c0a1385e765871aa8bac9e7ed4fbc010bfb98c70",
+    "components.css": "1a801c10521f4ef06f0dac040ded2a3bd33ce7a46d6f3d48348238314648402e",
+    "print-utils.js": "e4786d5e1b42b567fe2ed204f4c4436f732964cbcca8742382bcd75f4dc3b49b",
     "PROMPT.md": "2421ad654261cdbbcc2ed37d476db12db03b45c2854b3c5e7d0d708590f0197e",
     "section-utils.js": "e47dd47c0b53dfffe323c0a696942d13dcdc6c74987f330d5e770835365afce1",
     "design/base.css": "c528758a14a26fcdacb013e7bd49773ced9fd623d691c3492188d27472feb3ed",
@@ -19,13 +20,17 @@
     "design/svg/CATALOG.md": "cbacddc58bfe8725901a4480541613fc0702784d1a2523ae427e495a6226f9a1",
     "design/svg/charts-preview.html": "43eb50f452e40a1f7ef6aac1825ef460b2a1fcfd38dee4ef4de8fa36d166b71b",
     "design/svg/charts.md": "a0c8c40e1b433885d3a57c625f93d32740139c56cc4ecef6edfcc36b061eb7cf",
+    "design/svg/exo5-surcharge.svg": "3c56afaf20f3ccc719a1e37121b631bc97870d029876c4718bcbca8eb08629a0",
+    "design/svg/exo6-parking-schema.svg": "c3bdbe9e1c33234df016b05dd15964cc68cc1f4d042e6399d3ca7ee82a576199",
+    "design/svg/exo7-parle-bipartite.svg": "2e3cec61026c71260b491de900b23fd350f9a12ff29230bc26c027cf657a8793",
+    "design/svg/exo8-famille-composition.svg": "cf42d272ab1d897563adab8147bf350bd1129ebbf3de8cd7a29a7e2ebdccb9dd",
     "design/svg/line-dashed-preview.html": "d95fb3345f061b78582d635e8eefcacbd37c52d974e9d6cbc7144967492e30e2",
     "design/svg/line-preview.html": "6112dd0d49454e84733c17fe9018099113a15ea51af35f514c8a57587ff243a7",
     "design/svg/lines.md": "afc2c3d68332f62a769fe4f1bbef035add258db39c93944f191789494c6ec3a2",
     "design/svg/nodes-preview.html": "11eefbcc9dee9abfd7efa5516c33dc36a18dd61d4c8624104d5989870b8ef7fb",
     "design/svg/nodes.md": "cbad5a10c6ec1cc20bbf52a3ccb039e9a263458ad2fcc31cac1de47bd29f85a4",
     "design/tokens.css": "135cfc43b821f72e7bd89cd1bf44cbc2a8cde878d60ceeffcc2fb787f10e066e",
-    "layouts/sidebar-iframe.css": "4193c1804cbd8cf8a132e71797ce6f2a035585777da3dea9db7129c660f0cf86",
+    "layouts/sidebar-iframe.css": "9062bd1760c20eb3dcb667a148e3d326699210afa3a998a32b4c0d94ce42fdb3",
     "layouts/single-scroll.css": "5ebe74317639ce6875ab38685b704d2577d4e1d94141b6999b0e3a52ffd02e07",
     "layouts/slides.css": "f695200dbe791696f8340f31e46726c24be2521f436a8c9a7ba396e1060705cf"
   }
