@@ -22,9 +22,11 @@
                 <li>Comprendre le rôle d'un invariant de boucle dans une preuve de correction</li>
                 <li>Formuler les trois obligations de preuve associées à un invariant</li>
                 <li>Vérifier chaque obligation par calcul de wp ou implication logique</li>
+                <li>Distinguer <strong>correction partielle</strong> et <strong>correction totale</strong></li>
+                <li>Construire un <em>variant</em> et prouver la terminaison d'une boucle</li>
             </ul>
         </div>
-        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours 2 — Logique de Hoare · Exercice 3 (wp et validité de triplets)</em></p>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours 2 — Logique de Hoare · Exercice 3 (wp et validité de triplets) · Notion de variant (terminaison)</em></p>
     </div>
 
     <!-- ── CONTEXTE ── -->
@@ -38,8 +40,12 @@ done
 { x >= 0  ∧  ¬(x < b) }</code></pre>
         <p>
             L'invariant proposé est <code>I : x ≥ 0</code>.
-            Votre objectif est de formuler et de vérifier les trois obligations de preuve qui établissent la <strong>correction partielle</strong> de cette boucle vis-à-vis de cet invariant.
+            Cet exercice se déroule en deux parties :
         </p>
+        <ul>
+            <li><strong>Q1 — Correction partielle :</strong> formuler et vérifier les trois obligations de preuve qui établissent que <em>si</em> la boucle termine, <em>alors</em> la postcondition est satisfaite.</li>
+            <li><strong>Q2 — Correction totale :</strong> trouver un <em>variant</em> et prouver que la boucle se termine nécessairement.</li>
+        </ul>
     </div>
 
     <!-- ── RAPPEL DE COURS ── -->
@@ -107,7 +113,70 @@ done
             <p><span class="badge badge-blue">Correction partielle vs totale</span></p>
             <p>
                 Ces trois obligations établissent la <strong>correction partielle</strong> : <em>si</em> la boucle termine, <em>alors</em> la postcondition est satisfaite.
-                La <strong>correction totale</strong> (garantie de terminaison) nécessite en plus un <em>variant</em> — un entier strictement décroissant à chaque itération.
+                La <strong>correction totale</strong> (garantie de terminaison) nécessite en plus un <em>variant</em> — voir Q2 ci-dessous.
+            </p>
+        </div>
+
+        <hr style="border-color: var(--border); margin: 1.5rem 0;">
+        <h4 style="margin-top:0;">Correction totale — Variant</h4>
+
+        <p>
+            La correction totale = correction partielle + <strong>terminaison</strong>.
+            Pour prouver la terminaison, on introduit un <strong>variant</strong> <code>V</code> : une expression entière qui
+            <em>décroît strictement</em> à chaque itération et reste <em>positive ou nulle</em> (i.e., V ∈ ℕ).
+        </p>
+        <p>
+            La notation <code>Δ</code> (delta) représente la <strong>valeur du variant avant une itération</strong> — c'est une constante figée le temps d'analyser un tour de boucle.
+        </p>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Obligation de typage</span></p>
+            <p><code>I ∧ C ⟹ V ∈ ℕ</code></p>
+            <p>Quand on entre dans la boucle (I vrai et C vrai), le variant est un entier naturel (positif ou nul). Cela garantit qu'il ne peut pas décroître indéfiniment.</p>
+        </div>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Obligation de décroissance</span></p>
+            <p><code>{ I ∧ C ∧ V = Δ } S { I ∧ V &lt; Δ }</code></p>
+            <p>
+                Si l'invariant est vrai, la condition est vraie, et le variant vaut <code>Δ</code> avant l'itération,
+                alors après l'exécution du corps <code>S</code>, le variant est <strong>strictement inférieur à Δ</strong>.
+                On prouve ce triplet comme d'habitude par calcul de wp.
+            </p>
+        </div>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>Obligation</th><th>Formule</th><th>Ce qu'elle garantit</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Typage</strong></td>
+                        <td><code>I ∧ C ⟹ V ∈ ℕ</code></td>
+                        <td>Le variant est borné par zéro (ne peut pas être négatif)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Décroissance</strong></td>
+                        <td><code>{ I ∧ C ∧ V = Δ } S { I ∧ V &lt; Δ }</code></td>
+                        <td>Le variant diminue strictement à chaque tour</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Boucle totale</strong></td>
+                        <td><code>{ I } while C do S { I ∧ ¬C }</code></td>
+                        <td>Synthèse : correction partielle + terminaison = correction totale</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Analogie</span></p>
+            <p>
+                <strong>Le variant comme compte à rebours :</strong> imaginez un minuteur réglé sur <code>V</code> secondes.
+                À chaque itération, le minuteur doit avancer — il ne peut pas rester immobile.
+                Comme il ne peut pas descendre en dessous de 0, la sonnerie finira forcément par retentir.
+                La boucle est garantie de s'arrêter.
             </p>
         </div>
     </div>
@@ -232,17 +301,18 @@ done
             </div>
 
             <div class="callout-info" style="margin-top: 1.5rem;">
-                <strong>Conclusion</strong>
+                <strong>Conclusion — Correction partielle établie</strong>
                 <p>
                     Les trois obligations sont vérifiées : la boucle est <strong>partiellement correcte</strong> vis-à-vis de l'invariant <code>x ≥ 0</code>.
-                    La terminaison (correction totale) n'est pas demandée ici, mais s'établirait avec le variant <code>b − x</code>, strictement décroissant à chaque itération tant que <code>x &lt; b</code>.
+                    Cela signifie : <em>si</em> la boucle termine, <em>alors</em> on a bien <code>x ≥ 0 ∧ x ≥ b</code>.
+                    La <strong>correction totale</strong> (garantie de terminaison) est traitée en Q2 avec le variant <code>b − x</code>.
                 </p>
             </div>
         </div>
     </div>
 
 
-    <!-- ── BARÈME ── -->
+    <!-- ── BARÈME Q1 ── -->
     <div class="bareme">
         <span class="bareme-pts">2</span>
         <span class="bareme-label">a) Initialisation</span>
@@ -256,7 +326,204 @@ done
         <span class="bareme-label">c) Postcondition</span>
         <span class="bareme-desc">1 pt formule (I∧¬B) ⟹ Q instanciée · 2 pts identification Q = I∧¬B et conclusion</span>
 
-        <div class="bareme-total">Total : <strong>10 pts</strong></div>
+        <div class="bareme-total">Sous-total Q1 : <strong>10 pts</strong></div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 2 — CORRECTION TOTALE                 -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">10 pts</span>
+            <span class="diff-badge diff-avance">Avancé</span>
+        </div>
+        <p>
+            On reprend la même boucle. On a établi en Q1 sa <em>correction partielle</em>.
+            L'objectif est maintenant d'établir sa <strong>correction totale</strong>, c'est-à-dire de prouver
+            qu'elle <em>se termine nécessairement</em>.
+        </p>
+        <p>
+            On choisit le variant : <code>V = b − x</code>.
+        </p>
+
+        <div class="sub-question">
+            <strong>a)</strong> <strong>Typage</strong> — Montrez que <code>I ∧ C ⟹ V ∈ ℕ</code>, c'est-à-dire que <code>b − x</code> est bien un entier naturel (positif) dès qu'on entre dans la boucle. <em>(3 pts)</em>
+        </div>
+        <div class="sub-question">
+            <strong>b)</strong> <strong>Décroissance</strong> — Prouvez le triplet <code>{ I ∧ C ∧ V = Δ } x := x+1 { I ∧ V &lt; Δ }</code>, c'est-à-dire :
+            <blockquote><code>{ x ≥ 0 ∧ x &lt; b ∧ b−x = Δ } &nbsp; x := x+1 &nbsp; { x ≥ 0 ∧ b−x &lt; Δ }</code></blockquote>
+            <em>(5 pts)</em>
+        </div>
+        <div class="sub-question">
+            <strong>c)</strong> <strong>Conclusion</strong> — En combinant Q1 et Q2, que peut-on affirmer sur la boucle ? Rédigez la conclusion en langage naturel. <em>(2 pts)</em>
+        </div>
+
+        <div class="erreur-freq">
+            <strong>Piège courant — le rôle de Δ :</strong>
+            <code>Δ</code> est une <em>constante arbitraire</em> qui représente la valeur du variant <em>juste avant</em> une itération.
+            Elle ne varie pas pendant l'itération : elle sert de « témoin » pour comparer avant et après.
+            Ne confondez pas Δ avec <code>V</code> (qui change) : <code>V = Δ</code> est vrai <em>à l'entrée du corps</em>, et on doit montrer <code>V &lt; Δ</code> <em>à la sortie</em>.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/3 — Typage" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/3 — Typage</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            Pour montrer <code>I ∧ C ⟹ V ∈ ℕ</code>, instanciez :
+            <code>I = (x ≥ 0)</code>, <code>C = (x &lt; b)</code>, <code>V = b − x</code>.
+            Demandez-vous : si <code>x ≥ 0</code> et <code>x &lt; b</code>, alors que vaut <code>b − x</code> ?
+            Est-il positif ? Est-il entier (si x et b sont des entiers) ?
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2" data-label="Indice 2/3 — Décroissance (règle d'affectation)" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/3 — Décroissance (règle d'affectation)</span>
+        </button>
+        <div class="hint" id="q2-h2">
+            Pour prouver <code>{ x ≥ 0 ∧ x &lt; b ∧ b−x = Δ } x := x+1 { x ≥ 0 ∧ b−x &lt; Δ }</code>,
+            utilisez la règle d'affectation : calculez
+            <code>wp(x := x+1, &nbsp; x ≥ 0 ∧ b−x &lt; Δ)</code>
+            en substituant <code>x</code> par <code>(x+1)</code> dans la postcondition.
+            Vous obtiendrez deux conditions ; vérifiez que chacune est impliquée par la précondition.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h3" data-label="Indice 3/3 — Vérification des implications" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 3/3 — Vérification des implications</span>
+        </button>
+        <div class="hint" id="q2-h3">
+            Après substitution, la postcondition devient <code>x+1 ≥ 0 ∧ b−(x+1) &lt; Δ</code>, soit <code>x ≥ −1 ∧ b−x−1 &lt; Δ</code>.
+            <ul>
+                <li>Pour la première partie : la précondition donne <code>x ≥ 0</code>, or <code>0 &gt; −1</code>, donc <code>x ≥ 0 ⟹ x ≥ −1</code>. ✓</li>
+                <li>Pour la seconde : la précondition donne <code>b−x = Δ</code>, donc <code>b−x−1 = Δ−1 &lt; Δ</code>. ✓</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="a) Typage du variant · b) Triplet de décroissance · c) Conclusion…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2 (Correction totale)</h4>
+
+            <p><strong>Données :</strong> I = (x ≥ 0) · C = (x &lt; b) · V = b − x · Corps S = (x := x+1).</p>
+
+            <!-- a) Typage -->
+            <div class="highlight-box" style="margin-top: 1.5rem;">
+                <p><span class="badge badge-green">a) Typage du variant — 3 pts</span></p>
+                <p><strong>Formule à prouver :</strong> <code>I ∧ C ⟹ V ∈ ℕ</code></p>
+                <p><strong>Instance :</strong> <code>x ≥ 0 ∧ x &lt; b &nbsp;⟹&nbsp; b − x &gt; 0 ∧ b − x ∈ ℕ</code></p>
+                <ul class="steps">
+                    <li>
+                        <strong>Positivité :</strong> si <code>x &lt; b</code> alors <code>b − x &gt; 0</code> — par définition de l'inégalité stricte. ✓
+                    </li>
+                    <li>
+                        <strong>Intégrité :</strong> <code>b</code> et <code>x</code> sont des entiers, donc <code>b − x</code> est un entier. ✓
+                    </li>
+                    <li>
+                        Les deux conditions réunies donnent <code>b − x ∈ ℕ</code> (entier ≥ 1). ✓
+                    </li>
+                </ul>
+            </div>
+
+            <!-- b) Décroissance -->
+            <div class="highlight-box" style="margin-top: 1rem;">
+                <p><span class="badge badge-orange">b) Décroissance du variant — 5 pts</span></p>
+                <p><strong>Triplet à prouver :</strong></p>
+                <pre><code>{ x ≥ 0  ∧  x < b  ∧  b−x = Δ }   x := x+1   { x ≥ 0  ∧  b−x < Δ }</code></pre>
+
+                <p><strong>Étape 1 — Calcul de wp par la règle d'affectation</strong></p>
+                <p>On substitue <code>x</code> par <code>(x+1)</code> dans la postcondition <code>x ≥ 0 ∧ b−x &lt; Δ</code> :</p>
+                <pre><code>wp(x := x+1,  x ≥ 0 ∧ b−x < Δ)
+= [x+1 / x]( x ≥ 0 ∧ b−x < Δ )
+= (x+1) ≥ 0 ∧ b−(x+1) < Δ
+= x ≥ −1 ∧ b−x−1 < Δ</code></pre>
+
+                <p><strong>Étape 2 — Vérification que la précondition implique la wp</strong></p>
+                <p>On doit montrer : <code>(x ≥ 0 ∧ x &lt; b ∧ b−x = Δ) ⟹ (x ≥ −1 ∧ b−x−1 &lt; Δ)</code></p>
+
+                <ul class="steps">
+                    <li>
+                        <strong>Partie gauche</strong> <code>x ≥ −1</code> :
+                        la précondition donne <code>x ≥ 0</code>.
+                        Or <code>0 &gt; −1</code>, donc <code>x ≥ 0 ⟹ x ≥ −1</code>. ✓
+                    </li>
+                    <li>
+                        <strong>Partie droite</strong> <code>b−x−1 &lt; Δ</code> :
+                        la précondition donne <code>b−x = Δ</code>, donc <code>b−x−1 = Δ−1 &lt; Δ</code>
+                        (car 1 &gt; 0). ✓
+                    </li>
+                </ul>
+
+                <p>Les deux parties sont vérifiées, donc le triplet est valide. ✓</p>
+            </div>
+
+            <!-- c) Conclusion -->
+            <div class="highlight-box" style="margin-top: 1rem;">
+                <p><span class="badge badge-blue">c) Conclusion — 2 pts</span></p>
+                <p>
+                    On a prouvé les deux propriétés nécessaires à la correction totale :
+                </p>
+                <div class="table-glass" style="margin-top: 0.8rem;">
+                    <table>
+                        <thead>
+                            <tr><th>Propriété</th><th>Prouvée en</th><th>Résultat</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Correction partielle</td>
+                                <td>Q1</td>
+                                <td>Si ça termine → la postcondition est vraie ✓</td>
+                            </tr>
+                            <tr>
+                                <td>Terminaison</td>
+                                <td>Q2 a) + b)</td>
+                                <td>V = b−x ∈ ℕ et décroît strictement → ça termine ✓</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p style="margin-top: 1rem;">
+                    <strong>Conclusion :</strong> la boucle <code>while x &lt; b do x := x+1</code> est <strong>totalement correcte</strong> :
+                    elle se termine toujours (en au plus <code>b − x₀</code> itérations, où <code>x₀</code> est la valeur initiale de <code>x</code>),
+                    et à la sortie on a bien <code>x ≥ 0 ∧ x ≥ b</code>.
+                </p>
+            </div>
+
+            <div class="callout-info" style="margin-top: 1.5rem;">
+                <strong>Récapitulatif : les obligations de la correction totale</strong>
+                <pre><code>— Typage    : I ∧ C ⟹ V ∈ ℕ
+— Corps     : { I ∧ C ∧ V = Δ } S { I ∧ V < Δ }
+——————————————————————————————————————
+{ I } while C do S { I ∧ ¬C }   [totalement correct]</code></pre>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ── BARÈME Q2 ── -->
+    <div class="bareme">
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">a) Typage</span>
+        <span class="bareme-desc">1 pt formule I∧C ⟹ V∈ℕ instanciée · 1 pt positivité (x&lt;b → b−x&gt;0) · 1 pt intégrité (entiers)</span>
+
+        <span class="bareme-pts">5</span>
+        <span class="bareme-label">b) Décroissance</span>
+        <span class="bareme-desc">1 pt triplet correctement posé avec Δ · 2 pts calcul wp par substitution · 1 pt implication sur x≥−1 · 1 pt implication sur b−x−1&lt;Δ</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">c) Conclusion</span>
+        <span class="bareme-desc">1 pt mention correction partielle + terminaison · 1 pt borne explicite ou reformulation en langage naturel</span>
+
+        <div class="bareme-total">Sous-total Q2 : <strong>10 pts</strong> · Total exercice : <strong>20 pts</strong></div>
     </div>
 
 
@@ -264,9 +531,10 @@ done
     <div class="pour-aller-plus-loin">
         <strong>Pour aller plus loin</strong>
         <ul>
-            <li>Proposez un <strong>variant</strong> pour cette boucle et vérifiez qu'il est strictement décroissant à chaque itération. Que se passe-t-il si <code>b &lt; 0</code> initialement ?</li>
-            <li>Que se passerait-il si l'invariant choisi était <code>I : x &lt; b</code> ? Laquelle des trois obligations échouerait, et pourquoi ?</li>
-            <li>Modifiez le corps de la boucle en <code>x := x + 2</code>. L'obligation de conservation est-elle encore vérifiable avec <code>I : x ≥ 0</code> ? Faut-il renforcer l'invariant ?</li>
+            <li>Que se passe-t-il si <code>b ≤ 0</code> initialement (avant la boucle) ? La boucle s'exécute-t-elle ? Le variant est-il toujours dans ℕ ? Que garantit l'obligation de typage dans ce cas ?</li>
+            <li>Que se passerait-il si l'invariant choisi était <code>I : x &lt; b</code> ? Laquelle des trois obligations de Q1 échouerait, et pourquoi ?</li>
+            <li>Modifiez le corps de la boucle en <code>x := x + 2</code>. L'obligation de conservation (Q1b) est-elle encore vérifiable avec <code>I : x ≥ 0</code> ? Faut-il renforcer l'invariant ? Et le variant <code>b − x</code> est-il toujours valide ?</li>
+            <li>Pouvez-vous trouver un <strong>deuxième variant valide</strong> pour cette boucle (différent de <code>b − x</code>) ? Un variant doit-il être unique ?</li>
         </ul>
     </div>
 

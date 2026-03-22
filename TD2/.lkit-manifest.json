@@ -1,9 +1,10 @@
 {
   "templateName": "td-exercice",
-  "templateVersion": "1.0.0",
+  "templateVersion": "1.5.0",
   "createdAt": "2026-03-21T21:31:47.209Z",
   "fileHashes": {
-    "components.css": "23f6972ae226d12514a80b06c0a1385e765871aa8bac9e7ed4fbc010bfb98c70",
+    "components.css": "1a801c10521f4ef06f0dac040ded2a3bd33ce7a46d6f3d48348238314648402e",
+    "print-utils.js": "764a78b9b933d5505968db502e22741885e48823c0e82dfe918a0dd9e269bd0f",
     "PROMPT.md": "2421ad654261cdbbcc2ed37d476db12db03b45c2854b3c5e7d0d708590f0197e",
     "section-utils.js": "e47dd47c0b53dfffe323c0a696942d13dcdc6c74987f330d5e770835365afce1",
     "design/base.css": "c528758a14a26fcdacb013e7bd49773ced9fd623d691c3492188d27472feb3ed",
@@ -25,7 +26,7 @@
     "design/svg/nodes-preview.html": "11eefbcc9dee9abfd7efa5516c33dc36a18dd61d4c8624104d5989870b8ef7fb",
     "design/svg/nodes.md": "cbad5a10c6ec1cc20bbf52a3ccb039e9a263458ad2fcc31cac1de47bd29f85a4",
     "design/tokens.css": "135cfc43b821f72e7bd89cd1bf44cbc2a8cde878d60ceeffcc2fb787f10e066e",
-    "layouts/sidebar-iframe.css": "4193c1804cbd8cf8a132e71797ce6f2a035585777da3dea9db7129c660f0cf86",
+    "layouts/sidebar-iframe.css": "9062bd1760c20eb3dcb667a148e3d326699210afa3a998a32b4c0d94ce42fdb3",
     "layouts/single-scroll.css": "5ebe74317639ce6875ab38685b704d2577d4e1d94141b6999b0e3a52ffd02e07",
     "layouts/slides.css": "f695200dbe791696f8340f31e46726c24be2521f436a8c9a7ba396e1060705cf"
   }
