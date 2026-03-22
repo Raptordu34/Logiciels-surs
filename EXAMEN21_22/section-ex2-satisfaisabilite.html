@@ -33,55 +33,57 @@
 
         <!-- Système de transition SVG -->
         <div style="text-align: center; margin: 1.5rem 0;">
-            <svg width="420" height="320" viewBox="0 0 420 320" xmlns="http://www.w3.org/2000/svg" font-family="system-ui">
+            <svg width="420" height="320" viewBox="0 0 420 320" xmlns="http://www.w3.org/2000/svg" font-family="'Inter', system-ui, sans-serif">
                 <defs>
                     <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto" fill="#9e9a94">
                         <polygon points="0 0, 10 3.5, 0 7"/>
                     </marker>
                 </defs>
 
-                <!-- États -->
+                <!-- États (Teal) -->
                 <!-- s0 -->
-                <circle cx="100" cy="80" r="40" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.5)" stroke-width="2"/>
-                <text x="100" y="72" text-anchor="middle" fill="#93c5fd" font-size="15" font-weight="700">s₀</text>
-                <text x="100" y="94" text-anchor="middle" fill="#fdba74" font-size="13">p</text>
-                <!-- Flèche initiale s0 -->
-                <line x1="100" y1="20" x2="100" y2="38" stroke="#6ee7b7" stroke-width="2" marker-end="url(#arrow)"/>
+                <circle cx="100" cy="80" r="40" fill="rgba(91,166,160,0.1)" stroke="#5ba6a0" stroke-width="2"/>
+                <text x="100" y="72" text-anchor="middle" fill="#5ba6a0" font-size="15" font-weight="700">s₀</text>
+                <text x="100" y="94" text-anchor="middle" fill="#d67556" font-size="13" font-weight="600">p</text>
+                <!-- Flèche initiale s0 (Orange) -->
+                <line x1="100" y1="20" x2="100" y2="38" stroke="#f97316" stroke-width="2.5" marker-end="url(#arrow)"/>
 
                 <!-- s1 -->
-                <circle cx="300" cy="80" r="40" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.5)" stroke-width="2"/>
-                <text x="300" y="72" text-anchor="middle" fill="#93c5fd" font-size="15" font-weight="700">s₁</text>
-                <text x="300" y="94" text-anchor="middle" fill="#fdba74" font-size="13">q</text>
-                <!-- Flèche initiale s1 -->
-                <line x1="300" y1="20" x2="300" y2="38" stroke="#6ee7b7" stroke-width="2" marker-end="url(#arrow)"/>
+                <circle cx="300" cy="80" r="40" fill="rgba(91,166,160,0.1)" stroke="#5ba6a0" stroke-width="2"/>
+                <text x="300" y="72" text-anchor="middle" fill="#5ba6a0" font-size="15" font-weight="700">s₁</text>
+                <text x="300" y="94" text-anchor="middle" fill="#d67556" font-size="13" font-weight="600">q</text>
+                <!-- Flèche initiale s1 (Orange) -->
+                <line x1="300" y1="20" x2="300" y2="38" stroke="#f97316" stroke-width="2.5" marker-end="url(#arrow)"/>
 
                 <!-- s2 -->
-                <circle cx="100" cy="240" r="40" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.5)" stroke-width="2"/>
-                <text x="100" y="232" text-anchor="middle" fill="#93c5fd" font-size="15" font-weight="700">s₂</text>
-                <text x="100" y="254" text-anchor="middle" fill="#fdba74" font-size="13">p, r</text>
+                <circle cx="100" cy="240" r="40" fill="rgba(91,166,160,0.1)" stroke="#5ba6a0" stroke-width="2"/>
+                <text x="100" y="232" text-anchor="middle" fill="#5ba6a0" font-size="15" font-weight="700">s₂</text>
+                <text x="100" y="254" text-anchor="middle" fill="#d67556" font-size="13" font-weight="600">p, r</text>
 
                 <!-- s3 -->
-                <circle cx="300" cy="240" r="40" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.5)" stroke-width="2"/>
-                <text x="300" y="232" text-anchor="middle" fill="#93c5fd" font-size="15" font-weight="700">s₃</text>
-                <text x="300" y="254" text-anchor="middle" fill="#fdba74" font-size="13">q, r</text>
+                <circle cx="300" cy="240" r="40" fill="rgba(91,166,160,0.1)" stroke="#5ba6a0" stroke-width="2"/>
+                <text x="300" y="232" text-anchor="middle" fill="#5ba6a0" font-size="15" font-weight="700">s₃</text>
+                <text x="300" y="254" text-anchor="middle" fill="#d67556" font-size="13" font-weight="600">q, r</text>
 
-                <!-- Transitions -->
-                <!-- s0 → s1 -->
+                <!-- Transitions (Muted) -->
+                <!-- s0 → s1 / s1 → s0 -->
                 <line x1="142" y1="72" x2="258" y2="72" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
-                <!-- s0 → s2 -->
-                <line x1="92" y1="122" x2="92" y2="198" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
-                <!-- s1 → s3 -->
-                <line x1="308" y1="122" x2="308" y2="198" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
-                <!-- s1 → s0 -->
                 <line x1="258" y1="88" x2="142" y2="88" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
-                <!-- s2 → s3 -->
-                <line x1="142" y1="248" x2="258" y2="248" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
-                <!-- s2 → s1 -->
+                
+                <!-- s0 → s2 / s1 → s3 -->
+                <line x1="92" y1="122" x2="92" y2="198" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
+                <line x1="308" y1="122" x2="308" y2="198" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
+                
+                <!-- s2 → s3 / s3 → s2 -->
+                <line x1="142" y1="232" x2="258" y2="232" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
+                <line x1="258" y1="248" x2="142" y2="248" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
+                
+                <!-- Diagonales -->
                 <line x1="125" y1="205" x2="275" y2="115" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
-                <!-- s3 → s2 -->
-                <line x1="258" y1="255" x2="142" y2="255" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
-                <!-- s3 → s0 -->
                 <line x1="265" y1="215" x2="135" y2="115" stroke="#9e9a94" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+                <!-- Boucle sur s3 -->
+                <path d="M 335 225 C 365 200, 385 280, 335 255" stroke="#9e9a94" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
             </svg>
         </div>
 
@@ -89,7 +91,8 @@
         <p>Par exemple, dans l'état s₂ les propriétés p et r sont vraies.</p>
 
         <div class="callout-info">
-            <strong>Note :</strong> s₀ et s₁ sont les <strong>deux états initiaux</strong> du système (indiqués par les flèches entrantes).
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="vertical-align: middle; margin-right: 4px;"><path d="M 12 4 L 6.5 11 L 10 11 Q 10 19 12 19.5 Q 14 19 14 11 L 17.5 11 Z" fill="#f97316"/></svg>
+            <strong>Note :</strong> s₀ et s₁ sont les <strong>deux états initiaux</strong> du système (indiqués par les flèches orange entrantes).
         </div>
 
         <div class="table-glass">
@@ -101,7 +104,7 @@
                     <tr><td>s₀ (initial)</td><td>{p}</td><td>s₁, s₂</td></tr>
                     <tr><td>s₁ (initial)</td><td>{q}</td><td>s₀, s₃</td></tr>
                     <tr><td>s₂</td><td>{p, r}</td><td>s₁, s₃</td></tr>
-                    <tr><td>s₃</td><td>{q, r}</td><td>s₀, s₂</td></tr>
+                    <tr><td>s₃</td><td>{q, r}</td><td>s₀, s₂, s₃</td></tr>
                 </tbody>
             </table>
         </div>
@@ -200,8 +203,8 @@
                         </tr>
                         <tr>
                             <td><strong>φ₂</strong></td>
-                            <td style="color:#6ee7b7;"><strong>VRAIE ✓</strong></td>
-                            <td>Les états avec q sont s₁ et s₃. Successeurs de s₁ : {s₀, s₃} — s₃ contient r. Successeurs de s₃ : {s₀, s₂} — s₂ contient r. Dans tout chemin, après un état contenant q, l'état suivant contient r.</td>
+                            <td style="color:#fca5a5;"><strong>FAUSSE ✗</strong></td>
+                            <td>Les états avec q sont s₁ et s₃. Successeurs de s₁ : {s₀, s₃}. Or <strong>s₀ ne contient pas r</strong>. Contre-exemple : s₁ → s₀.</td>
                         </tr>
                         <tr>
                             <td><strong>φ₃</strong></td>
@@ -210,16 +213,39 @@
                         </tr>
                         <tr>
                             <td><strong>φ₄</strong></td>
-                            <td style="color:#6ee7b7;"><strong>VRAIE ✓</strong></td>
-                            <td>Tout chemin infini finit par atteindre s₂ ou s₃ (qui contiennent r). Il n'existe pas de cycle évitant indéfiniment les états contenant r.</td>
+                            <td style="color:#fca5a5;"><strong>FAUSSE ✗</strong></td>
+                            <td>Il existe un cycle infini évitant r : s₀ → s₁ → s₀ → … Aucun de ces deux états ne contient r.</td>
                         </tr>
                         <tr>
                             <td><strong>φ₅</strong></td>
                             <td style="color:#fca5a5;"><strong>FAUSSE ✗</strong></td>
-                            <td>Depuis s₁ (état initial), il existe un chemin infini évitant p : le cycle s₁ → s₃ → … qui ne passe que par des états contenant q (sans p).</td>
+                            <td>Depuis l'état initial s₁, le chemin s₁ → s₃ → s₃ → … évite indéfiniment p (s₃ contient q, r).</td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <div class="two-col" style="margin-top: 1.5rem;">
+                <div class="callout-info">
+                    <p><span class="badge badge-red">Contre-exemple φ₄ (évitement r)</span></p>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" fill="#5ba6a0"/></svg> <span>s₀</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M 20 12 L 13 6.5 L 13 10 Q 5 10 4.5 12 Q 5 14 13 14 L 13 17.5 Z" fill="#9e9a94"/></svg>
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" fill="#5ba6a0"/></svg> <span>s₁</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M 20 12 L 13 6.5 L 13 10 Q 5 10 4.5 12 Q 5 14 13 14 L 13 17.5 Z" fill="#9e9a94"/></svg>
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" fill="#5ba6a0"/></svg> <span>s₀</span>
+                    </div>
+                </div>
+                <div class="callout-info">
+                    <p><span class="badge badge-red">Contre-exemple φ₅ (évitement p)</span></p>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" fill="#5ba6a0"/></svg> <span>s₁</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M 20 12 L 13 6.5 L 13 10 Q 5 10 4.5 12 Q 5 14 13 14 L 13 17.5 Z" fill="#9e9a94"/></svg>
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" fill="#5ba6a0"/></svg> <span>s₃</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M 20 12 L 13 6.5 L 13 10 Q 5 10 4.5 12 Q 5 14 13 14 L 13 17.5 Z" fill="#9e9a94"/></svg>
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" fill="#5ba6a0"/></svg> <span>s₃</span>
+                    </div>
+                </div>
             </div>
 
             <h4>Analyse détaillée</h4>
@@ -228,16 +254,16 @@
             <p>On examine chaque état : s₀={p}, s₁={q}, s₂={p,r}, s₃={q,r}. Dans aucun état p et q ne coexistent.</p>
 
             <p><strong>φ₂ — « tout q est immédiatement suivi d'un r » :</strong></p>
-            <p>On vérifie que dans tout chemin, chaque occurrence de q est suivie d'un état contenant r. En examinant tous les chemins possibles depuis les états contenant q, on constate que la propriété est satisfaite.</p>
+            <p>On examine les états où q est vrai (s₁ et s₃). Les successeurs de s₁ sont s₀ et s₃. Or s₀ ne contient pas r. La propriété est donc réfutée.</p>
 
             <p><strong>φ₃ — Contre-exemple :</strong></p>
             <p>s₀ contient p, et parmi ses successeurs, s₂ = {p, r} ne contient pas q. Le chemin s₀ → s₂ montre que p n'est pas toujours immédiatement suivi de q.</p>
 
-            <p><strong>φ₄ — Absence de cycle évitant r :</strong></p>
-            <p>Les états sans r sont s₀ et s₁. Les successeurs de s₀ sont {s₁, s₂}, ceux de s₁ sont {s₀, s₃}. Le seul cycle possible entre états sans r serait s₀ → s₁ → s₀ → …, mais depuis s₀ on peut aussi aller vers s₂ (qui a r) et depuis s₁ vers s₃ (qui a r). Tout chemin infini finit nécessairement par atteindre un état avec r.</p>
+            <p><strong>φ₄ — Cycle évitant r :</strong></p>
+            <p>Les états sans r sont s₀ et s₁. Comme il existe une transition entre s₀ et s₁ (dans les deux sens), on peut former le cycle infini (s₀s₁)<sup>ω</sup> qui ne passe jamais par un état contenant r.</p>
 
-            <p><strong>φ₅ — Contre-exemple :</strong></p>
-            <p>Depuis l'état initial s₁, il existe un chemin infini qui ne passe jamais par un état contenant p. Les états sans p sont s₁ = {q} et s₃ = {q, r}. Un cycle entre ces états permet d'éviter indéfiniment p.</p>
+            <p><strong>φ₅ — Cycle évitant p :</strong></p>
+            <p>Les états sans p sont s₁ and s₃. Depuis l'état initial s₁, on peut aller en s₃. s₃ possède une boucle sur lui-même (self-loop). Le chemin s₁s₃<sup>ω</sup> évite donc p indéfiniment.</p>
         </div>
     </div>
 

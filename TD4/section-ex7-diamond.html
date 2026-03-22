@@ -151,6 +151,27 @@
             mais <code>◇(a ∧ b)</code> est fausse. Utiliser ST comme exemple au sens du cours.
         </p>
 
+        <div style="display:flex; justify-content:center; margin: 1.5rem 0;">
+            <svg width="300" height="100" viewBox="0 0 300 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Transitions -->
+                <!-- S1 -> S2 (Top) -->
+                <path d="M 110 35 C 130 20, 170 20, 190 35" stroke="#d67556" stroke-width="1.5" fill="none" />
+                <path d="M 195 38 L 186 32 Q 189 38 186 44 Z" fill="#d67556" />
+
+                <!-- S2 -> S1 (Bottom) -->
+                <path d="M 190 65 C 170 80, 130 80, 110 65" stroke="#d67556" stroke-width="1.5" fill="none" />
+                <path d="M 105 62 L 114 68 Q 111 62 114 56 Z" fill="#d67556" />
+
+                <!-- States -->
+                <rect x="10" y="30" width="100" height="40" rx="20" fill="rgba(91,166,160,0.1)" stroke="#5ba6a0" stroke-width="2"/>
+                <text x="60" y="55" text-anchor="middle" font-family="'Inter', system-ui, sans-serif" font-size="12" fill="#dedad5" font-weight="600">S1 {a}</text>
+                <text x="60" y="22" text-anchor="middle" font-family="'Inter', system-ui, sans-serif" font-size="10" fill="#5ba6a0" font-weight="500">Initial</text>
+
+                <rect x="190" y="30" width="100" height="40" rx="8" fill="rgba(214,117,86,0.08)" stroke="#d67556" stroke-width="1.5"/>
+                <text x="240" y="55" text-anchor="middle" font-family="'Inter', system-ui, sans-serif" font-size="12" fill="#dedad5">S2 {b}</text>
+            </svg>
+        </div>
+
         <div class="erreur-freq">
             <strong>Piège courant :</strong> Proposer un ST avec un seul état contenant a et b — cela satisferait
             les deux formules. Le ST doit être conçu de sorte que a et b ne soient jamais vrais <em>en même temps</em>.

@@ -37,13 +37,13 @@
         <!-- Diagramme de Venn LTL / CTL -->
         <div style="text-align: center; margin: 1.5rem 0;">
             <svg width="360" height="180" viewBox="0 0 360 180" xmlns="http://www.w3.org/2000/svg">
-                <!-- Cercle LTL -->
-                <ellipse cx="140" cy="90" rx="110" ry="70" fill="rgba(59,130,246,0.12)" stroke="rgba(59,130,246,0.5)" stroke-width="2"/>
-                <!-- Cercle CTL -->
-                <ellipse cx="220" cy="90" rx="110" ry="70" fill="rgba(249,115,22,0.12)" stroke="rgba(249,115,22,0.5)" stroke-width="2"/>
+                <!-- Cercle LTL (Teal) -->
+                <ellipse cx="140" cy="90" rx="110" ry="70" fill="rgba(91,166,160,0.12)" stroke="#5ba6a0" stroke-width="2"/>
+                <!-- Cercle CTL (Terracotta) -->
+                <ellipse cx="220" cy="90" rx="110" ry="70" fill="rgba(214,117,86,0.12)" stroke="#d67556" stroke-width="2"/>
                 <!-- Labels -->
-                <text x="90" y="95" fill="#93c5fd" font-size="18" font-weight="700" text-anchor="middle" font-family="system-ui">LTL</text>
-                <text x="270" y="95" fill="#fdba74" font-size="18" font-weight="700" text-anchor="middle" font-family="system-ui">CTL</text>
+                <text x="90" y="95" fill="#5ba6a0" font-size="18" font-weight="700" text-anchor="middle" font-family="'Inter', system-ui, sans-serif">LTL</text>
+                <text x="270" y="95" fill="#d67556" font-size="18" font-weight="700" text-anchor="middle" font-family="'Inter', system-ui, sans-serif">CTL</text>
             </svg>
         </div>
     </div>
@@ -54,8 +54,39 @@
         <span class="btn-label">Rappel de cours</span>
     </button>
     <div class="hint" id="rappel-ltl-ctl">
-        <p><strong>LTL (Linear Temporal Logic) :</strong> raisonne sur des chemins linéaires (séquences infinies d'états). Les opérateurs temporels (G, F, X, U) s'appliquent implicitement à <em>tous les chemins</em>.</p>
-        <p><strong>CTL (Computation Tree Logic) :</strong> raisonne sur un arbre de calcul. Chaque opérateur temporel est précédé d'un quantificateur de chemin (A = tous les chemins, E = il existe un chemin).</p>
+        <div class="two-col">
+            <div>
+                <p><strong>LTL (Linear Temporal Logic) :</strong> raisonne sur des chemins linéaires (séquences infinies d'états). Les opérateurs temporels (G, F, X, U) s'appliquent implicitement à <em>tous les chemins</em>.</p>
+                <div class="callout-info" style="margin-top: 1rem;">
+                    <p><span class="badge badge-blue">Intuition : Linéaire</span></p>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" fill="#5ba6a0"/></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M 20 12 L 13 6.5 L 13 10 Q 5 10 4.5 12 Q 5 14 13 14 L 13 17.5 Z" fill="#5ba6a0"/></svg>
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" fill="#5ba6a0"/></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M 20 12 L 13 6.5 L 13 10 Q 5 10 4.5 12 Q 5 14 13 14 L 13 17.5 Z" fill="#5ba6a0"/></svg>
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" fill="#5ba6a0"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <p><strong>CTL (Computation Tree Logic) :</strong> raisonne sur un arbre de calcul. Chaque opérateur temporel est précédé d'un quantificateur de chemin (A = tous les chemins, E = il existe un chemin).</p>
+                <div class="callout-info" style="margin-top: 1rem;">
+                    <p><span class="badge badge-orange">Intuition : Arborescent</span></p>
+                    <div style="display: flex; align-items: center; gap: 4px; margin-top: 8px;">
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" fill="#d67556"/></svg>
+                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                            <svg width="40" height="16" viewBox="0 0 200 40" fill="none"><path d="M 10 24 C 60 5, 140 5, 180 20" stroke="#d67556" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M 188 21 L 179 15 Q 182 21 179 27 Z" fill="#d67556"/></svg>
+                            <svg width="40" height="16" viewBox="0 0 200 40" fill="none" style="transform: scaleY(-1);"><path d="M 10 24 C 60 5, 140 5, 180 20" stroke="#d67556" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M 188 21 L 179 15 Q 182 21 179 27 Z" fill="#d67556"/></svg>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" fill="#d67556"/></svg>
+                            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" fill="#d67556"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p style="margin-top: 1.5rem;"><strong>Comparaison des fragments :</strong></p>
         <ul>
             <li><strong>LTL seul :</strong> certaines propriétés ne sont exprimables qu'en LTL (ex : équité forte).</li>
             <li><strong>CTL seul :</strong> certaines propriétés ne sont exprimables qu'en CTL (ex : <code>AG EF p</code> — depuis tout état, il existe un chemin atteignant p).</li>

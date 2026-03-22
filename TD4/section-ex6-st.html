@@ -30,6 +30,45 @@
         <h3>Système de transitions (ST)</h3>
         <p>On considère le système de transitions suivant :</p>
 
+        <div style="display:flex; justify-content:center; margin: 1.5rem 0;">
+            <svg width="400" height="220" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Transitions -->
+                <!-- S1 -> S2 -->
+                <path d="M 140 100 L 210 75" stroke="#d67556" stroke-width="1.5" stroke-dasharray="4 2" />
+                <path d="M 216 73 L 207 69 Q 210 75 207 81 Z" fill="#d67556" />
+
+                <!-- S1 -> S3 -->
+                <path d="M 140 120 L 210 145" stroke="#d67556" stroke-width="1.5" />
+                <path d="M 216 147 L 207 141 Q 210 145 207 151 Z" fill="#d67556" />
+
+                <!-- S2 -> S3 -->
+                <path d="M 270 92 L 270 128" stroke="#d67556" stroke-width="1.5" />
+                <path d="M 270 135 L 266 128 Q 270 131 274 128 Z" fill="#d67556" />
+
+                <!-- S3 -> S1 -->
+                <path d="M 220 160 C 150 160, 100 150, 90 132" stroke="#d67556" stroke-width="1.5" fill="none" />
+                <path d="M 88 125 L 86 134 Q 90 130 94 134 Z" fill="#d67556" />
+
+                <!-- S2 loop -->
+                <path d="M 320 60 C 350 40, 350 100, 320 80" stroke="#d67556" stroke-width="1.5" fill="none" />
+                <path d="M 315 82 L 324 84 Q 320 80 324 76 Z" fill="#d67556" />
+
+                <!-- States -->
+                <!-- S1 (Initial) -->
+                <rect x="20" y="90" width="120" height="40" rx="20" fill="rgba(91,166,160,0.1)" stroke="#5ba6a0" stroke-width="2"/>
+                <text x="80" y="115" text-anchor="middle" font-family="'Inter', system-ui, sans-serif" font-size="12" fill="#dedad5" font-weight="600">S1 {p, q}</text>
+                <text x="80" y="82" text-anchor="middle" font-family="'Inter', system-ui, sans-serif" font-size="10" fill="#5ba6a0" font-weight="500">Initial</text>
+
+                <!-- S2 -->
+                <rect x="220" y="50" width="100" height="40" rx="8" fill="rgba(214,117,86,0.08)" stroke="#d67556" stroke-width="1.5"/>
+                <text x="270" y="75" text-anchor="middle" font-family="'Inter', system-ui, sans-serif" font-size="12" fill="#dedad5">S2 {p, q}</text>
+
+                <!-- S3 -->
+                <rect x="220" y="130" width="100" height="40" rx="8" fill="rgba(214,117,86,0.08)" stroke="#d67556" stroke-width="1.5"/>
+                <text x="270" y="155" text-anchor="middle" font-family="'Inter', system-ui, sans-serif" font-size="12" fill="#dedad5">S3 {p}</text>
+            </svg>
+        </div>
+
         <div class="highlight-box">
             <p><span class="badge badge-blue">Topologie du ST</span></p>
             <pre><code>États et étiquettes :
@@ -44,7 +83,7 @@ Transitions :
         </div>
 
         <div class="callout-info">
-            <p><strong>Lecture :</strong> S1 est l'état initial (doublement encadré dans le diagramme original).
+            <p><strong>Lecture :</strong> S1 est l'état initial.
             Les propositions atomiques vraies sont listées entre accolades.
             Une flèche S → S' indique une transition possible.</p>
         </div>
@@ -273,35 +312,25 @@ Transitions :
     <div class="solution">
         <div class="solution-inner">
             <h4 style="margin-top:0;">Solution — Q4</h4>
-            <p><strong>ST ⊨ q U (p → ¬q) est VRAIE.</strong></p>
+            <p><strong>ST ⊨ q U (p → ¬q) est FAUSSE (avec Until fort).</strong></p>
 
-            <p>Analysons les types de chemins :</p>
+            <p>Pour que <code>q U ψ</code> soit vraie, il faut que sur <em>tout</em> chemin, ψ devienne vrai à un instant k, et que q soit vrai avant.</p>
 
-            <p><strong>Chemins passant par S3 :</strong><br>
-            Exemple : S1 → S2 → S3 → S1 → …<br>
-            — Position 0 (S1) : q = vrai ✓<br>
-            — Position 1 (S2) : q = vrai ✓<br>
-            — Position 2 (S3) : p = vrai, q = faux → p→¬q = vrai ✓ (ici ψ devient vrai)<br>
-            q est vrai aux positions 0 et 1 avant que ψ = (p→¬q) devienne vrai en position 2.
-            <strong>Until satisfait.</strong></p>
-
-            <p><strong>Chemin en boucle infinie S1 → S2 → S2 → … :</strong><br>
-            q est vrai à tous les instants. Mais Until exige que ψ finisse par devenir vrai…<br>
-            En S1 et S2 : p→¬q = vrai → faux = faux. Sur ce chemin, p→¬q ne devient jamais vrai.</p>
+            <p><strong>Contre-exemple :</strong> le chemin infini qui boucle sur S2 : <code>S1 → S2 → S2 → S2 → …</code></p>
+            <ul>
+                <li>En S1 et S2, q est <strong>vrai</strong>. ✓</li>
+                <li>Mais en S1 et S2, ψ = (p → ¬q) est <strong>faux</strong> (vrai → faux).</li>
+                <li>Sur ce chemin, ψ ne devient <strong>jamais vrai</strong>.</li>
+            </ul>
 
             <div class="callout-info">
-                <p><strong>Note sur le Until "faible" vs "fort" :</strong> si ce ST utilise le Until <em>faible</em>
-                (W = Weak Until), alors q W ψ est satisfait même si ψ n'arrive jamais (et q reste vrai à jamais).
-                Avec le Until <em>fort</em>, le chemin S2→S2→… violerait la formule.</p>
-                <p>Dans le contexte de ce cours (Until fort), la formule tient sur les chemins atteignant S3,
-                mais la vérification complète dépend de la sémantique choisie.</p>
+                <p><strong>Note sur la sémantique :</strong></p>
+                <ul>
+                    <li><strong>Until fort (U) :</strong> ψ doit obligatoirement devenir vrai. Ici, le chemin restant bloqué en S2 invalide la formule.</li>
+                    <li><strong>Until faible (W) :</strong> la formule serait vraie car q reste vrai indéfiniment.</li>
+                </ul>
+                <p>Dans la plupart des exercices de vérification formelle, on utilise le <strong>Until fort</strong> par défaut.</p>
             </div>
-
-            <p class="inline-note">
-                En pratique, pour ce cours : <code>q U (p → ¬q)</code> est vraie sur les chemins qui atteignent S3,
-                car q est vrai jusqu'à S3 et p→¬q y est vrai. Sur le chemin bouclant en S2, q est toujours vrai
-                (Until trivially satisfied avec Until faible).
-            </p>
         </div>
     </div>
 
@@ -320,8 +349,8 @@ Transitions :
         <span class="bareme-desc">1 pt réponse · 2 pts justification (S1 : p∧q vrai → p→¬q faux)</span>
 
         <span class="bareme-pts">3</span>
-        <span class="bareme-label">Q4 — q U (p→¬q)</span>
-        <span class="bareme-desc">1 pt réponse · 2 pts analyse du chemin S1→S2→S3 et rôle de S3</span>
+        <span class="bareme-label">Q4 — q U (p→¬q) : FAUX</span>
+        <span class="bareme-desc">1 pt réponse · 2 pts contre-exemple (chemin S1→S2→S2...)</span>
 
         <div class="bareme-total">Total : <strong>12 pts</strong></div>
     </div>
