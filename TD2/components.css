@@ -567,6 +567,11 @@ ol li::before {
     box-shadow: 0 0 10px var(--accent-glow);
     animation: water-ripple 5.5s ease-out infinite;
 }
+.steps li > .step-body {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: break-word;
+}
 
 /* ═══════════════════════════════════════════════════
    CODE — blocs et terminal (identiques au compte-rendu)

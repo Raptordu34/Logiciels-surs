@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Annexe 1 — Machine autoEcoleRamoa</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-fondamental">Documentation</span>
+        </div>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3>Contexte — Machine abstraite B</h3>
+        <p>
+            Cette annexe présente le squelette de la machine abstraite <code>autoEcoleRamoa</code>,
+            référence pour l'exercice 6. Elle modélise un système de gestion d'auto-école :
+            les candidats inscrits, ceux ayant validé l'examen du code, et les titulaires du permis.
+        </p>
+        <p>
+            La <strong>méthode B</strong> (Jean-Raymond Abrial, 1996) formalise les systèmes logiciels
+            par des <em>machines abstraites</em> : chaque machine déclare un état (variables), des contraintes
+            invariantes sur cet état, une initialisation et des transitions (opérations).
+        </p>
+    </div>
+
+    <!-- ── RAPPEL — STRUCTURE D'UNE MACHINE B ── -->
+    <button class="hint-btn" data-hint="rappel-b-method" data-label="Rappel — Structure d'une machine B" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel — Structure d'une machine B</span>
+    </button>
+    <div class="hint" id="rappel-b-method">
+        <p>Les clauses d'une machine B, dans l'ordre :</p>
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>Clause</th><th>Rôle</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>MACHINE</strong></td><td>Nom de la machine</td></tr>
+                    <tr><td><strong>SETS</strong></td><td>Ensembles abstraits — types de base non interprétés</td></tr>
+                    <tr><td><strong>VARIABLES</strong></td><td>Variables d'état, modifiées par les opérations</td></tr>
+                    <tr><td><strong>INVARIANT</strong></td><td>Contrainte toujours vraie sur les variables (type + propriétés métier)</td></tr>
+                    <tr><td><strong>INITIALISATION</strong></td><td>Valeur initiale des variables — doit satisfaire l'invariant</td></tr>
+                    <tr><td><strong>OPERATIONS</strong></td><td>Transitions : chacune comporte une précondition (<code>PRE</code>) et une action (<code>THEN</code>)</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Obligation de preuve</span></p>
+            <p>Chaque opération doit être prouvée : si l'invariant est vrai avant l'opération
+            et que la précondition est satisfaite, alors l'invariant doit être vrai après l'action.
+            La <code>PRE</code> n'est pas un test exécuté — c'est une <em>obligation</em> que l'appelant garantit.</p>
+        </div>
+    </div>
+
+    <!-- ── MACHINE DONNÉE ── -->
+    <h3>Machine donnée (squelette initial)</h3>
+
+    <pre><code>MACHINE autoEcoleRamoa
+
+SETS
+    POP
+
+VARIABLES
+    inscrit, aCode, aPermis
+
+INVARIANT
+    ...
+
+INITIALISATION
+    inscrit, aCode, aPermis := ∅, ∅, ∅
+
+OPERATIONS
+    ...
+
+END</code></pre>
+
+    <!-- ── EXPLICATION DES CLAUSES ── -->
+    <h3>Explication de chaque clause</h3>
+
+    <div class="highlight-box">
+        <p><strong>SETS — <code>POP</code></strong></p>
+        <p>
+            <code>POP</code> représente la <em>population</em> totale des personnes pouvant interagir avec le système.
+            C'est un ensemble abstrait non interprété : la méthode B ne lui donne aucune valeur concrète.
+            Chaque candidat est un élément <code>pp ∈ POP</code>.
+        </p>
+        <p class="inline-note">L'abstraction de <code>POP</code> permet de raisonner sur le système indépendamment
+        de toute représentation informatique des personnes (numéro, nom, identifiant…).</p>
+    </div>
+
+    <div class="highlight-box">
+        <p><strong>VARIABLES</strong></p>
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>Variable</th><th>Signification</th><th>Type attendu dans l'invariant</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>inscrit</code></td>
+                        <td>Ensemble des personnes inscrites à l'auto-école</td>
+                        <td><code>inscrit ⊆ POP</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>aCode</code></td>
+                        <td>Ensemble des personnes ayant réussi l'examen du code</td>
+                        <td><code>aCode ⊆ inscrit</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>aPermis</code></td>
+                        <td>Ensemble des personnes titulaires du permis de conduire</td>
+                        <td><code>aPermis ⊆ aCode</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="callout-info">
+        <p><span class="badge badge-blue">Logique métier</span></p>
+        <p>
+            <strong>Contrainte naturelle :</strong> obtenir le permis suppose d'avoir réussi le code,
+            qui suppose d'être inscrit. Ces inclusions en cascade doivent figurer dans l'invariant :
+        </p>
+        <p><code>aPermis ⊆ aCode ⊆ inscrit ⊆ POP</code></p>
+        <p>Cette chaîne d'inclusions est la propriété de sûreté centrale du système.</p>
+    </div>
+
+    <div class="highlight-box">
+        <p><strong>INITIALISATION</strong></p>
+        <p>
+            <code>inscrit, aCode, aPermis := ∅, ∅, ∅</code>
+        </p>
+        <p>
+            Affectation simultanée des trois variables à l'ensemble vide.
+            Au démarrage du système, personne n'est inscrit, n'a validé le code, ni n'a le permis.
+        </p>
+        <p class="inline-note">
+            Cette initialisation doit satisfaire l'invariant :
+            <code>∅ ⊆ ∅ ⊆ ∅ ⊆ POP</code> ✓ — l'ensemble vide est inclus dans tout ensemble.
+        </p>
+    </div>
+
+    <div class="callout-info">
+        <strong>Sections à compléter dans l'exercice 6 :</strong>
+        <ul>
+            <li>L'<strong>invariant</strong> complet, en écrivant explicitement les contraintes de type et d'inclusion entre les trois variables.</li>
+            <li>Les <strong>opérations</strong> permettant d'inscrire un candidat, de valider le code et d'attribuer le permis — chacune avec sa <code>PRE</code> et son <code>THEN</code>.</li>
+        </ul>
+    </div>
+
+    <!-- ── CONVENTIONS DE NOTATION B ── -->
+    <h3>Conventions de notation B utiles</h3>
+
+    <div class="table-glass">
+        <table>
+            <thead>
+                <tr><th>Notation B</th><th>Signification</th><th>Exemple dans ce système</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>pp ∈ inscrit</code></td><td>pp est membre de l'ensemble inscrit</td><td>pp est inscrit à l'auto-école</td></tr>
+                <tr><td><code>pp ∉ inscrit</code></td><td>pp n'est pas dans inscrit</td><td>pp n'est pas encore inscrit</td></tr>
+                <tr><td><code>aCode ⊆ inscrit</code></td><td>aCode est inclus dans inscrit</td><td>Tout titulaire du code est inscrit</td></tr>
+                <tr><td><code>inscrit ∪ {pp}</code></td><td>Union avec le singleton {pp}</td><td>Ajouter pp à inscrit</td></tr>
+                <tr><td><code>inscrit ∖ {pp}</code></td><td>Différence ensembliste</td><td>Retirer pp de inscrit</td></tr>
+                <tr><td><code>∅</code></td><td>Ensemble vide</td><td>Aucun inscrit au démarrage</td></tr>
+                <tr><td><code>x, y := e₁, e₂</code></td><td>Affectation simultanée</td><td>Initialiser plusieurs variables en une ligne</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ── STRUCTURE TYPE D'UNE OPÉRATION ── -->
+    <div class="highlight-box">
+        <p><span class="badge badge-orange">Méthode</span></p>
+        <p>Structure type d'une opération B :</p>
+        <pre><code>nom_operation(pp) =
+PRE
+    pp ∈ POP ∧            -- contrainte de type sur le paramètre
+    pp ∉ inscrit           -- précondition métier (état requis avant l'opération)
+THEN
+    inscrit := inscrit ∪ {pp}   -- action : modification de l'état
+END</code></pre>
+        <p class="inline-note">
+            La clause <code>PRE</code> n'est pas un test conditionnel — c'est une <em>obligation</em>.
+            L'appelant garantit la précondition ; en contrepartie, la machine garantit que l'invariant
+            est préservé après l'action. Toute opération appelée hors de sa précondition est indéfinie.
+        </p>
+    </div>
+
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple</span></p>
+            <p>Opération <code>s_inscrire(pp)</code> :</p>
+            <pre><code>s_inscrire(pp) =
+PRE
+    pp ∈ POP ∧
+    pp ∉ inscrit
+THEN
+    inscrit := inscrit ∪ {pp}
+END</code></pre>
+            <p class="inline-note">
+                Précondition : pp existe et n'est pas déjà inscrit.
+                Action : on l'ajoute à l'ensemble <code>inscrit</code>.
+                L'invariant <code>inscrit ⊆ POP</code> est préservé car <code>pp ∈ POP</code>. ✓
+            </p>
+        </div>
+
+        <div class="callout-info">
+            <p><span class="badge badge-blue">À déduire pour Exo 6</span></p>
+            <p>Sur le modèle de <code>s_inscrire</code>, écrire les deux opérations suivantes :</p>
+            <ul>
+                <li><strong><code>valider_code(pp)</code></strong> : un inscrit réussit l'examen du code.</li>
+                <li><strong><code>obtenir_permis(pp)</code></strong> : un titulaire du code obtient le permis.</li>
+            </ul>
+            <p>Pour chacune, identifier la précondition et l'action qui préservent l'invariant
+            <code>aPermis ⊆ aCode ⊆ inscrit ⊆ POP</code>.</p>
+        </div>
+    </div>
+
+</body>
+</html>

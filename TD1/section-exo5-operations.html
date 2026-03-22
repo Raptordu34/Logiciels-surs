@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 5 — Opérations sur les relations</h2>
+
+    <!-- ── EN-TÊTE DE L'EXERCICE ── -->
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 6 pts</span>
+            <span class="exo-time">⏱ 25–35 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Appliquer les opérateurs de restriction de domaine et de codomaine</li>
+                <li>Distinguer restriction et anti-restriction de domaine</li>
+                <li>Calculer la composition d'une relation avec son inverse</li>
+                <li>Maîtriser l'opérateur de surcharge et comprendre son rôle</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours — Relations en B-Méthode : restriction, composition, surcharge</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3>Opérateurs fondamentaux sur les relations</h3>
+        <p>
+            En B-Méthode, une relation <strong>r ∈ ℙ(A × B)</strong> est un ensemble de paires ordonnées.
+            Plusieurs opérateurs permettent de la filtrer, la combiner ou la transformer sans la reconstruire depuis zéro.
+        </p>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>Opérateur</th><th>Notation</th><th>Définition</th><th>Intuition</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Restriction de domaine</td><td><code>S ◁ r</code></td><td>{ (a,b) ∈ r | a ∈ S }</td><td>Filtre sur la 1ère colonne</td></tr>
+                    <tr><td>Anti-restriction de domaine</td><td><code>S ⩤ r</code></td><td>{ (a,b) ∈ r | a ∉ S }</td><td>Exclut les clés de S</td></tr>
+                    <tr><td>Restriction de codomaine</td><td><code>r ▷ T</code></td><td>{ (a,b) ∈ r | b ∈ T }</td><td>Filtre sur la 2ème colonne</td></tr>
+                    <tr><td>Anti-restriction de codomaine</td><td><code>r ⩥ T</code></td><td>{ (a,b) ∈ r | b ∉ T }</td><td>Exclut les images de T</td></tr>
+                    <tr><td>Inverse (converse)</td><td><code>r~</code></td><td>{ (b,a) | (a,b) ∈ r }</td><td>Retourne chaque paire</td></tr>
+                    <tr><td>Composition</td><td><code>r ; s</code></td><td>{ (a,c) | ∃b, (a,b) ∈ r ∧ (b,c) ∈ s }</td><td>Chaîne deux relations</td></tr>
+                    <tr><td>Surcharge</td><td><code>r ⊕ s</code></td><td>(dom(s) ⩤ r) ∪ s</td><td>s écrase r sur ses clés</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Rappel de cours compact -->
+    <button class="hint-btn" data-hint="rappel-ops" data-label="Rappel de cours" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours</span>
+    </button>
+    <div class="hint" id="rappel-ops">
+        <p>Les opérateurs ◁ et ▷ portent le nom du côté de la relation qu'ils filtrent :</p>
+        <ul>
+            <li><strong>S ◁ r</strong> — le triangle pointe vers r, S est à gauche → filtre sur le <em>domaine</em> (première composante). On garde les paires (a,b) avec a ∈ S.</li>
+            <li><strong>r ▷ T</strong> — r est à gauche, T à droite → filtre sur le <em>codomaine</em> (deuxième composante). On garde les paires (a,b) avec b ∈ T.</li>
+            <li><strong>S ⩤ r</strong> — anti-restriction : on garde exactement les paires <em>exclues</em> par S ◁ r. Propriété : (S ◁ r) ∪ (S ⩤ r) = r.</li>
+        </ul>
+    </div>
+
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple</span></p>
+            <p>Soit p = { (1,a), (2,b), (3,a) }.</p>
+            <ul>
+                <li><strong>{1,2} ◁ p</strong> = { (1,a), (2,b) } — on garde 1 et 2 comme antécédents.</li>
+                <li><strong>p ▷ {a}</strong> = { (1,a), (3,a) } — on garde les paires menant à a.</li>
+                <li><strong>{2} ⩤ p</strong> = { (1,a), (3,a) } — on exclut les paires d'antécédent 2.</li>
+            </ul>
+        </div>
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Analogie</span></p>
+            <p><strong>Intuition SQL :</strong> une relation r ⊆ A × B ressemble à une table à deux colonnes <code>(clé, valeur)</code>.</p>
+            <ul>
+                <li><code>S ◁ r</code> ≈ <code>WHERE clé IN S</code></li>
+                <li><code>r ▷ T</code> ≈ <code>WHERE valeur IN T</code></li>
+                <li><code>r ⊕ s</code> ≈ <code>UPSERT</code> — s remplace les lignes de r dont la clé est dans dom(s), laisse les autres intactes.</li>
+            </ul>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 1 — Évaluer les expressions           -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Soit <strong>A = {0, 1, 2}</strong>, <strong>B = {a, b, c}</strong> et la relation :</p>
+        <div class="highlight-box">
+            <strong>r = { (0, a), (0, b), (1, c) }</strong>
+        </div>
+        <p>Évaluer les expressions suivantes :</p>
+        <ul>
+            <li>a. &nbsp;<code>{0} ◁ r</code></li>
+            <li>b. &nbsp;<code>{1} ⩤ r</code></li>
+            <li>c. &nbsp;<code>r ⊕ {(0, c)}</code></li>
+            <li>d. &nbsp;<code>r ; r~</code></li>
+        </ul>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> confondre <code>S ◁ r</code> (restriction — garde les clés <em>dans</em> S) et <code>S ⩤ r</code> (anti-restriction — garde les clés <em>hors de</em> S). Pour <strong>b</strong>, c'est bien ⩤ : on élimine les paires dont la clé est 1, et on conserve les autres. Pour <strong>c</strong>, ne pas oublier que la surcharge <em>supprime d'abord</em> les anciennes associations de la clé avant d'ajouter la nouvelle.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            <p>Pour <strong>a</strong> : parcourez chaque paire (x, y) ∈ r et conservez-la si x ∈ {0}. Pour <strong>b</strong> : c'est une anti-restriction — conservez les paires dont x ∉ {1}. Dans les deux cas, la valeur y n'entre pas en compte.</p>
+            <p>Pour <strong>c</strong> : appliquez la définition de la surcharge — <code>r ⊕ s = (dom(s) ⩤ r) ∪ s</code>. Ici s = {(0, c)}, donc dom(s) = {0}. Commencez par supprimer de r toutes les paires dont la clé est 0.</p>
+            <p>Pour <strong>d</strong> : calculez d'abord r~ en inversant chaque paire de r, puis appliquez la définition de la composition (chercher un intermédiaire commun).</p>
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            <p><strong>r~ = { (a, 0), (b, 0), (c, 1) }</strong></p>
+            <p>Pour r ; r~ : (x, z) ∈ r ; r~ si et seulement si ∃y, (x, y) ∈ r <em>et</em> (y, z) ∈ r~, c'est-à-dire (z, y) ∈ r. Testez toutes les combinaisons possibles de x ∈ {0, 1} et z ∈ {0, 1}.</p>
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Calculez les quatre expressions en détaillant chaque étape…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <p><strong>a. {0} ◁ r</strong> — conserver les paires dont l'antécédent est dans {0} :</p>
+            <div class="highlight-box">
+                <ul>
+                    <li>(0, a) : 0 ∈ {0} ✓ &nbsp;→ conservée</li>
+                    <li>(0, b) : 0 ∈ {0} ✓ &nbsp;→ conservée</li>
+                    <li>(1, c) : 1 ∉ {0} ✗ &nbsp;→ éliminée</li>
+                </ul>
+                <p><strong>{0} ◁ r = { (0, a), (0, b) }</strong></p>
+            </div>
+
+            <p><strong>b. {1} ⩤ r</strong> — conserver les paires dont l'antécédent n'est <em>pas</em> dans {1} :</p>
+            <div class="highlight-box">
+                <ul>
+                    <li>(0, a) : 0 ∉ {1} ✓ &nbsp;→ conservée</li>
+                    <li>(0, b) : 0 ∉ {1} ✓ &nbsp;→ conservée</li>
+                    <li>(1, c) : 1 ∈ {1} ✗ &nbsp;→ éliminée</li>
+                </ul>
+                <p><strong>{1} ⩤ r = { (0, a), (0, b) }</strong></p>
+            </div>
+
+            <p><strong>c. r ⊕ {(0, c)}</strong> — surcharge de r par {(0, c)} :</p>
+            <div class="highlight-box">
+                <p><strong>Étape 1</strong> — dom({(0, c)}) = {0}.</p>
+                <p><strong>Étape 2</strong> — supprimer de r toutes les paires dont la clé est dans {0} :</p>
+                <ul>
+                    <li>(0, a) : clé 0 ∈ {0} → <strong>éliminée</strong></li>
+                    <li>(0, b) : clé 0 ∈ {0} → <strong>éliminée</strong></li>
+                    <li>(1, c) : clé 1 ∉ {0} → conservée</li>
+                </ul>
+                <p>{0} ⩤ r = { (1, c) }</p>
+                <p><strong>Étape 3</strong> — union avec {(0, c)} :</p>
+                <p><strong>r ⊕ {(0, c)} = { (0, c), (1, c) }</strong></p>
+                <p class="inline-note">Les deux associations (0→a) et (0→b) sont remplacées par l'unique association (0→c). C'est le rôle de la surcharge : écraser les anciennes valeurs d'une clé par la nouvelle.</p>
+            </div>
+
+            <p><strong>d. r ; r~</strong> — composition de r avec son inverse :</p>
+            <p>On calcule d'abord r~ en inversant chaque paire :</p>
+            <div class="highlight-box">
+                r~ = { (a, 0), (b, 0), (c, 1) }
+            </div>
+            <p>On cherche ensuite (x, z) tels que ∃ y intermédiaire avec (x, y) ∈ r et (y, z) ∈ r~ :</p>
+            <div class="table-glass">
+                <table>
+                    <thead>
+                        <tr><th>(x, y) ∈ r</th><th>Intermédiaire y</th><th>(y, z) ∈ r~</th><th>Paire produite (x, z)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>(0, a)</td><td>y = a</td><td>(a, 0)</td><td><strong>(0, 0) ✓</strong></td></tr>
+                        <tr><td>(0, b)</td><td>y = b</td><td>(b, 0)</td><td>(0, 0) — déjà produite</td></tr>
+                        <tr><td>(1, c)</td><td>y = c</td><td>(c, 1)</td><td><strong>(1, 1) ✓</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="highlight-box">
+                <p><strong>r ; r~ = { (0, 0), (1, 1) }</strong></p>
+                <p class="inline-note">C'est la relation identité restreinte au domaine de r : dom(r) = {0, 1}. Ce résultat se généralise : pour toute injection r, on a toujours r ; r~ = Id<sub>dom(r)</sub>.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 2 — Opérations sur R₁ et R₂          -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div style="display:flex; justify-content:center; margin: 0.5rem 0;">
+        <img src="design/svg/exo5-surcharge.svg" alt="Processus de surcharge : R₁ ⊕ R₂ = (dom(R₂) ⩤ R₁) ∪ R₂" style="max-width:100%;">
+    </div>
+    <p class="inline-note" style="text-align:center;">Surcharge R₁ ⊕ R₂ : supprimer de R₁ les clés de dom(R₂), puis faire l'union avec R₂.</p>
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Soit les relations :</p>
+        <div class="highlight-box">
+            <ul>
+                <li><strong>R₁ = { (2 → 1), (2 → 8), (3 → 9), (4 → 7), (4 → 9) }</strong></li>
+                <li><strong>R₂ = { (3 → 3), (5 → 4) }</strong></li>
+            </ul>
+        </div>
+        <p>et les ensembles <strong>E = {1, 2, 3}</strong> et <strong>F = {5, 7, 9}</strong>.</p>
+        <p>Calculer :</p>
+        <ul>
+            <li><code>E ◁ R₁</code></li>
+            <li><code>E ⩤ R₁</code></li>
+            <li><code>R₁ ▷ F</code></li>
+            <li><code>R₁ ⩥ F</code></li>
+            <li><code>R₁ ⊕ R₂</code> &nbsp; (⊕ désigne la surcharge)</li>
+        </ul>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> pour la surcharge <code>R₁ ⊕ R₂</code>, ne pas oublier d'<em>éliminer d'abord</em> de R₁ toutes les paires dont la clé appartient à dom(R₂), puis de faire l'union. Ajouter simplement R₂ à R₁ sans supprimer les anciennes associations donne une relation incohérente où une même clé a deux images différentes.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            <p>Commencez par identifier domaines et codomaines :</p>
+            <ul>
+                <li>dom(R₁) = {2, 3, 4} &nbsp;·&nbsp; ran(R₁) = {1, 7, 8, 9}</li>
+                <li>dom(R₂) = {3, 5} &nbsp;·&nbsp; ran(R₂) = {3, 4}</li>
+            </ul>
+            <p>Pour chaque opération, seules les paires dont la clé (ou la valeur) intersecte E, F ou dom(R₂) sont concernées.</p>
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q2-h2">
+            <p><strong>Pour R₁ ⊕ R₂</strong> — rappel de la définition :</p>
+            <p>R₁ ⊕ R₂ = (dom(R₂) ⩤ R₁) ∪ R₂</p>
+            <p>dom(R₂) = {3, 5}. Supprimez de R₁ toute paire commençant par 3 ou 5. Il ne reste que {(2,1),(2,8),(4,7),(4,9)}. Faites ensuite l'union avec R₂ = {(3,3),(5,4)}.</p>
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Calculez les quatre expressions en montrant quelles paires sont conservées ou éliminées…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+
+            <p><strong>E ◁ R₁</strong> — restriction au domaine E = {1, 2, 3} :</p>
+            <div class="table-glass">
+                <table>
+                    <thead><tr><th>Paire</th><th>Antécédent ∈ E ?</th><th>Conservée</th></tr></thead>
+                    <tbody>
+                        <tr><td>(2, 1)</td><td>2 ∈ {1,2,3} ✓</td><td>✓</td></tr>
+                        <tr><td>(2, 8)</td><td>2 ∈ {1,2,3} ✓</td><td>✓</td></tr>
+                        <tr><td>(3, 9)</td><td>3 ∈ {1,2,3} ✓</td><td>✓</td></tr>
+                        <tr><td>(4, 7)</td><td>4 ∉ {1,2,3} ✗</td><td>✗</td></tr>
+                        <tr><td>(4, 9)</td><td>4 ∉ {1,2,3} ✗</td><td>✗</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="highlight-box">
+                <strong>E ◁ R₁ = { (2, 1), (2, 8), (3, 9) }</strong>
+            </div>
+
+            <p><strong>E ⩤ R₁</strong> — anti-restriction de domaine (complémentaire de la restriction) :</p>
+            <div class="highlight-box">
+                <p>On garde exactement les paires <em>éliminées</em> par E ◁ R₁ — celles dont l'antécédent n'appartient pas à E :</p>
+                <p><strong>E ⩤ R₁ = { (4, 7), (4, 9) }</strong></p>
+                <p class="inline-note">Vérification : (E ◁ R₁) ∪ (E ⩤ R₁) = R₁ ✓</p>
+            </div>
+
+            <p><strong>R₁ ▷ F</strong> — restriction au codomaine F = {5, 7, 9} :</p>
+            <div class="table-glass">
+                <table>
+                    <thead><tr><th>Paire</th><th>Image ∈ F ?</th><th>Conservée</th></tr></thead>
+                    <tbody>
+                        <tr><td>(2, 1)</td><td>1 ∉ {5,7,9} ✗</td><td>✗</td></tr>
+                        <tr><td>(2, 8)</td><td>8 ∉ {5,7,9} ✗</td><td>✗</td></tr>
+                        <tr><td>(3, 9)</td><td>9 ∈ {5,7,9} ✓</td><td>✓</td></tr>
+                        <tr><td>(4, 7)</td><td>7 ∈ {5,7,9} ✓</td><td>✓</td></tr>
+                        <tr><td>(4, 9)</td><td>9 ∈ {5,7,9} ✓</td><td>✓</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="highlight-box">
+                <strong>R₁ ▷ F = { (3, 9), (4, 7), (4, 9) }</strong>
+            </div>
+
+            <p><strong>R₁ ⩥ F</strong> — anti-restriction au codomaine F = {5, 7, 9} : conserver les paires dont l'image n'est <em>pas</em> dans F :</p>
+            <div class="table-glass">
+                <table>
+                    <thead><tr><th>Paire</th><th>Image ∉ F ?</th><th>Conservée</th></tr></thead>
+                    <tbody>
+                        <tr><td>(2, 1)</td><td>1 ∉ {5,7,9} ✓</td><td>✓</td></tr>
+                        <tr><td>(2, 8)</td><td>8 ∉ {5,7,9} ✓</td><td>✓</td></tr>
+                        <tr><td>(3, 9)</td><td>9 ∈ {5,7,9} ✗</td><td>✗</td></tr>
+                        <tr><td>(4, 7)</td><td>7 ∈ {5,7,9} ✗</td><td>✗</td></tr>
+                        <tr><td>(4, 9)</td><td>9 ∈ {5,7,9} ✗</td><td>✗</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="highlight-box">
+                <strong>R₁ ⩥ F = { (2, 1), (2, 8) }</strong>
+                <p class="inline-note">Vérification : (R₁ ▷ F) ∪ (R₁ ⩥ F) = R₁ ✓</p>
+            </div>
+
+            <p><strong>R₁ ⊕ R₂</strong> — surcharge de R₁ par R₂ :</p>
+            <div class="highlight-box">
+                <p><strong>Étape 1</strong> — identifier dom(R₂) = {3, 5}.</p>
+                <p><strong>Étape 2</strong> — supprimer de R₁ les paires dont l'antécédent est dans {3, 5} :</p>
+                <p>dom(R₂) ⩤ R₁ = R₁ \ { (3, 9) } = <strong>{ (2, 1), (2, 8), (4, 7), (4, 9) }</strong></p>
+                <p><strong>Étape 3</strong> — faire l'union avec R₂ = { (3, 3), (5, 4) } :</p>
+                <p><strong>R₁ ⊕ R₂ = { (2, 1), (2, 8), (3, 3), (4, 7), (4, 9), (5, 4) }</strong></p>
+                <p class="inline-note">L'ancienne association (3 → 9) ∈ R₁ est remplacée par (3 → 3) ∈ R₂. C'est le sens de la surcharge : R₂ a priorité sur R₁ pour les clés de dom(R₂), et les autres clés de R₁ restent inchangées.</p>
+            </div>
+
+            <div class="callout-info">
+                <p><span class="badge badge-blue">Point méthode — surcharge</span></p>
+                <p><strong>Définition formelle :</strong> R₁ ⊕ R₂ = (dom(R₂) ⩤ R₁) ∪ R₂</p>
+                <p>On retrouve la même logique qu'une mise à jour de dictionnaire Python (<code>d1 | d2</code>) ou un <code>UPSERT</code> SQL : les nouvelles associations écrasent les anciennes, les clés absentes de R₂ restent inchangées dans R₁.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">1,5</span>
+        <span class="bareme-label">Q1 a, b, c</span>
+        <span class="bareme-desc">0,5 pt par expression (résultat correct + paires justifiées) — b : anti-restriction ⩤ ; c : surcharge ⊕</span>
+
+        <span class="bareme-pts">1,5</span>
+        <span class="bareme-label">Q1 d — r ; r~</span>
+        <span class="bareme-desc">0,5 pt calcul de r~ · 0,5 pt tableau de composition · 0,5 pt résultat</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q2 E ◁ R₁, E ⩤ R₁, R₁ ▷ F, R₁ ⩥ F</span>
+        <span class="bareme-desc">0,5 pt par expression, résultat correct</span>
+
+        <span class="bareme-pts">1,5</span>
+        <span class="bareme-label">Q2 R₁ ⊕ R₂</span>
+        <span class="bareme-desc">0,5 pt identification de dom(R₂) · 0,5 pt anti-restriction correcte · 0,5 pt résultat final</span>
+
+        <div class="bareme-total">Total : <strong>6,5 pts</strong></div>
+    </div>
+
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Montrer que la surcharge est associative : (R₁ ⊕ R₂) ⊕ R₃ = R₁ ⊕ (R₂ ⊕ R₃).</li>
+            <li>Vérifier que r ; r~ = Id<sub>dom(r)</sub> si et seulement si r est une injection (fonction injective).</li>
+            <li>Exprimer la restriction de codomaine <code>r ▷ T</code> à l'aide de la composition avec Id<sub>T</sub> : <code>r ; Id<sub>T</sub></code>. Est-ce équivalent ?</li>
+            <li>Calculer R₂ ⊕ R₁ et vérifier que ⊕ n'est pas commutatif.</li>
+        </ul>
+    </div>
+
+</body>
+</html>

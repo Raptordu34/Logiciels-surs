@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 1 — Calculer</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+            <span class="exo-points">◎ 4 pts</span>
+            <span class="exo-time">⏱ 10 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Calculer des préconditions les plus faibles par application mécanique des règles.</li>
+                <li>Distinguer le cas wp = <code>false</code> (postcondition inatteignable) du cas wp = <code>true</code> (postcondition toujours vraie).</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours — Calcul de la précondition la plus faible (wp)</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3>Contexte — Préconditions les plus faibles</h3>
+        <p>
+            Étant donné un programme <code>S</code> et une postcondition <code>Q</code>,
+            la <strong>précondition la plus faible</strong> <code>wp(S, Q)</code> est la condition initiale
+            la moins restrictive qui garantit que <code>S</code> se termine en satisfaisant <code>Q</code>.
+        </p>
+        <p>
+            Si <code>wp(S, Q) = false</code>, aucun état initial ne permet d'atteindre <code>Q</code> via <code>S</code>.
+            Si <code>wp(S, Q) = true</code>, tout état initial convient.
+        </p>
+    </div>
+
+    <!-- ── RAPPEL DE COURS ── -->
+    <button class="hint-btn" data-hint="rappel-wp-regles" data-label="Rappel — Règles de calcul wp" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel — Règles de calcul wp</span>
+    </button>
+    <div class="hint" id="rappel-wp-regles">
+        <p><strong>Règle de l'affectation :</strong></p>
+        <div class="highlight-box">
+            <p><code>wp(x := e, Q) = Q[x ← e]</code></p>
+            <p>On substitue mécaniquement toute occurrence de <code>x</code> dans <code>Q</code> par l'expression <code>e</code>.
+            Si <code>x</code> n'apparaît <em>pas</em> dans <code>Q</code>, alors <code>Q</code> reste inchangée.</p>
+        </div>
+        <p><strong>Règle de la composition séquentielle :</strong></p>
+        <div class="highlight-box">
+            <p><code>wp(S₁ ; S₂, Q) = wp(S₁, wp(S₂, Q))</code></p>
+            <p>On calcule de <strong>droite à gauche</strong> : d'abord la wp de l'instruction la plus à droite,
+            puis on remonte vers la gauche en utilisant le résultat intermédiaire comme nouvelle postcondition.</p>
+        </div>
+    </div>
+
+    <!-- ── EXEMPLE + ANALOGIE ── -->
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple</span></p>
+            <p>Calculer <code>wp([x := x+3 ; x := x-1], x > 10)</code> :</p>
+            <ul>
+                <li>Étape 1 : <code>wp(x := x-1, x > 10) = (x-1) > 10 = x > 11</code></li>
+                <li>Étape 2 : <code>wp(x := x+3, x > 11) = (x+3) > 11 = x > 8</code></li>
+            </ul>
+            <p class="inline-note">Résultat : <code>x > 8</code>. On substitue de droite à gauche, étape par étape.</p>
+        </div>
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Analogie</span></p>
+            <p><strong>Intuition :</strong> la wp est un <em>voyage à rebours</em>. Pour garantir l'arrivée, on remonte le chemin instruction par instruction, en propageant la condition vers l'amont.</p>
+            <p>Comme un GPS recalculant depuis la destination : on cherche d'où partir pour être sûr d'arriver.</p>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- QUESTION 1 — [x := x+2 ; x := x+1](x > 9)               -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">1 pt</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Calculer <code>wp([x := x+2 ; x := x+1], x > 9)</code>.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> appliquer les substitutions dans le mauvais sens (de gauche à droite).
+            La règle de séquence exige de partir de la postcondition et de remonter de droite à gauche.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            Appliquer la règle de séquence : <code>wp(S1 ; S2, Q) = wp(S1, wp(S2, Q))</code>.
+            Commencer par calculer <code>wp(x := x+1, x &gt; 9)</code>, puis utiliser ce résultat
+            comme postcondition de <code>wp(x := x+2, …)</code>.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Détaillez le calcul étape par étape…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+            <ul class="steps">
+                <li><span class="step-body"><strong>Étape 1</strong> — <code>wp(x := x+1, x &gt; 9)</code><br>
+                    Substituer <code>x ← x+1</code> dans <code>x &gt; 9</code> → <code>x+1 &gt; 9</code> → <code>x &gt; 8</code></span></li>
+                <li><span class="step-body"><strong>Étape 2</strong> — <code>wp(x := x+2, x &gt; 8)</code><br>
+                    Substituer <code>x ← x+2</code> dans <code>x &gt; 8</code> → <code>x+2 &gt; 8</code> → <code>x &gt; 6</code></span></li>
+            </ul>
+            <div class="highlight-box">
+                <p><strong>Résultat :</strong> <code>wp([x := x+2 ; x := x+1], x &gt; 9) = <strong>x &gt; 6</strong></code></p>
+                <p class="inline-note">On remonte de droite à gauche : chaque affectation décale le seuil
+                de 1 puis de 2, ce qui ramène la contrainte initiale <code>x &gt; 9</code> à <code>x &gt; 6</code>.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- QUESTION 2 — [y := x+y ; x := y-x](y ≥ 5 ∧ x ≤ 3)               -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">2 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Calculer <code>wp([y := x+y ; x := y-x], y ≥ 5 ∧ x ≤ 3)</code>.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> oublier que <code>y</code> a changé de valeur après la première affectation.
+            À l'étape 2, le <code>y</code> dans <code>x := y-x</code> désigne la <em>nouvelle</em> valeur de <code>y</code>
+            (i.e. <code>x+y</code> initial), pas l'ancienne.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            Commencer par <code>wp(x := y-x, y ≥ 5 ∧ x ≤ 3)</code> : substituer <code>x ← y-x</code>
+            dans la postcondition. La partie <code>y ≥ 5</code> est inchangée (pas de <code>x</code>) ;
+            <code>x ≤ 3</code> devient <code>y-x ≤ 3</code>, soit <code>x ≥ y-3</code>.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q2-h2">
+            Après l'étape 1, on obtient <code>y ≥ 5 ∧ x ≥ y-3</code>.
+            Appliquer maintenant <code>wp(y := x+y, y ≥ 5 ∧ x ≥ y-3)</code> : substituer <code>y ← x+y</code>.
+            Simplifier chaque contrainte séparément.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Détaillez le calcul étape par étape…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+            <ul class="steps">
+                <li><span class="step-body"><strong>Étape 1</strong> — Substituer <code>x ← y-x</code> dans <code>y ≥ 5 ∧ x ≤ 3</code> :
+                    <code>y ≥ 5 ∧ (y-x) ≤ 3</code> → <code>y ≥ 5 ∧ x ≥ y-3</code></span></li>
+
+                <li><span class="step-body"><strong>Étape 2</strong> — Substituer <code>y ← x+y</code> dans <code>y ≥ 5 ∧ x ≥ y-3</code> :<br>
+                    <code>(x+y) ≥ 5 ∧ x ≥ (x+y)-3</code><br>
+                    → <code>x+y ≥ 5 ∧ x ≥ x+y-3</code><br>
+                    → <code>x+y ≥ 5 ∧ 0 ≥ y-3</code><br>
+                    → <code>x+y ≥ 5 ∧ y ≤ 3</code></span></li>
+            </ul>
+            <div class="highlight-box">
+                <p><strong>Résultat :</strong> <code>wp([y := x+y ; x := y-x], y ≥ 5 ∧ x ≤ 3) = <strong>x+y ≥ 5 ∧ y ≤ 3</strong></code></p>
+                <p class="inline-note">La précondition est satisfiable : par exemple <code>x = 3, y = 2</code>
+                vérifie <code>3+2 ≥ 5</code> et <code>2 ≤ 3</code>.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- QUESTION 3 — [x := y ; y := x²](y > x)                   -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q3</span>
+            <span class="question-pts">1 pt</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Calculer <code>wp([x := y ; y := x²], y > x)</code>.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> substituer <code>x ← y</code> dans la postcondition finale
+            sans avoir d'abord propagé <code>y := x²</code>. La règle de séquence impose de partir
+            de la postcondition et de remonter instruction par instruction de droite à gauche.
+        </div>
+
+        <button class="hint-btn" data-hint="q3-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q3-h1">
+            Commencer par <code>wp(y := x², y > x)</code> : substituer <code>y ← x²</code> dans <code>y > x</code>.
+            Quel prédicat obtient-on ?
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q3-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q3-h2">
+            L'étape 1 donne <code>x² > x</code>. Appliquer maintenant <code>wp(x := y, x² > x)</code> :
+            substituer <code>x ← y</code> dans <code>x² > x</code>.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Détaillez le calcul étape par étape…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q3</h4>
+            <ul class="steps">
+                <li><span class="step-body"><strong>Étape 1</strong> — <code>wp(y := x², y > x)</code><br>
+                    Substituer <code>y ← x²</code> dans <code>y > x</code> :<br>
+                    <code>= x² > x</code></span></li>
+                <li><span class="step-body"><strong>Étape 2</strong> — <code>wp(x := y, x² > x)</code><br>
+                    Substituer <code>x ← y</code> dans <code>x² > x</code> :<br>
+                    <code>= y² > y</code></span></li>
+            </ul>
+            <div class="highlight-box">
+                <p><strong>Résultat :</strong> <code>wp([x := y ; y := x²], y > x) = <strong>y² > y</strong></code></p>
+            </div>
+            <div class="callout-info">
+                <p><span class="badge badge-blue">Explication</span></p>
+                <p>La condition <code>y² > y</code> est équivalente à <code>y(y−1) > 0</code>,
+                c'est-à-dire <code>y &lt; 0</code> ou <code>y > 1</code>.
+                Le programme satisfait la postcondition exactement quand la valeur initiale de <code>y</code>
+                est strictement négative ou strictement supérieure à 1.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── BILAN DES TROIS CAS ── -->
+    <div class="callout-info">
+        <strong>Bilan — Trois comportements possibles du wp</strong>
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>Question</th><th>wp calculée</th><th>Signification</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Q1</td><td><code>x &gt; 6</code></td><td>Deux affectations successives décalent le seuil de 3</td></tr>
+                    <tr><td>Q2</td><td><code>x+y ≥ 5 ∧ y ≤ 3</code></td><td>Deux substitutions enchaînées simplifient les contraintes</td></tr>
+                    <tr><td>Q3</td><td><code>y² > y</code></td><td>La substitution enchaîne x² > x puis y² > y</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">1</span>
+        <span class="bareme-label">Q1 — wp de séquence d'affectations</span>
+        <span class="bareme-desc">Résultat <code>x &gt; 6</code> + les deux étapes de substitution correctes</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q2 — wp de séquence avec deux variables</span>
+        <span class="bareme-desc">1 pt calcul étape 1 correct · 1 pt calcul étape 2 + résultat <code>x+y ≥ 5 ∧ y ≤ 3</code></span>
+
+        <span class="bareme-pts">1</span>
+        <span class="bareme-label">Q3 — wp avec expression quadratique</span>
+        <span class="bareme-desc">Résultat <code>y² > y</code> + les deux étapes de substitution correctes</span>
+
+        <div class="bareme-total">Total : <strong>4 pts</strong></div>
+    </div>
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Comment échangerait-on vraiment <code>x</code> et <code>y</code> en programmation séquentielle ? Calculez wp du vrai échange avec variable temporaire <code>t</code>.</li>
+            <li>La notation B permet l'affectation simultanée : <code>x, y := y, x</code>. Calculer sa wp pour <code>y &gt; x</code> — le résultat diffère-t-il de Q3 ?</li>
+            <li>Calculer <code>wp([x := x+y ; y := x-y ; x := x-y], y &gt; x)</code> — c'est un échange sans variable temporaire.</li>
+        </ul>
+    </div>
+
+</body>
+</html>

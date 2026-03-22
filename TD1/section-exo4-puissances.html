@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 4 — Puissances d'une relation</h2>
+
+    <!-- ── EN-TÊTE DE L'EXERCICE ── -->
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 8 pts</span>
+            <span class="exo-time">⏱ 20–30 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Calculer la composition de deux relations par un procédé systématique</li>
+                <li>Calculer les puissances successives d'une relation</li>
+                <li>Identifier un cycle dans la suite des puissances et l'exploiter</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours 2 — Composition et puissances de relations</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3>Contexte — Puissances d'une relation</h3>
+        <p>Soit la relation R définie par :</p>
+
+        <div class="highlight-box">
+            <strong>R = { (0 → 2),  (1 → 0),  (2 → 1) }</strong>
+        </div>
+
+        <div style="display:flex; justify-content:center; margin: 1rem 0;">
+            <svg width="300" height="155" viewBox="0 0 300 155" fill="none" xmlns="http://www.w3.org/2000/svg" style="font-family:'Inter',system-ui,sans-serif;">
+              <!-- Nodes en triangle : 0 haut, 1 bas-gauche, 2 bas-droit -->
+              <circle cx="150" cy="25" r="20" fill="rgba(91,166,160,0.1)" stroke="#5ba6a0" stroke-width="1.5"/>
+              <text x="150" y="31" text-anchor="middle" font-size="13" fill="#dedad5">0</text>
+              <circle cx="50" cy="125" r="20" fill="rgba(91,166,160,0.1)" stroke="#5ba6a0" stroke-width="1.5"/>
+              <text x="50" y="131" text-anchor="middle" font-size="13" fill="#dedad5">1</text>
+              <circle cx="250" cy="125" r="20" fill="rgba(91,166,160,0.1)" stroke="#5ba6a0" stroke-width="1.5"/>
+              <text x="250" y="131" text-anchor="middle" font-size="13" fill="#dedad5">2</text>
+              <!-- 0 → 2 : direction (100,100), unit (0.707,0.707) -->
+              <line x1="164" y1="39" x2="236" y2="111" stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+              <polygon points="236,111 228,107 232,101" fill="#d67556"/>
+              <!-- 1 → 0 : direction (100,−100), unit (0.707,−0.707) -->
+              <line x1="64" y1="111" x2="136" y2="39" stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+              <polygon points="136,39 133,48 128,42" fill="#d67556"/>
+              <!-- 2 → 1 : horizontal gauche -->
+              <line x1="230" y1="125" x2="70" y2="125" stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+              <polygon points="70,125 78,121 78,129" fill="#d67556"/>
+              <text x="150" y="90" text-anchor="middle" font-size="10" fill="#9e9a94" font-style="italic">R (période 3)</text>
+            </svg>
+        </div>
+
+        <p>Calculer R¹, R², R³ et R⁷.</p>
+
+        <div class="callout-info">
+            <strong>Rappel de notation</strong>
+            <ul>
+                <li><strong>R¹ = R</strong></li>
+                <li><strong>R² = R ; R</strong> &nbsp;(R composé avec lui-même)</li>
+                <li><strong>Rⁿ = Rⁿ⁻¹ ; R</strong> &nbsp;pour n ≥ 2</li>
+                <li><strong>Composition S ; R</strong> : (x, z) ∈ S ; R &nbsp;⟺&nbsp; ∃ y · (x, y) ∈ S  ∧  (y, z) ∈ R</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Rappel de cours compact -->
+    <button class="hint-btn" data-hint="rappel-compo-court" data-label="Rappel de cours" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours</span>
+    </button>
+    <div class="hint" id="rappel-compo-court">
+        <p>La <strong>composition</strong> S ; R produit toutes les paires (x, z) telles qu'il existe un intermédiaire y avec (x, y) ∈ S et (y, z) ∈ R.</p>
+        <p>Pour calculer R², on cherche, pour chaque paire (x, y) ∈ R, une paire (y, z) ∈ R ayant le même intermédiaire y, et on produit (x, z).</p>
+    </div>
+
+    <!-- Rappel de cours approfondi -->
+    <button class="hint-btn" data-hint="rappel-compo-long" data-label="Rappel de cours approfondi" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours approfondi</span>
+    </button>
+    <div class="hint" id="rappel-compo-long">
+        <p><strong>Méthode systématique pour calculer S ; R :</strong></p>
+        <ul>
+            <li>Pour chaque paire (x, y) ∈ S, chercher toutes les paires (y, z) ∈ R ayant y comme antécédent.</li>
+            <li>Chaque paire (y, z) trouvée produit une nouvelle paire (x, z) dans le résultat.</li>
+            <li>Si aucune paire de R ne commence par y, la paire (x, y) de S ne contribue à rien.</li>
+        </ul>
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Point clé</span></p>
+            <p>La composition n'est pas commutative en général : S ; R ≠ R ; S. Dans cet exercice, c'est toujours R qui joue le rôle du côté droit — vérifiez l'ordre à chaque étape.</p>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple — composition</span></p>
+            <p>Soit P = { a → b,  b → c } et Q = { b → x,  c → y }.</p>
+            <p><strong>P ; Q :</strong></p>
+            <ul>
+                <li>(a → b) ∈ P et (b → x) ∈ Q → produit <strong>(a → x)</strong></li>
+                <li>(b → c) ∈ P et (c → y) ∈ Q → produit <strong>(b → y)</strong></li>
+            </ul>
+            <p>P ; Q = { a → x,  b → y }</p>
+        </div>
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Analogie</span></p>
+            <p><strong>Intuition :</strong> composer une relation, c'est enchaîner deux étapes d'un itinéraire. Si on va de x à y en une étape (S), et de y à z en une étape (R), alors S ; R dit qu'on peut aller de x à z en deux étapes.</p>
+            <p>Les puissances Rⁿ représentent les destinations accessibles en <em>exactement n étapes</em> dans le graphe de R.</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 1 — R¹, R², R³                       -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">5 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Soit la relation :</p>
+        <div class="highlight-box">
+            <strong>R = { (0 → 2),  (1 → 0),  (2 → 1) }</strong>
+        </div>
+        <p>Calculez <strong>R¹, R² et R³</strong>. Détaillez chaque étape de composition.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Confondre la composition avec l'union. R² = R ; R ne contient que les paires (x, z) reliées via un intermédiaire dans R — ce n'est pas R ∪ R ni un simple "doublement" des éléments.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1-puis" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1-puis">
+            Pour R² = R ; R, prenez chaque paire (x → y) ∈ R et cherchez (y → z) ∈ R.
+            Par exemple : (0 → 2) ∈ R — cherchez une paire débutant par 2 dans R : (2 → 1). Cela donne (0 → 1) ∈ R².
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2-puis" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2-puis">
+            R² = { 0 → 1,  1 → 2,  2 → 0 }. Pour R³ = R² ; R, refaites le même procédé en prenant R² à gauche et R à droite — cherchez les intermédiaires dans R.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Calculez R¹, R² et R³ en détaillant chaque étape de composition…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <p><strong>R¹ = R</strong> (par définition)</p>
+            <div class="highlight-box">
+                R¹ = { 0 → 2,  1 → 0,  2 → 1 }
+            </div>
+
+            <p><strong>R² = R ; R</strong> — pour chaque (x → y) ∈ R, chercher (y → z) ∈ R :</p>
+            <div class="table-glass">
+                <table>
+                    <thead>
+                        <tr><th>Paire dans R</th><th>Intermédiaire y</th><th>Paire (y → z) dans R</th><th>Résultat (x → z)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0 → 2</td><td>y = 2</td><td>2 → 1</td><td><strong>0 → 1</strong></td></tr>
+                        <tr><td>1 → 0</td><td>y = 0</td><td>0 → 2</td><td><strong>1 → 2</strong></td></tr>
+                        <tr><td>2 → 1</td><td>y = 1</td><td>1 → 0</td><td><strong>2 → 0</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="highlight-box">
+                R² = { 0 → 1,  1 → 2,  2 → 0 }
+            </div>
+
+            <p><strong>R³ = R² ; R</strong> — même procédé avec R² à gauche :</p>
+            <div class="table-glass">
+                <table>
+                    <thead>
+                        <tr><th>Paire dans R²</th><th>Intermédiaire y</th><th>Paire (y → z) dans R</th><th>Résultat (x → z)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0 → 1</td><td>y = 1</td><td>1 → 0</td><td><strong>0 → 0</strong></td></tr>
+                        <tr><td>1 → 2</td><td>y = 2</td><td>2 → 1</td><td><strong>1 → 1</strong></td></tr>
+                        <tr><td>2 → 0</td><td>y = 0</td><td>0 → 2</td><td><strong>2 → 2</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="highlight-box">
+                R³ = { 0 → 0,  1 → 1,  2 → 2 } = <strong>Id</strong> (relation d'identité sur {0, 1, 2})
+            </div>
+
+            <p class="inline-note">R³ est la relation d'identité : chaque élément est mis en correspondance avec lui-même. Ce résultat remarquable n'est pas une coïncidence — voir Q2.</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 2 — R⁷                               -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-avance">Avancé</span>
+        </div>
+        <p>Calculez <strong>R⁷</strong> sans effectuer toutes les compositions intermédiaires. Justifiez le raisonnement.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Calculer R⁴, R⁵, R⁶, R⁷ une par une. Ce procédé est correct mais inutilement long — le résultat de Q1 contient déjà le raccourci nécessaire.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1-puis" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q2-h1-puis">
+            R³ = Id (l'identité). Id ; R = R pour toute relation R.
+            Que vaut donc R⁴ = R³ ; R ?
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2-puis" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q2-h2-puis">
+            R⁴ = R¹ = R. La suite est périodique de période 3 : R¹ = R⁴ = R⁷, R² = R⁵, R³ = R⁶ = Id.
+            Calculez 7 mod 3 pour identifier à quelle puissance "de base" R⁷ correspond.
+        </div>
+    </div>
+
+    <div class="highlight-box">
+        <p><span class="badge badge-orange">Méthode</span></p>
+        <ul class="steps">
+            <li>Identifier si une puissance de R est une relation connue (Id, R, R², ∅…).</li>
+            <li>En déduire la période du cycle.</li>
+            <li>Réduire l'exposant cible modulo la période.</li>
+            <li>Conclure par identification avec la puissance de base correspondante.</li>
+        </ul>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Justifiez le cycle et donnez R⁷…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+
+            <ul class="steps">
+                <li>On a montré que <strong>R³ = Id</strong>.</li>
+                <li>Donc R⁴ = R³ ; R = Id ; R = <strong>R = R¹</strong>.</li>
+                <li>De même : R⁵ = R², R⁶ = R³ = Id, R⁷ = R⁴ = R¹.</li>
+                <li>La suite (Rⁿ) est <strong>périodique de période 3</strong> : Rⁿ = R<sup>n mod 3</sup>.</li>
+                <li>7 mod 3 = <strong>1</strong>, donc R⁷ = R¹ = R.</li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>R⁷ = R = { 0 → 2,  1 → 0,  2 → 1 }</strong>
+            </div>
+
+            <div class="callout-info">
+                <strong>Pourquoi R est-elle cyclique de période 3 ?</strong>
+                <p>R est une <em>permutation circulaire</em> de {0, 1, 2} : elle envoie 0 sur 2, 2 sur 1, 1 sur 0 — une rotation d'ordre 3. Toute permutation d'ordre k vérifie Rᵏ = Id, ce qui engendre le cycle observé ici.</p>
+            </div>
+
+            <div class="table-glass">
+                <table>
+                    <thead>
+                        <tr><th>Puissance</th><th>Résultat</th><th>Justification</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>R¹</td><td>{ 0→2, 1→0, 2→1 }</td><td>Définition</td></tr>
+                        <tr><td>R²</td><td>{ 0→1, 1→2, 2→0 }</td><td>Composition R ; R</td></tr>
+                        <tr><td>R³</td><td>{ 0→0, 1→1, 2→2 } = Id</td><td>Composition R² ; R</td></tr>
+                        <tr><td>R⁷</td><td>{ 0→2, 1→0, 2→1 } = R</td><td>7 mod 3 = 1 → R⁷ = R¹</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">1</span>
+        <span class="bareme-label">R¹</span>
+        <span class="bareme-desc">1 pt résultat correct</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">R²</span>
+        <span class="bareme-desc">1 pt méthode (tableau de composition avec intermédiaire) · 1 pt résultat correct</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">R³ = Id</span>
+        <span class="bareme-desc">1 pt calcul correct · 1 pt identification de la relation d'identité</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">R⁷</span>
+        <span class="bareme-desc">1 pt raisonnement par cycle (R³ = Id → période 3) · 1 pt calcul 7 mod 3 · 1 pt résultat correct</span>
+
+        <div class="bareme-total">Total : <strong>8 pts</strong></div>
+    </div>
+
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Quelle est la relation R⁰ ? Donnez sa définition formelle et vérifiez qu'elle est cohérente avec la formule Rⁿ = Rⁿ⁻¹ ; R pour n = 1.</li>
+            <li>Si on modifie R en ajoutant la paire (0 → 0), la suite des puissances reste-t-elle périodique ? Quel est l'effet sur R² et R³ ?</li>
+            <li>Montrez formellement que si Rᵏ = Id pour une permutation R, alors Rⁿ = R<sup>n mod k</sup> pour tout n ≥ 0.</li>
+        </ul>
+    </div>
+
+</body>
+</html>

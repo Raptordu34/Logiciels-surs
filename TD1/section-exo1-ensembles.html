@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 1 — Ensembles</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+            <span class="exo-points">◎ 8 pts</span>
+            <span class="exo-time">⏱ 20–30 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Calculer l'ensemble des parties d'un ensemble fini, y compris de manière itérée</li>
+                <li>Maîtriser le produit cartésien et construire son ensemble des parties</li>
+                <li>Appliquer la formule |P(E)| = 2<sup>|E|</sup> de façon rigoureuse</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours 1 — Théorie des ensembles, parties et produit cartésien</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3>Données</h3>
+        <p>Soit les deux ensembles finis :</p>
+        <div class="highlight-box">
+            <p><strong>S = {a, b}</strong> &nbsp;&nbsp; <strong>T = {1, 2}</strong></p>
+        </div>
+        <div style="display:flex; justify-content:center; margin: 1rem 0 0.5rem;">
+            <svg width="434" height="60" viewBox="0 0 434 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="font-family:'Inter',system-ui,sans-serif;">
+              <rect x="1" y="10" width="90" height="40" rx="7" fill="rgba(214,117,86,0.08)" stroke="#d67556" stroke-width="1.5"/>
+              <text x="46" y="27" text-anchor="middle" font-size="11" font-weight="600" fill="#d67556">S = {a, b}</text>
+              <text x="46" y="43" text-anchor="middle" font-size="9" fill="#9e9a94">|S| = 2</text>
+              <line x1="91" y1="30" x2="126" y2="30" stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+              <polygon points="130,30 122,26 122,34" fill="#d67556"/>
+              <text x="110" y="22" text-anchor="middle" font-size="9" fill="#9e9a94">𝒫</text>
+              <rect x="131" y="10" width="120" height="40" rx="7" fill="rgba(214,117,86,0.08)" stroke="#d67556" stroke-width="1.5"/>
+              <text x="191" y="27" text-anchor="middle" font-size="11" font-weight="600" fill="#d67556">P(S)</text>
+              <text x="191" y="43" text-anchor="middle" font-size="9" fill="#9e9a94">|P(S)| = 2² = 4</text>
+              <line x1="251" y1="30" x2="286" y2="30" stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+              <polygon points="290,30 282,26 282,34" fill="#d67556"/>
+              <text x="270" y="22" text-anchor="middle" font-size="9" fill="#9e9a94">𝒫</text>
+              <rect x="291" y="10" width="142" height="40" rx="7" fill="rgba(214,117,86,0.08)" stroke="#d67556" stroke-width="1.5"/>
+              <text x="362" y="27" text-anchor="middle" font-size="11" font-weight="600" fill="#d67556">P(P(S))</text>
+              <text x="362" y="43" text-anchor="middle" font-size="9" fill="#9e9a94">|P(P(S))| = 2⁴ = 16</text>
+            </svg>
+        </div>
+        <p>On note <strong>P(E)</strong> l'ensemble des parties (sous-ensembles) d'un ensemble E. Il contient toujours ∅ et E lui-même.</p>
+    </div>
+
+    <!-- Rappel de cours -->
+    <button class="hint-btn" data-hint="rappel-parties" data-label="Rappel de cours — Ensemble des parties" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours — Ensemble des parties</span>
+    </button>
+    <div class="hint" id="rappel-parties">
+        <p><strong>Définition :</strong> P(E) = { A | A ⊆ E }. Tout ensemble A est un sous-ensemble de E si chacun de ses éléments appartient à E.</p>
+        <p><strong>Propriété cardinale :</strong> si |E| = n, alors |P(E)| = 2<sup>n</sup>. Intuition : pour chaque élément de E, on choisit indépendamment de l'inclure ou non dans un sous-ensemble — ce qui donne 2 × 2 × … × 2 = 2<sup>n</sup> choix.</p>
+        <ul>
+            <li>|E| = 0 → P(∅) = {∅}, cardinal 2<sup>0</sup> = 1</li>
+            <li>|E| = 1, E = {x} → P(E) = {∅, {x}}, cardinal 2<sup>1</sup> = 2</li>
+            <li>|E| = 2, E = {x, y} → P(E) = {∅, {x}, {y}, {x,y}}, cardinal 2<sup>2</sup> = 4</li>
+            <li>|E| = 3, E = {x, y, z} → P(E) contient 2<sup>3</sup> = 8 éléments</li>
+        </ul>
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Points d'attention</span></p>
+            <p>∅ est <em>toujours</em> un élément de P(E), quel que soit E — c'est le sous-ensemble vide. De même, E lui-même est toujours un élément de P(E). Ces deux éléments sont systématiquement oubliés lors d'un premier listage.</p>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple</span></p>
+            <p>Pour E = {1, 2, 3}, |P(E)| = 2<sup>3</sup> = 8 :</p>
+            <ul>
+                <li>∅, {1}, {2}, {3}</li>
+                <li>{1,2}, {1,3}, {2,3}</li>
+                <li>{1,2,3}</li>
+            </ul>
+            <p class="inline-note">On regroupe par taille : 1 + 3 + 3 + 1 = 8 ✓</p>
+        </div>
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Analogie</span></p>
+            <p><strong>Intuition :</strong> construire P(E), c'est dresser la liste de tous les menus possibles dans un buffet où chaque plat peut être pris ou laissé. Avec n plats, on obtient exactement 2<sup>n</sup> menus — y compris le plateau vide (∅) et le plateau complet (E).</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 1                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">4 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Calculer <strong>P(P(S))</strong> en listant explicitement tous ses éléments.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Oublier que ∅ est un élément à part entière de P(S), donc aussi un membre sur lequel P(P(S)) s'appuie. Ne pas confondre ∅ (ensemble vide) et {∅} (ensemble contenant l'ensemble vide) : ces deux objets sont distincts — et tous deux présents dans P(P(S)).
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            <p>Procédez en deux étapes :</p>
+            <ol>
+                <li>Calculez d'abord P(S). Puisque |S| = 2, vous obtiendrez un ensemble à 2<sup>2</sup> = 4 éléments.</li>
+                <li>Calculez ensuite P(P(S)), c'est-à-dire l'ensemble des parties d'un ensemble à 4 éléments. Il contiendra 2<sup>4</sup> = 16 éléments.</li>
+            </ol>
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            <p>P(S) = {∅, {a}, {b}, {a,b}}. Pour lister P(P(S)) sans rien oublier, groupez les sous-ensembles par taille :</p>
+            <ul>
+                <li>Taille 0 : 1 sous-ensemble (∅ lui-même)</li>
+                <li>Taille 1 : 4 singletons — un pour chaque élément de P(S)</li>
+                <li>Taille 2 : C(4,2) = 6 paires</li>
+                <li>Taille 3 : C(4,3) = 4 triplets</li>
+                <li>Taille 4 : 1 seul (P(S) entier)</li>
+            </ul>
+            <p>Total : 1 + 4 + 6 + 4 + 1 = 16 ✓</p>
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Listez d'abord P(S), puis P(P(S)) groupé par taille de sous-ensemble…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <p><strong>Étape 1 — Calcul de P(S)</strong></p>
+            <p>S = {a, b}, |S| = 2, donc |P(S)| = 2<sup>2</sup> = 4.</p>
+            <p><code>P(S) = { ∅,  {a},  {b},  {a,b} }</code></p>
+
+            <p><strong>Étape 2 — Calcul de P(P(S))</strong></p>
+            <p>|P(S)| = 4, donc |P(P(S))| = 2<sup>4</sup> = <strong>16</strong>. On liste les 16 sous-ensembles de P(S) en regroupant par taille :</p>
+
+            <div class="highlight-box">
+                <p><span class="badge badge-orange">Méthode</span> Listage par taille — coefficients binomiaux C(4, k)</p>
+                <ul>
+                    <li><strong>Taille 0 (1 élément) :</strong> ∅</li>
+                    <li><strong>Taille 1 (4 éléments) :</strong> {∅} &nbsp;·&nbsp; {{a}} &nbsp;·&nbsp; {{b}} &nbsp;·&nbsp; {{a,b}}</li>
+                    <li><strong>Taille 2 (6 éléments) :</strong> {∅,{a}} &nbsp;·&nbsp; {∅,{b}} &nbsp;·&nbsp; {∅,{a,b}} &nbsp;·&nbsp; {{a},{b}} &nbsp;·&nbsp; {{a},{a,b}} &nbsp;·&nbsp; {{b},{a,b}}</li>
+                    <li><strong>Taille 3 (4 éléments) :</strong> {∅,{a},{b}} &nbsp;·&nbsp; {∅,{a},{a,b}} &nbsp;·&nbsp; {∅,{b},{a,b}} &nbsp;·&nbsp; {{a},{b},{a,b}}</li>
+                    <li><strong>Taille 4 (1 élément) :</strong> {∅, {a}, {b}, {a,b}}</li>
+                </ul>
+            </div>
+            <p class="inline-note">1 + 4 + 6 + 4 + 1 = 16 éléments ✓ — on retrouve exactement les coefficients de la ligne n = 4 du triangle de Pascal.</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 2                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">4 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Décrire <strong>P(S×T)</strong> : calculer S×T, donner le cardinal de P(S×T) et caractériser la nature de ses éléments.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Confondre S×T (produit cartésien — ensemble de couples ordonnés) avec S∪T (union) ou avec P(S)×P(T). Les éléments de S×T sont des paires <em>(s, t)</em> avec s ∈ S et t ∈ T. L'ordre dans le couple est significatif : (a, 1) ≠ (1, a).
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            Listez S×T en formant toutes les paires (s, t) avec s ∈ {a, b} et t ∈ {1, 2}. Vous devez obtenir |S| × |T| = 2 × 2 = 4 couples distincts.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q2-h2">
+            <p>S×T = {(a,1), (a,2), (b,1), (b,2)}, cardinal 4. Donc |P(S×T)| = 2<sup>4</sup> = 16.</p>
+            <p>Chaque élément de P(S×T) est un sous-ensemble de couples — c'est exactement ce qu'on appelle une <strong>relation binaire</strong> de S vers T. Parmi ces 16 relations, certaines sont des fonctions.</p>
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Calculez S×T, donnez le cardinal de P(S×T) et caractérisez ses éléments…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+
+            <p><strong>Produit cartésien S×T</strong></p>
+            <p><code>S×T = { (a,1), (a,2), (b,1), (b,2) }</code></p>
+            <p>|S×T| = |S| × |T| = 2 × 2 = 4</p>
+
+            <p><strong>Ensemble des parties P(S×T)</strong></p>
+            <p>|P(S×T)| = 2<sup>|S×T|</sup> = 2<sup>4</sup> = <strong>16</strong></p>
+            <p>P(S×T) est l'ensemble de toutes les <strong>relations binaires</strong> de S vers T : chacun de ses 16 éléments est un sous-ensemble de couples de S×T, allant de la relation vide ∅ à la relation totale S×T.</p>
+
+            <div class="highlight-box">
+                <p><span class="badge badge-green">Exemples d'éléments de P(S×T)</span></p>
+                <ul>
+                    <li>∅ — relation vide : aucun élément de S n'est relié à quoi que ce soit</li>
+                    <li>{(a,1)} — seul a est relié, uniquement à 1</li>
+                    <li>{(a,1), (b,2)} — <em>fonction</em> de S dans T : a ↦ 1, b ↦ 2</li>
+                    <li>{(a,1), (a,2)} — a est relié à 1 et à 2 : relation valide, mais pas une fonction</li>
+                    <li>{(a,1), (a,2), (b,1), (b,2)} = S×T — relation totale</li>
+                </ul>
+            </div>
+
+            <div class="callout-info">
+                <p><strong>Fonctions parmi les 16 relations :</strong> une fonction de S dans T exige que chaque élément de S ait <em>exactement une</em> image dans T. Il y en a |T|<sup>|S|</sup> = 2<sup>2</sup> = 4 : les quatre façons d'associer une image dans {1, 2} à chacun de a et b indépendamment.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">4</span>
+        <span class="bareme-label">Q1 — P(P(S))</span>
+        <span class="bareme-desc">1 pt P(S) correct · 1 pt cardinal 16 justifié · 2 pts liste complète des 16 éléments sans omission ni doublon</span>
+
+        <span class="bareme-pts">4</span>
+        <span class="bareme-label">Q2 — P(S×T)</span>
+        <span class="bareme-desc">1 pt S×T correct · 1 pt cardinal 16 · 2 pts caractérisation correcte des éléments comme relations binaires</span>
+
+        <div class="bareme-total">Total : <strong>8 pts</strong></div>
+    </div>
+
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Quel est le cardinal de P(P(P(S))) ? Généralisez la formule pour le n-ième itéré de P appliqué à S.</li>
+            <li>Parmi les 16 éléments de P(S×T), combien sont des fonctions injectives ? Surjectives ? Bijectives ? Vérifiez en les listant.</li>
+            <li>Démontrez par récurrence sur |E| que |P(E)| = 2<sup>|E|</sup> pour tout ensemble fini E.</li>
+        </ul>
+    </div>
+
+</body>
+</html>

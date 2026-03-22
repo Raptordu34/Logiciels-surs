@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 6 — Modélisation d'un parking</h2>
+
+    <!-- ── EN-TÊTE DE L'EXERCICE ── -->
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 8 pts</span>
+            <span class="exo-time">⏱ 25–35 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Traduire une spécification en langage naturel en expression B formelle</li>
+                <li>Distinguer sous-ensemble, fonction totale et fonction partielle</li>
+                <li>Utiliser la restriction et l'image d'une relation pour exprimer une contrainte</li>
+                <li>Choisir le bon type de relation (⊆, →, ↛) selon les contraintes d'unicité</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours — Types de relations et de fonctions en B-Méthode</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3>Contexte — Système de gestion d'un parking à abonnement</h3>
+        <p>
+            On modélise un parking géré par badge. Trois ensembles de base sont donnés :
+        </p>
+        <ul>
+            <li><strong>BADGES</strong> — l'ensemble de tous les badges émis par le parking</li>
+            <li><strong>CLIENTS</strong> — l'ensemble de tous les clients enregistrés</li>
+            <li><strong>PLACES</strong> — l'ensemble de toutes les places du parking</li>
+        </ul>
+        <p>
+            À partir de ces ensembles, on veut formaliser cinq spécifications R1 à R5 qui décrivent
+            les règles métier du système. Pour chacune, il faut choisir le type de relation ou d'ensemble
+            adéquat et écrire l'expression B correspondante.
+        </p>
+
+        <div style="display:flex; justify-content:center; margin: 1rem 0 0.5rem;">
+            <img src="design/svg/exo6-parking-schema.svg" alt="Schéma du modèle B : BADGES, abonnés, CLIENTS, PLACES, réservées et leurs relations" style="max-width:100%;">
+        </div>
+        <p class="inline-note" style="text-align:center;">Vue d'ensemble du modèle — les tirets indiquent des sous-ensembles ; la barre sur la flèche occupation marque la fonction partielle (↛).</p>
+
+        <div class="callout-info">
+            <strong>Rappel — vocabulaire B-Méthode :</strong>
+            <ul>
+                <li><strong>abonnés ⊆ CLIENTS</strong> — sous-ensemble : abonnés est une partie de CLIENTS</li>
+                <li><strong>f ∈ A → B</strong> — <em>fonction totale</em> : tout élément de A a exactement une image dans B</li>
+                <li><strong>f ∈ A ↛ B</strong> — <em>fonction partielle</em> : certains éléments de A peuvent n'avoir aucune image</li>
+                <li><strong>r[S]</strong> — <em>image</em> de S par r : { b | ∃ a ∈ S · (a, b) ∈ r }</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Rappel de cours compact -->
+    <button class="hint-btn" data-hint="rappel-types-fonctions" data-label="Rappel — Types de fonctions" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel — Types de fonctions</span>
+    </button>
+    <div class="hint" id="rappel-types-fonctions">
+        <p>En B-Méthode, on distingue plusieurs types de relations entre A et B :</p>
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>Notation</th><th>Nom</th><th>Contrainte</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>A → B</code></td><td>Fonction totale</td><td>Chaque a ∈ A a <strong>exactement une</strong> image dans B</td></tr>
+                    <tr><td><code>A ↛ B</code></td><td>Fonction partielle</td><td>Chaque a ∈ A a <strong>au plus une</strong> image dans B (peut en avoir aucune)</td></tr>
+                    <tr><td><code>A ↣ B</code></td><td>Injection totale</td><td>Fonction totale + deux éléments distincts de A ont des images distinctes</td></tr>
+                    <tr><td><code>S ⊆ T</code></td><td>Sous-ensemble</td><td>Tous les éléments de S appartiennent à T</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="inline-note">Choisir le bon type, c'est exprimer exactement ce que la spécification garantit — ni plus, ni moins.</p>
+    </div>
+
+    <!-- Rappel de cours approfondi -->
+    <button class="hint-btn" data-hint="rappel-methode-formalisation" data-label="Méthode de formalisation" data-close-label="Masquer la méthode" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Méthode de formalisation</span>
+    </button>
+    <div class="hint" id="rappel-methode-formalisation">
+        <p><strong>Comment passer du langage naturel à l'expression B ?</strong></p>
+        <ul>
+            <li><strong>Repérez les noms communs :</strong> ils deviennent des variables ou des types. "Les abonnés" → variable <em>abonnés</em> de type sous-ensemble de CLIENTS.</li>
+            <li><strong>Repérez les verbes de liaison :</strong> "appartient à", "associé à", "est réservée" → relation ou fonction.</li>
+            <li><strong>Repérez les adverbes d'unicité :</strong> "unique" → fonction (au plus une image) ; "exactement un" → fonction totale ; "certaines" → sous-ensemble partial.</li>
+            <li><strong>Repérez les contraintes croisées :</strong> si une spécification relie deux variables déjà définies (ex. R5), utilisez l'image r[S] ou une restriction ◁/▷.</li>
+        </ul>
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Règle pratique</span></p>
+            <p>Commencez toujours par déclarer les <em>types</em> simples (R1, R3) avant d'écrire les contraintes qui les lient (R5). Un invariant ne peut contraindre que des variables déjà déclarées.</p>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple guidé</span></p>
+            <p>Spécification : « Chaque enseignant est un membre du personnel ».</p>
+            <ul>
+                <li>Ensembles de base : ENSEIGNANTS, PERSONNEL</li>
+                <li>Formalisation : <strong>ENSEIGNANTS ⊆ PERSONNEL</strong></li>
+            </ul>
+            <p>Spécification : « Chaque carte associe un étudiant à exactement un vestiaire ».</p>
+            <ul>
+                <li>Formalisation : <strong>casier ∈ CARTES → VESTIAIRES</strong> (fonction totale)</li>
+            </ul>
+        </div>
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Analogie</span></p>
+            <p><strong>Sous-ensemble vs. fonction :</strong> "les abonnés sont des clients" décrit une <em>appartenance de catégorie</em> → ⊆. "Chaque badge est attribué à un abonné" décrit une <em>association individualisée</em> → fonction.</p>
+            <p>Une ⊆ dit "qui fait partie de qui" ; une fonction dit "qui pointe vers qui".</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 1 — R1, R2, R3 : Déclarations       -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">4 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Donner la représentation formelle B des spécifications suivantes :</p>
+        <ul>
+            <li><strong>R1 :</strong> les abonnés sont des clients particuliers</li>
+            <li><strong>R2 :</strong> chaque badge appartient à un unique abonné</li>
+            <li><strong>R3 :</strong> certaines places sont réservées</li>
+        </ul>
+        <p>Pour chaque réponse, précisez le nom de la variable introduite et son type B.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant — R2 :</strong> écrire <em>abonnement ∈ BADGES ↛ abonnés</em> (fonction <em>partielle</em>) alors que la spécification dit "chaque badge" — ce mot "chaque" impose une <em>fonction totale</em>. Une fonction partielle autoriserait qu'un badge n'ait aucun abonné associé, ce qui contredit l'énoncé.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1-parking" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1-parking">
+            <p>R1 et R3 expriment qu'une certaine collection est une <em>partie</em> d'un ensemble de base. Quel opérateur B traduit "est un sous-ensemble de" ?</p>
+            <p>R2 exprime une association : à chaque badge correspond un abonné. Quel type de relation garantit qu'un élément a <em>exactement une</em> image ?</p>
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2-parking" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2-parking">
+            <ul>
+                <li>R1 : introduire la variable <strong>abonnés</strong> de type <strong>ℙ(CLIENTS)</strong>. La contrainte est <em>abonnés ⊆ CLIENTS</em>.</li>
+                <li>R2 : introduire <strong>abonnement ∈ BADGES → abonnés</strong> (fonction totale de BADGES vers abonnés — "chaque badge" = domaine total ; "unique abonné" = fonctionnel).</li>
+                <li>R3 : introduire <strong>réservées ⊆ PLACES</strong>.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Écrire la variable et son type B pour R1, R2 et R3…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <p><strong>R1 : les abonnés sont des clients particuliers</strong></p>
+            <div class="highlight-box">
+                <p>On introduit la variable <strong>abonnés</strong>.</p>
+                <p><strong>abonnés ⊆ CLIENTS</strong></p>
+                <p class="inline-note">abonnés est un sous-ensemble de CLIENTS : tout abonné est un client, mais tous les clients ne sont pas nécessairement abonnés.</p>
+            </div>
+
+            <p><strong>R2 : chaque badge appartient à un unique abonné</strong></p>
+            <div class="highlight-box">
+                <p>On introduit la variable <strong>abonnement</strong>.</p>
+                <p><strong>abonnement ∈ BADGES → abonnés</strong></p>
+                <p class="inline-note">"Chaque badge" → domaine total (tout badge a une image). "Unique abonné" → fonctionnel (au plus une image par élément du domaine). Combinés : fonction totale BADGES → abonnés.</p>
+            </div>
+
+            <div class="callout-info">
+                <p><span class="badge badge-blue">Pourquoi pas ↣ (injection) ?</span></p>
+                <p>La spécification dit que chaque badge appartient à <em>un</em> abonné — elle ne dit pas que deux badges distincts ne peuvent pas appartenir au même abonné. Un client abonné pourrait avoir plusieurs badges (badge de voiture et de moto, par exemple). Si la spécification avait dit "chaque abonné possède au plus un badge", il faudrait alors une injection.</p>
+            </div>
+
+            <p><strong>R3 : certaines places sont réservées</strong></p>
+            <div class="highlight-box">
+                <p>On introduit la variable <strong>réservées</strong>.</p>
+                <p><strong>réservées ⊆ PLACES</strong></p>
+                <p class="inline-note">"Certaines" signifie une partie des places — sous-ensemble de PLACES, pas nécessairement toutes.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 2 — R4, R5 : Relations et contraintes -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">4 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Donner la représentation formelle B des spécifications suivantes :</p>
+        <ul>
+            <li><strong>R4 :</strong> plan d'occupation des places</li>
+            <li><strong>R5 :</strong> respect des réservations</li>
+        </ul>
+        <p>Pour R5, la réponse doit exprimer une contrainte reliant <em>occupation</em>, <em>réservées</em> et <em>abonnés</em> (variables définies en Q1).</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant — R4 :</strong> écrire <em>occupation ∈ PLACES → CLIENTS</em> (fonction <em>totale</em>), ce qui imposerait que toutes les places soient occupées en permanence. Une place peut être libre : il faut une <em>fonction partielle</em> occupation ∈ PLACES ↛ CLIENTS.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1-parking" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q2-h1-parking">
+            <p><strong>R4 :</strong> une place peut être libre ou occupée par un client. Quel type de fonction traduit "au plus un client par place" avec la possibilité qu'une place soit vide ?</p>
+            <p><strong>R5 :</strong> exprimer que tous les clients occupant une place réservée sont des abonnés. Pensez à l'<em>image</em> de l'ensemble réservées par la relation occupation : <code>occupation[réservées]</code>.</p>
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2-parking" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q2-h2-parking">
+            <ul>
+                <li>R4 : <strong>occupation ∈ PLACES ↛ CLIENTS</strong> — fonction partielle (une place peut être libre).</li>
+                <li>R5 : <strong>occupation[réservées] ⊆ abonnés</strong> — l'ensemble des clients stationnés dans des places réservées est un sous-ensemble des abonnés.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Écrire la variable et son type B pour R4, puis la contrainte B pour R5…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+
+            <p><strong>R4 : plan d'occupation des places</strong></p>
+            <div class="highlight-box">
+                <p>On introduit la variable <strong>occupation</strong>.</p>
+                <p><strong>occupation ∈ PLACES ↛ CLIENTS</strong></p>
+                <p class="inline-note">Fonction partielle : chaque place est soit libre (pas d'image), soit occupée par exactement un client (au plus une image). dom(occupation) est l'ensemble des places effectivement occupées à l'instant t.</p>
+            </div>
+
+            <div class="callout-info">
+                <p><span class="badge badge-blue">Lecture de occupation ∈ PLACES ↛ CLIENTS</span></p>
+                <p>La flèche barrée ↛ signifie "fonction partielle de … vers …". Concrètement :</p>
+                <ul>
+                    <li>Si p ∈ dom(occupation), alors occupation(p) est le client garé en p.</li>
+                    <li>Si p ∉ dom(occupation), la place p est libre.</li>
+                </ul>
+                <p>À chaque instant, dom(occupation) ⊆ PLACES représente l'ensemble des places occupées.</p>
+            </div>
+
+            <p><strong>R5 : respect des réservations</strong></p>
+            <div class="highlight-box">
+                <p><strong>occupation[réservées] ⊆ abonnés</strong></p>
+                <p class="inline-note">
+                    occupation[réservées] est l'image de réservées par occupation : c'est l'ensemble de tous les clients
+                    qui ont garé leur véhicule dans une place réservée.
+                    La contrainte dit que cet ensemble doit être entièrement inclus dans abonnés.
+                </p>
+            </div>
+
+            <div class="callout-info">
+                <p><span class="badge badge-blue">Décoder R5 étape par étape</span></p>
+                <p>occupation[réservées] = { c ∈ CLIENTS | ∃ p ∈ réservées · (p, c) ∈ occupation }</p>
+                <p>Autrement dit : "l'ensemble des clients qui occupent au moins une place réservée".</p>
+                <p>Imposer occupation[réservées] ⊆ abonnés, c'est dire : si un client est garé dans une place réservée, alors c'est nécessairement un abonné. Un non-abonné ne peut pas occuper une place réservée.</p>
+            </div>
+
+            <h4>Récapitulatif de la machine B</h4>
+            <div class="table-glass">
+                <table>
+                    <thead>
+                        <tr><th>Spéc.</th><th>Variable</th><th>Expression B</th><th>Type</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>R1</td><td>abonnés</td><td>abonnés ⊆ CLIENTS</td><td>Sous-ensemble</td></tr>
+                        <tr><td>R2</td><td>abonnement</td><td>abonnement ∈ BADGES → abonnés</td><td>Fonction totale</td></tr>
+                        <tr><td>R3</td><td>réservées</td><td>réservées ⊆ PLACES</td><td>Sous-ensemble</td></tr>
+                        <tr><td>R4</td><td>occupation</td><td>occupation ∈ PLACES ↛ CLIENTS</td><td>Fonction partielle</td></tr>
+                        <tr><td>R5</td><td>—</td><td>occupation[réservées] ⊆ abonnés</td><td>Contrainte invariant</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">1</span>
+        <span class="bareme-label">R1</span>
+        <span class="bareme-desc">0,5 pt variable correcte · 0,5 pt type ⊆ CLIENTS</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">R2</span>
+        <span class="bareme-desc">0,5 pt variable · 0,5 pt domaine BADGES · 0,5 pt codomaine abonnés · 0,5 pt type → (totale)</span>
+
+        <span class="bareme-pts">1</span>
+        <span class="bareme-label">R3</span>
+        <span class="bareme-desc">0,5 pt variable · 0,5 pt type ⊆ PLACES</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">R4</span>
+        <span class="bareme-desc">0,5 pt variable · 0,5 pt domaine PLACES · 0,5 pt codomaine CLIENTS · 0,5 pt type ↛ (partielle)</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">R5</span>
+        <span class="bareme-desc">1 pt image occupation[réservées] · 1 pt contrainte ⊆ abonnés</span>
+
+        <div class="bareme-total">Total : <strong>8 pts</strong></div>
+    </div>
+
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Exprimer R5 à l'aide de la restriction de domaine plutôt que de l'image : <em>réservées ◁ occupation ∈ réservées ↛ abonnés</em>. Ces deux formulations sont-elles équivalentes ?</li>
+            <li>Ajouter une spécification R6 : "un abonné ne peut occuper qu'une seule place à la fois". Quelle propriété de la relation <em>occupation</em> cela impose-t-il (injection partielle) ?</li>
+            <li>Rédiger en B-Méthode une opération <code>entrer(b, p)</code> permettant à un porteur de badge b d'entrer et d'occuper la place p, avec sa précondition et sa substitution.</li>
+        </ul>
+    </div>
+
+</body>
+</html>

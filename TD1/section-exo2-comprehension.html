@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 2 — Compréhension – Extension</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 12 pts</span>
+            <span class="exo-time">⏱ 30–40 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Convertir une description en compréhension en liste en extension (et vice versa)</li>
+                <li>Distinguer une relation d'une fonction à partir de sa définition</li>
+                <li>Écrire une fonction avec la notation λ</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours 1 — Ensembles · Cours 2 — Relations et fonctions, notation λ</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3>Consigne</h3>
+        <p>
+            Pour chaque ensemble suivant (décrit en compréhension), fournir une description en <strong>extension</strong>.
+            Si la relation décrite est une <strong>fonction</strong>, l'exprimer aussi en utilisant la <strong>notation λ</strong>.
+        </p>
+    </div>
+
+    <!-- Rappel de cours -->
+    <button class="hint-btn" data-hint="rappel-comp-ext" data-label="Rappel de cours — Compréhension, extension et notation λ" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours — Compréhension, extension et notation λ</span>
+    </button>
+    <div class="hint" id="rappel-comp-ext">
+        <p><strong>Description en extension :</strong> on liste explicitement tous les éléments. Exemple : {0, 2, 4, 6, 8, 10}. Si l'ensemble est infini, on montre quelques éléments avec des points de suspension.</p>
+        <p><strong>Description en compréhension :</strong> on donne une propriété caractéristique. Exemple : {x ∈ ℕ | x &lt; 11 ∧ x mod 2 = 0}. La compréhension est plus concise pour les ensembles infinis ou très grands.</p>
+        <p><strong>Relation de A vers B :</strong> tout sous-ensemble de A×B. Un couple (a, b) appartient à la relation si a est relié à b.</p>
+        <p><strong>Fonction de A vers B :</strong> relation où chaque élément de A a <em>exactement une</em> image dans B. Critère : ∀ a ∈ A, il existe un unique b tel que (a, b) ∈ f.</p>
+        <p><strong>Notation λ :</strong> <code>λx ∈ A . expr(x)</code> désigne la fonction qui associe à tout x de A la valeur expr(x). Exemple : <code>λx ∈ ℕ . x²</code> associe à chaque entier naturel son carré.</p>
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Critère de fonction</span></p>
+            <p>Une relation R ⊆ A×B est une fonction si et seulement si : pour tout a ∈ A, il existe <em>un et un seul</em> b ∈ B tel que (a, b) ∈ R.</p>
+            <ul>
+                <li>Si un a est relié à <em>deux</em> b distincts → pas une fonction (ambiguïté).</li>
+                <li>Si un a n'est relié à aucun b → fonction partielle, non définie sur tout A.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple</span></p>
+            <p>Compréhension : {x ∈ ℕ | x &lt; 5}<br>Extension : {0, 1, 2, 3, 4}</p>
+            <p>Compréhension : {(n, n²) | n ∈ ℕ}<br>Extension (partielle) : {(0,0), (1,1), (2,4), (3,9), …}<br>Notation λ : <code>λn ∈ ℕ . n²</code></p>
+        </div>
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Analogie</span></p>
+            <p><strong>Intuition :</strong> la compréhension est une recette (« les entiers pairs inférieurs à 11 »), l'extension est le plat servi ({0, 2, 4, 6, 8, 10}). La notation λ est une machine à calculer : <code>λx . x/2</code> est la machine « prends x, rends x divisé par 2 ».</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 1                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Soit la relation définie en compréhension :</p>
+        <div class="highlight-box">
+            <code>{ (x, y) ∈ ℕ²  |  x &lt; 5  ∧  x + y = 3 }</code>
+        </div>
+        <p>Donner une description en extension (complète si l'ensemble est fini). La relation est-elle une fonction ? Si oui, exprimer avec la notation λ.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Oublier que y doit aussi appartenir à ℕ. La contrainte x + y = 3 impose y = 3 − x. Pour que y ≥ 0, il faut x ≤ 3. Ainsi x = 4 est exclu même si x &lt; 5 : le couple (4, −1) n'est pas dans ℕ². L'ensemble est donc fini, avec exactement 4 couples.
+        </div>
+
+        <button class="hint-btn" data-hint="q1c-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1c-h1">
+            La contrainte x + y = 3 détermine y de façon unique dès que x est fixé : y = 3 − x. Testez les valeurs x = 0, 1, 2, 3, 4 (qui vérifient x &lt; 5 et x ∈ ℕ) et vérifiez pour chacune si y = 3 − x est bien dans ℕ.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1c-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1c-h2">
+            <p>x=0 → y=3 ✓ ; x=1 → y=2 ✓ ; x=2 → y=1 ✓ ; x=3 → y=0 ✓ ; x=4 → y=−1 ✗ (pas dans ℕ).</p>
+            <p>L'ensemble complet est {(0,3), (1,2), (2,1), (3,0)}. Chaque valeur de x donne <em>exactement</em> une valeur de y → c'est bien une fonction.</p>
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Description en extension complète, test du critère de fonction, notation λ…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <p><strong>Description en extension (complète — ensemble fini) :</strong></p>
+            <pre><code>{ (0, 3), (1, 2), (2, 1), (3, 0) }</code></pre>
+
+            <div style="display:flex; justify-content:center; margin: 0.75rem 0;">
+                <svg width="280" height="145" viewBox="0 0 280 145" fill="none" xmlns="http://www.w3.org/2000/svg" style="font-family:'Inter',system-ui,sans-serif;">
+                  <text x="60" y="10" text-anchor="middle" font-size="8" fill="#9e9a94">domaine</text>
+                  <text x="220" y="10" text-anchor="middle" font-size="8" fill="#9e9a94">image</text>
+                  <!-- Nœuds domaine (gauche) -->
+                  <circle cx="60" cy="30" r="13" fill="rgba(214,117,86,0.1)" stroke="#d67556" stroke-width="1.2"/>
+                  <text x="60" y="35" text-anchor="middle" font-size="11" fill="#dedad5">0</text>
+                  <circle cx="60" cy="63" r="13" fill="rgba(214,117,86,0.1)" stroke="#d67556" stroke-width="1.2"/>
+                  <text x="60" y="68" text-anchor="middle" font-size="11" fill="#dedad5">1</text>
+                  <circle cx="60" cy="96" r="13" fill="rgba(214,117,86,0.1)" stroke="#d67556" stroke-width="1.2"/>
+                  <text x="60" y="101" text-anchor="middle" font-size="11" fill="#dedad5">2</text>
+                  <circle cx="60" cy="129" r="13" fill="rgba(214,117,86,0.1)" stroke="#d67556" stroke-width="1.2"/>
+                  <text x="60" y="134" text-anchor="middle" font-size="11" fill="#dedad5">3</text>
+                  <!-- Nœuds image (droite, ordre naturel) -->
+                  <circle cx="220" cy="30" r="13" fill="rgba(91,166,160,0.1)" stroke="#5ba6a0" stroke-width="1.2"/>
+                  <text x="220" y="35" text-anchor="middle" font-size="11" fill="#dedad5">0</text>
+                  <circle cx="220" cy="63" r="13" fill="rgba(91,166,160,0.1)" stroke="#5ba6a0" stroke-width="1.2"/>
+                  <text x="220" y="68" text-anchor="middle" font-size="11" fill="#dedad5">1</text>
+                  <circle cx="220" cy="96" r="13" fill="rgba(91,166,160,0.1)" stroke="#5ba6a0" stroke-width="1.2"/>
+                  <text x="220" y="101" text-anchor="middle" font-size="11" fill="#dedad5">2</text>
+                  <circle cx="220" cy="129" r="13" fill="rgba(91,166,160,0.1)" stroke="#5ba6a0" stroke-width="1.2"/>
+                  <text x="220" y="134" text-anchor="middle" font-size="11" fill="#dedad5">3</text>
+                  <!-- Flèches croisées — montrent la bijectivité par inversion -->
+                  <!-- 0 → 3 (diagonal bas-droite) : (73,30)→(207,129), unit≈(0.804,0.594) -->
+                  <line x1="73" y1="30" x2="207" y2="129" stroke="#d67556" stroke-width="1.2" stroke-linecap="round"/>
+                  <polygon points="207,129 199,122 203,118" fill="#d67556"/>
+                  <!-- 1 → 2 (légèrement diagonal bas) : (73,63)→(207,96), unit≈(0.971,0.239) -->
+                  <line x1="73" y1="63" x2="207" y2="96" stroke="#d67556" stroke-width="1.2" stroke-linecap="round"/>
+                  <polygon points="207,96 199,91 200,98" fill="#d67556"/>
+                  <!-- 2 → 1 (légèrement diagonal haut) : (73,96)→(207,63), unit≈(0.971,−0.239) -->
+                  <line x1="73" y1="96" x2="207" y2="63" stroke="#d67556" stroke-width="1.2" stroke-linecap="round"/>
+                  <polygon points="207,63 199,60 200,67" fill="#d67556"/>
+                  <!-- 3 → 0 (diagonal haut-droite) : (73,129)→(207,30), unit≈(0.804,−0.594) -->
+                  <line x1="73" y1="129" x2="207" y2="30" stroke="#d67556" stroke-width="1.2" stroke-linecap="round"/>
+                  <polygon points="207,30 203,37 199,32" fill="#d67556"/>
+                  <!-- Label fonction -->
+                  <text x="140" y="80" text-anchor="middle" font-size="9" fill="#d67556" font-style="italic">λx.(3−x)</text>
+                </svg>
+            </div>
+
+            <p>Pour tout x ∈ ℕ avec x &lt; 5, on calcule y = 3 − x. La contrainte y ∈ ℕ (y ≥ 0) impose x ≤ 3 — le cas x = 4 donne y = −1 ∉ ℕ et est donc exclu. L'ensemble est fini (4 couples).</p>
+
+            <p><strong>Est-ce une fonction ?</strong> <span class="badge badge-green">Oui</span></p>
+            <p>Pour tout x ∈ {0, 1, 2, 3}, la valeur y = 3 − x est déterminée de façon unique par la contrainte x + y = 3. Chaque antécédent a exactement une image : c'est une fonction.</p>
+
+            <p><strong>Notation λ :</strong></p>
+            <pre><code>λx ∈ { 0, 1, 2, 3 } . (3 − x)</code></pre>
+            <p class="inline-note">Le domaine est fini et peut être listé en extension. On aurait aussi pu l'écrire en compréhension : {z ∈ ℕ | z ≤ 3}.</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 2                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Soit la relation définie en notation λ :</p>
+        <div class="highlight-box">
+            <code>λx ( x ∈ ℕ  ∧  x &lt; 11  ∧  x mod 2 = 0  |  x / 2 )</code>
+        </div>
+        <p>Identifier le domaine, donner la liste complète des couples en extension, et confirmer que c'est une fonction.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Oublier 0. En ℕ, 0 est inclus par convention dans ce cours. Or 0 est pair et 0 &lt; 11 — le couple (0, 0) fait partie de la relation. Sans lui, on n'obtient que 5 couples au lieu de 6.
+        </div>
+
+        <button class="hint-btn" data-hint="q2c-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q2c-h1">
+            Identifiez d'abord le domaine : les x ∈ ℕ vérifiant x &lt; 11 <em>et</em> x mod 2 = 0. Listez-les, puis calculez x/2 pour chacun afin d'obtenir les couples (x, x/2).
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Domaine, puis liste complète des couples (x, x/2)…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+
+            <p><strong>Domaine :</strong> {x ∈ ℕ | x &lt; 11 ∧ x mod 2 = 0} = {0, 2, 4, 6, 8, 10}</p>
+            <p><strong>Description en extension :</strong></p>
+            <pre><code>{ (0, 0), (2, 1), (4, 2), (6, 3), (8, 4), (10, 5) }</code></pre>
+
+            <div class="table-glass">
+                <table>
+                    <thead>
+                        <tr><th>x</th><th>x mod 2 = 0 ?</th><th>x &lt; 11 ?</th><th>image x / 2</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0</td><td>✓</td><td>✓</td><td>0</td></tr>
+                        <tr><td>2</td><td>✓</td><td>✓</td><td>1</td></tr>
+                        <tr><td>4</td><td>✓</td><td>✓</td><td>2</td></tr>
+                        <tr><td>6</td><td>✓</td><td>✓</td><td>3</td></tr>
+                        <tr><td>8</td><td>✓</td><td>✓</td><td>4</td></tr>
+                        <tr><td>10</td><td>✓</td><td>✓</td><td>5</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p><strong>Est-ce une fonction ?</strong> <span class="badge badge-green">Oui</span></p>
+            <p>Chaque antécédent du domaine (0, 2, 4, 6, 8, 10) a exactement une image. La notation λ de l'énoncé est déjà la définition d'une fonction — la question confirme simplement sa validité.</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 3                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q3</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Soit la fonction décrite en langage naturel :</p>
+        <div class="highlight-box">
+            <p>« Une fonction qui associe n avec 1 + 2<sup>n</sup> »</p>
+        </div>
+        <p>Donner une description en compréhension, une description en extension (partielle), et la notation λ.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Confondre 1 + 2<sup>n</sup> avec (1 + 2)<sup>n</sup> = 3<sup>n</sup>. L'exposant porte uniquement sur 2 — l'expression est bien 1 + (2<sup>n</sup>). Pour n = 3 : 1 + 8 = 9, pas 3<sup>3</sup> = 27.
+        </div>
+
+        <button class="hint-btn" data-hint="q3c-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q3c-h1">
+            Le domaine naturel de cette fonction est ℕ (entiers naturels). Calculez les premières images pour n = 0, 1, 2, 3, 4 afin de construire l'extension partielle.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q3c-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q3c-h2">
+            <p>Calculs : n=0 → 1+1=2 ; n=1 → 1+2=3 ; n=2 → 1+4=5 ; n=3 → 1+8=9 ; n=4 → 1+16=17.</p>
+            <p>En compréhension : <code>{(n, 1+2<sup>n</sup>) | n ∈ ℕ}</code>. Notation λ : <code>λn ∈ ℕ . (1 + 2<sup>n</sup>)</code>.</p>
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Description en compréhension, extension partielle et notation λ…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q3</h4>
+
+            <p><strong>Description en compréhension :</strong></p>
+            <pre><code>{ (n, 1 + 2ⁿ) | n ∈ ℕ }</code></pre>
+
+            <p><strong>Description en extension (partielle — ensemble infini) :</strong></p>
+            <pre><code>{ (0, 2), (1, 3), (2, 5), (3, 9), (4, 17), (5, 33), … }</code></pre>
+
+            <div class="table-glass">
+                <table>
+                    <thead>
+                        <tr><th>n</th><th>2<sup>n</sup></th><th>1 + 2<sup>n</sup></th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0</td><td>1</td><td>2</td></tr>
+                        <tr><td>1</td><td>2</td><td>3</td></tr>
+                        <tr><td>2</td><td>4</td><td>5</td></tr>
+                        <tr><td>3</td><td>8</td><td>9</td></tr>
+                        <tr><td>4</td><td>16</td><td>17</td></tr>
+                        <tr><td>5</td><td>32</td><td>33</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p><strong>Notation λ :</strong></p>
+            <pre><code>λn ∈ ℕ . (1 + 2ⁿ)</code></pre>
+
+            <p class="inline-note">C'est bien une fonction : pour tout n ∈ ℕ, 1 + 2<sup>n</sup> est une valeur unique et bien définie. L'ensemble est infini — seule une liste partielle en extension est possible.</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 4                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q4</span>
+            <span class="question-pts">3 pts</span>
+            <span class="diff-badge diff-avance">Avancé</span>
+        </div>
+        <p>Soit la fonction décrite en langage naturel :</p>
+        <div class="highlight-box">
+            <p>« Une fonction qui associe un ensemble <em>non vide</em> d'entiers naturels avec son plus petit membre »</p>
+        </div>
+        <p>Identifier le domaine, donner une description en compréhension, quelques exemples en extension, et la notation λ.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Oublier la condition « non vide ». L'ensemble vide ∅ n'a pas de plus petit élément — la fonction serait non définie sur ∅. Le domaine doit donc explicitement exclure ∅, noté P*(ℕ) = P(ℕ) \ {∅}.
+        </div>
+
+        <button class="hint-btn" data-hint="q4c-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q4c-h1">
+            <p>Le domaine est l'ensemble de tous les sous-ensembles <em>non vides</em> de ℕ, noté P*(ℕ).</p>
+            <p>Pour trouver l'image d'un élément du domaine (qui est lui-même un ensemble), il suffit de prendre son minimum — qui existe toujours pour tout sous-ensemble non vide de ℕ (principe du bon ordre).</p>
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q4c-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q4c-h2">
+            <p>Quelques couples : ({0}, 0), ({1, 2}, 1), ({3, 5, 7}, 3), ({100}, 100).</p>
+            <p>En compréhension : <code>{(A, m) | A ∈ P*(ℕ) ∧ m = min(A)}</code>. Notation λ : <code>λA ∈ P*(ℕ) . min(A)</code>.</p>
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Domaine, description en compréhension, exemples en extension, notation λ…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q4</h4>
+
+            <p><strong>Domaine :</strong> P*(ℕ) = P(ℕ) \ {∅} — l'ensemble de tous les sous-ensembles non vides de ℕ.</p>
+            <p><strong>Codomaine :</strong> ℕ.</p>
+
+            <p><strong>Description en compréhension :</strong></p>
+            <pre><code>{ (A, m) | A ∈ P*(ℕ)  ∧  m = min(A) }</code></pre>
+
+            <p><strong>Exemples en extension :</strong></p>
+            <pre><code>{ ({0}, 0),  ({1}, 1),  ({1, 2, 3}, 1),  ({3, 5, 7}, 3),  ({100}, 100),  … }</code></pre>
+
+            <div class="callout-info">
+                <p><strong>Pourquoi min(A) existe-t-il toujours ?</strong> Par le <em>principe du bon ordre</em> : tout sous-ensemble non vide de ℕ admet un plus petit élément. C'est une propriété fondamentale de ℕ — elle ne se transfère pas à ℤ (les entiers relatifs n'ont pas de minimum).</p>
+            </div>
+
+            <p><strong>Notation λ :</strong></p>
+            <pre><code>λA ∈ P*(ℕ) . min(A)</code></pre>
+
+            <p><strong>Est-ce une fonction ?</strong> <span class="badge badge-green">Oui</span></p>
+            <p class="inline-note">Pour tout A ∈ P*(ℕ), min(A) est unique — un ensemble ne peut avoir qu'un seul plus petit élément. La condition de fonction est satisfaite. Notez cependant que deux antécédents distincts peuvent partager la même image : ({1}, 1) et ({1, 2, 3}, 1) → la fonction n'est pas injective.</p>
+        </div>
+    </div>
+
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q1 — { (x,y) ∈ ℕ² | x+y=3, x&lt;5 }</span>
+        <span class="bareme-desc">1 pt extension complète correcte (4 couples, x=4 exclu) · 1 pt identification comme fonction avec justification · 1 pt notation λ correcte</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q2 — λx(pair, &lt;11 | x/2)</span>
+        <span class="bareme-desc">1 pt domaine correct (0 inclus) · 1 pt liste complète des 6 couples · 1 pt confirmation du critère de fonction</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q3 — n ↦ 1+2ⁿ</span>
+        <span class="bareme-desc">1 pt compréhension · 1 pt extension partielle (au moins 4 couples corrects) · 1 pt notation λ</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Q4 — min d'un ensemble non vide</span>
+        <span class="bareme-desc">1 pt domaine P*(ℕ) explicité · 1 pt compréhension + exemples · 1 pt notation λ et justification du principe du bon ordre</span>
+
+        <div class="bareme-total">Total : <strong>12 pts</strong></div>
+    </div>
+
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>La fonction de Q4 est-elle surjective ? Tout entier naturel m est-il le minimum d'au moins un sous-ensemble de ℕ ? Justifiez.</li>
+            <li>Pourquoi la même construction sur ℤ ne donne-t-elle pas une fonction bien définie ? Que faudrait-il restreindre pour que min soit valide sur ℤ ?</li>
+            <li>Écrivez en notation λ la composition des fonctions de Q1 et Q3. Quel est son domaine ? Donnez quelques couples en extension.</li>
+        </ul>
+    </div>
+
+</body>
+</html>

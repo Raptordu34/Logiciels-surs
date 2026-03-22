@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 4 — Invariant et Variant</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 6 pts</span>
+            <span class="exo-time">⏱ 20 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Démontrer la correction d'un programme avec boucle.</li>
+                <li>Identifier un invariant de boucle à partir d'une postcondition.</li>
+                <li>Proposer un variant garantissant la terminaison du programme.</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Triplets de Hoare, sémantique de la boucle while, correction totale</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3>Contexte — Multiplication russe</h3>
+        <p>
+            Le programme suivant calcule le produit de deux entiers naturels <code>a</code> et <code>b</code>
+            uniquement par additions et divisions entières, sans jamais utiliser la multiplication directement.
+            C'est l'algorithme dit de <strong>multiplication russe</strong> (ou multiplication binaire).
+        </p>
+
+        <pre><code>-- Précondition : a ∈ ℕ, b ∈ ℕ
+x     := a;
+y     := b;
+total := 0;
+
+while x > 0 do
+    if x mod 2 = 1 then
+        total := total + y;
+        x     := x - 1
+    end;
+    x := x / 2;   -- division entière (ex : 7/2 = 3)
+    y := y * 2
+end
+
+-- Postcondition : total = a × b</code></pre>
+
+        <div class="callout-info">
+            <strong>Notations :</strong>
+            <ul>
+                <li><code>x mod 2</code> vaut <code>0</code> si x est pair, <code>1</code> si x est impair.</li>
+                <li><code>x / 2</code> désigne la <strong>division entière</strong> (quotient sans reste).</li>
+            </ul>
+        </div>
+
+        <div class="highlight-box">
+            <p><strong>Données du problème</strong> — l'énoncé fournit :</p>
+            <ul>
+                <li><strong>Invariant :</strong> <code>I  ≡  x ∈ ℕ  ∧  total + x × y = a × b</code></li>
+                <li><strong>Variant :</strong> <code>V = x</code></li>
+                <li><strong>Postcondition :</strong> <code>total = a × b</code></li>
+            </ul>
+            <p class="inline-note">Le but de l'exercice est de <strong>prouver la correction</strong> du programme en vérifiant les trois propriétés de l'invariant (établissement, conservation, conclusion) et la terminaison par le variant.</p>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- BLOC COMPRÉHENSION — POURQUOI ET COMMENT              -->
+    <!-- ══════════════════════════════════════════════════════ -->
+
+    <div class="callout-info">
+        <p><span class="badge badge-blue">Pourquoi prouver la correction d'un programme ?</span></p>
+        <p>
+            Tester un programme, c'est vérifier qu'il marche <em>sur quelques exemples</em>.
+            Mais ça ne prouve rien de général : un bug peut se cacher dans un cas que tu n'as pas testé.
+        </p>
+        <p>
+            <strong>Prouver la correction</strong>, c'est démontrer mathématiquement que le programme donne
+            toujours le bon résultat, <em>quels que soient les inputs</em>.
+            C'est ce qu'on fait en logiciel sûr : on ne se contente pas de tester, on prouve.
+        </p>
+        <p class="inline-note">
+            Exemple : l'algorithme de multiplication russe de cet exercice ne fait jamais de multiplication directe.
+            Comment être sûr qu'il calcule bien <code>a × b</code> dans <em>tous</em> les cas ?
+            Seule une preuve formelle le garantit.
+        </p>
+    </div>
+
+    <div class="callout-info">
+        <p><span class="badge badge-blue">Le problème spécifique des boucles <code>while</code></span></p>
+        <p>
+            Pour une séquence d'instructions sans boucle, prouver la correction est relativement simple :
+            on remonte les substitutions avec le wp, instruction par instruction.
+        </p>
+        <p>
+            Mais une boucle <code>while</code> pose un problème fondamental :
+            <strong>on ne sait pas à l'avance combien de fois elle va s'exécuter.</strong>
+            Elle peut tourner 3 fois, 100 fois, 0 fois… On ne peut pas dérouler le calcul à l'infini.
+        </p>
+        <p>
+            La solution : au lieu de raisonner sur <em>toutes les itérations</em>, on cherche une propriété
+            qui reste vraie <em>à chaque instant</em>, quel que soit le tour.
+            C'est l'<strong>invariant</strong>.
+        </p>
+    </div>
+
+    <!-- INTUITION INVARIANT -->
+    <div class="callout-info">
+        <p><span class="badge badge-blue">L'invariant — intuition</span></p>
+        <p>
+            Un invariant de boucle est une <strong>propriété sur les variables</strong> qui est vraie
+            avant d'entrer dans la boucle, après chaque tour, et donc encore vraie quand on en sort.
+        </p>
+        <p>
+            <strong>Analogie :</strong> imagine un arbitre qui surveille une partie d'échecs.
+            Il ne vérifie pas chaque case à chaque microseconde — il vérifie juste une règle simple
+            à chaque coup : <em>"le roi noir n'est pas en échec illégal"</em>.
+            Si cette règle est vraie au départ et reste vraie à chaque coup, elle est vraie à la fin.
+            C'est exactement le principe de l'invariant.
+        </p>
+        <p>
+            Pour ce programme, l'invariant est : <code>total + x × y = a × b</code>.<br>
+            Traduction : <strong>à tout moment, ce qu'on a déjà accumulé dans <code>total</code>
+            + ce qu'il reste à traiter (<code>x × y</code>) = le résultat final voulu.</strong>
+        </p>
+        <p>
+            Comme une caisse enregistreuse dont le sous-total + les articles non encore scannés
+            = le total final — à tout instant de la caisse.
+        </p>
+    </div>
+
+    <!-- TRACE PAS À PAS -->
+    <div class="callout-info">
+        <p><span class="badge badge-green">Trace concrète — a = 6, b = 3 (résultat attendu : 18)</span></p>
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>Moment</th><th><code>x</code></th><th><code>y</code></th><th><code>total</code></th><th>Ce qui se passe</th><th><code>total + x×y</code></th><th>Variant <code>x</code></th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Avant boucle</td><td>6</td><td>3</td><td>0</td><td>Initialisation</td><td>0 + 18 = 18 ✓</td><td>6</td></tr>
+                    <tr><td>Après tour 1</td><td>3</td><td>6</td><td>0</td><td>x pair → pas d'addition ; x÷2, y×2</td><td>0 + 18 = 18 ✓</td><td>3</td></tr>
+                    <tr><td>Après tour 2</td><td>1</td><td>12</td><td>6</td><td>x impair → total += 6 ; x−1 puis x÷2, y×2</td><td>6 + 12 = 18 ✓</td><td>1</td></tr>
+                    <tr><td>Après tour 3</td><td>0</td><td>24</td><td>18</td><td>x impair → total += 12 ; x−1 puis x÷2, y×2</td><td>18 + 0 = 18 ✓</td><td>0</td></tr>
+                    <tr><td>Sortie</td><td>0</td><td>24</td><td>18</td><td>x = 0 → boucle terminée</td><td><strong>total = 18 = a×b ✓</strong></td><td>—</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="inline-note">
+            L'invariant est vrai à chaque ligne — c'est ça la conservation.
+            Le variant passe de 6 → 3 → 1 → 0 : il décroît strictement, donc la boucle s'arrête.
+        </p>
+    </div>
+
+    <!-- NOTATION [S]P -->
+    <div class="callout-info">
+        <p><span class="badge badge-blue">La notation <code>[S]P</code> — c'est quoi ?</span></p>
+        <p>
+            <code>[S]P</code> se lit : <em>"après avoir exécuté S, P est vrai"</em>.
+            C'est la notation <strong>wp (weakest precondition)</strong> appliquée au programme S avec postcondition P.
+        </p>
+        <p>
+            On la calcule <strong>en remontant les substitutions à l'envers</strong>, comme on l'a fait en exo 1 :
+        </p>
+        <ul>
+            <li>Pour une affectation <code>x := e</code> : <code>[x := e]P</code> = P dans lequel on remplace <code>x</code> par <code>e</code>.</li>
+            <li>Pour une séquence <code>S1 ; S2</code> : on commence par S2, puis on applique S1 au résultat.</li>
+            <li>Pour un <code>if B then S1 else S2</code> : on traite les deux branches séparément.</li>
+        </ul>
+        <p><strong>Exemple rapide :</strong></p>
+        <ul>
+            <li><code>[x := x+1](x &gt; 5)</code> = <code>x+1 &gt; 5</code> = <code>x &gt; 4</code></li>
+            <li><code>[x := x/2 ; y := y*2](total + x×y = K)</code> = substituer d'abord <code>y ← y×2</code>, puis <code>x ← x/2</code> dans le prédicat.</li>
+        </ul>
+        <p>
+            Pourquoi cette notation ? Parce que le prof exprime <strong>la conservation de l'invariant
+            directement en termes de wp</strong> : dire "I est vrai après un tour" c'est dire que
+            I est la postcondition du corps S — soit <code>[S]I</code>.
+            Vérifier que <code>I ∧ E ⊃ [S]I</code>, c'est calculer <code>[S]I</code> et montrer
+            que <code>I ∧ E</code> l'implique.
+        </p>
+    </div>
+
+    <!-- LES 4 OBLIGATIONS -->
+    <div class="callout-info">
+        <p><span class="badge badge-orange">Les 4 obligations de preuve du prof — expliquées</span></p>
+        <p>
+            Pour prouver qu'une boucle <code>while E do S end</code> est <strong>totalement correcte</strong>
+            (résultat juste <em>et</em> terminaison garantie), le prof décompose la preuve en 4 obligations.
+            Voici ce que chacune signifie concrètement.
+        </p>
+
+        <p><strong>1. Invariance</strong> : <code>(I ∧ E) ⊃ [S]I</code></p>
+        <p class="inline-note">
+            Traduction : "si l'invariant est vrai ET qu'on est encore dans la boucle (E = x &gt; 0),
+            alors après avoir exécuté un tour complet du corps (S), l'invariant est encore vrai."<br>
+            C'est la <strong>conservation</strong> du cours, écrite en wp.
+            On calcule [S]I, on simplifie, et on vérifie que I∧E l'implique.
+            Ici il faut traiter deux cas : x pair et x impair, parce que le corps contient un <code>if</code>.
+        </p>
+
+        <p><strong>2. Typage</strong> : <code>(I ∧ E) ⊃ V ∈ ℕ</code></p>
+        <p class="inline-note">
+            Traduction : "pendant que la boucle tourne, le variant est bien un entier naturel (≥ 0)."<br>
+            C'est une condition préalable pour pouvoir utiliser V comme compteur de terminaison :
+            un compteur qui descend doit rester positif pour qu'on sache qu'il va atteindre 0.
+            Ici c'est immédiat car I contient déjà <code>x ∈ ℕ</code> et V = x.
+        </p>
+
+        <p><strong>3. Terminaison</strong> : <code>(I ∧ E ∧ V = δ) ⊃ [S](V &lt; δ)</code></p>
+        <p class="inline-note">
+            Traduction : "si le variant vaut δ au début d'un tour, alors après ce tour il est strictement inférieur à δ."<br>
+            <strong>δ (delta) est une variable fantôme</strong> qui "photographie" la valeur de V avant le tour.
+            C'est comme un arbitre qui note le score avant la manche, pour vérifier qu'il a baissé après.
+            On calcule [S](V &lt; δ) et on vérifie que I∧E∧(V=δ) l'implique.
+            Comme pour l'invariance, deux cas à traiter (x pair / x impair).
+        </p>
+
+        <p><strong>4. Finalisation</strong> : <code>(I ∧ ¬E) ⊃ R</code></p>
+        <p class="inline-note">
+            Traduction : "quand la boucle s'arrête (¬E = x ≤ 0), l'invariant implique la postcondition R."<br>
+            C'est la <strong>conclusion</strong> du cours.
+            Ici : I contient <code>x ∈ ℕ</code> et ¬E donne <code>x ≤ 0</code>, donc <code>x = 0</code>.
+            L'invariant devient alors <code>total + 0×y = a×b</code>, soit <code>total = a×b</code>. ✓
+        </p>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Correspondance des deux vocabulaires</span></p>
+            <div class="table-glass">
+                <table>
+                    <thead>
+                        <tr><th>Cours</th><th>Prof (wp)</th><th>Ce que ça prouve</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Établissement</td><td><em>(hors boucle, non listé)</em></td><td>I est vrai avant d'entrer</td></tr>
+                        <tr><td>Conservation</td><td>Invariance <code>(I∧E)⊃[S]I</code></td><td>I reste vrai après chaque tour</td></tr>
+                        <tr><td>Positivité du variant</td><td>Typage <code>(I∧E)⊃V∈ℕ</code></td><td>V est bien un entier naturel</td></tr>
+                        <tr><td>Décroissance du variant</td><td>Terminaison <code>(I∧E∧V=δ)⊃[S](V&lt;δ)</code></td><td>V diminue strictement</td></tr>
+                        <tr><td>Conclusion</td><td>Finalisation <code>(I∧¬E)⊃R</code></td><td>À la sortie, postcondition établie</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 1                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">4 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>
+            En utilisant l'invariant <code>I  ≡  x ∈ ℕ  ∧  total + x × y = a × b</code>,
+            vérifiez les <strong>trois propriétés</strong> : établissement, conservation, conclusion.
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> pour la conservation, oublier de traiter les deux cas séparément.
+            Le corps de la boucle se comporte différemment selon que <code>x</code> est pair ou impair —
+            il faut analyser chaque branche du <code>if</code>.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2 — Établissement" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2 — Établissement</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            Avant la boucle : <code>x = a</code>, <code>y = b</code>, <code>total = 0</code>.
+            Calculer <code>total + x × y</code> dans cet état. Est-ce bien égal à <code>a × b</code> ?
+            Et <code>x ∈ ℕ</code> est-il satisfait ?
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2 — Conservation" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2 — Conservation</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            Supposer <em>I</em> vraie et <code>x &gt; 0</code>. Traiter deux cas :
+            <br>• <em>x impair</em> : le corps exécute <code>total += y</code>, puis <code>x := x−1</code>, puis <code>x := x/2</code>, puis <code>y := y*2</code>.
+            Calculer <code>total' + x' × y'</code> et vérifier que cela vaut toujours <code>a × b</code>.
+            <br>• <em>x pair</em> : le corps saute le <code>if</code>, puis <code>x := x/2</code>, <code>y := y*2</code>.
+            Même vérification.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Vérifiez les trois propriétés de l'invariant : établissement, conservation (cas pair / cas impair), conclusion…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+            <p><strong>Invariant :</strong> <code>I  ≡  x ∈ ℕ  ∧  total + x × y = a × b</code> &nbsp;·&nbsp; <strong>E :</strong> <code>x &gt; 0</code></p>
+
+            <!-- VERSION COURS -->
+            <div class="highlight-box">
+                <p><span class="badge badge-green">Version cours — établissement, conservation, conclusion</span></p>
+
+                <p><strong>Établissement</strong> <span class="inline-note">(I est vraie avant d'entrer dans la boucle)</span></p>
+                <ul class="steps">
+                    <li>Avant la boucle : <code>x = a ∈ ℕ</code>, <code>y = b</code>, <code>total = 0</code>.</li>
+                    <li><code>x ∈ ℕ</code> ✓</li>
+                    <li><code>total + x×y = 0 + a×b = a×b</code> ✓</li>
+                </ul>
+
+                <p><strong>Conservation</strong> <span class="inline-note">(supposons I vraie et x &gt; 0 ; montrons que I est encore vraie après un tour)</span></p>
+                <ul class="steps">
+                    <li><em>x impair :</em> <code>total' = total + y</code>, <code>x' = (x−1)/2</code>, <code>y' = 2y</code>.</li>
+                    <li>→ <code>total' + x'×y' = (total+y) + (x−1)/2 × 2y = total + y + (x−1)y = total + xy = a×b</code> ✓</li>
+                    <li>→ <code>x' = (x−1)/2 ∈ ℕ</code> car x impair implique x−1 pair. ✓</li>
+                    <li><em>x pair :</em> <code>total' = total</code>, <code>x' = x/2</code>, <code>y' = 2y</code>.</li>
+                    <li>→ <code>total' + x'×y' = total + (x/2)×2y = total + xy = a×b</code> ✓</li>
+                    <li>→ <code>x' = x/2 ∈ ℕ</code> car x pair et x ≥ 2. ✓</li>
+                    <li>Dans les deux cas, I est restaurée après le tour. ✓</li>
+                </ul>
+
+                <p><strong>Conclusion</strong> <span class="inline-note">(quand la boucle s'arrête, I implique la postcondition)</span></p>
+                <ul class="steps">
+                    <li>À la sortie, <code>¬E</code> donc <code>x = 0</code>.</li>
+                    <li>I donne : <code>total + 0×y = a×b</code>, soit <code>total = a×b</code>. ✓</li>
+                </ul>
+            </div>
+
+            <!-- VERSION PROF -->
+            <div class="highlight-box">
+                <p><span class="badge badge-orange">Version prof — notation wp (Invariance + Finalisation)</span></p>
+
+                <p><strong>1. Invariance</strong> : <code>(I ∧ E) ⊃ [S]I</code></p>
+                <p class="inline-note">
+                    Traduction : "si l'invariant est vrai ET la boucle continue, alors après avoir exécuté le corps S,
+                    l'invariant est encore vrai." On calcule [S]I avec le wp, puis on montre que I∧E l'implique.
+                </p>
+                <ul class="steps">
+                    <li><em>x impair :</em> on calcule <code>[total:=total+y ; x:=x−1 ; x:=x/2 ; y:=y×2](total + x×y = a×b)</code></li>
+                    <li>→ en remontant les substitutions : <code>total + y + (x−1)/2 × 2y = a×b</code></li>
+                    <li>→ simplifié : <code>total + y + (x−1)y = a×b</code> → <code>total + xy = a×b</code></li>
+                    <li>→ c'est exactement la partie de I sur total, donc I∧E l'implique. ✓</li>
+                    <li><em>x pair :</em> on calcule <code>[x:=x/2 ; y:=y×2](total + x×y = a×b)</code></li>
+                    <li>→ substitution : <code>total + (x/2)×2y = a×b</code> → <code>total + xy = a×b</code>. ✓</li>
+                </ul>
+
+                <p><strong>4. Finalisation</strong> : <code>(I ∧ ¬E) ⊃ R</code></p>
+                <p class="inline-note">
+                    Traduction : "quand la boucle s'arrête (¬E = x ≤ 0), l'invariant implique la postcondition R."
+                    Comme I contient x ∈ ℕ et ¬E donne x ≤ 0, on conclut x = 0.
+                </p>
+                <ul class="steps">
+                    <li><code>x ∈ ℕ ∧ x ≤ 0</code> → <code>x = 0</code>.</li>
+                    <li><code>total + 0×y = a×b</code> → <code>total = a×b</code>. ✓</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 2                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">2 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>
+            En utilisant le variant <code>V = x</code>, prouvez la <strong>terminaison</strong> du programme :
+            montrez que <code>V</code> est positif pendant la boucle et qu'il décroît <em>strictement</em> à chaque itération.
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> vérifier la décroissance uniquement pour le cas pair.
+            Il faut traiter les deux branches du <code>if</code> et montrer que dans <em>chaque</em> cas, <code>x</code> diminue strictement.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            La condition de boucle est <code>x &gt; 0</code>, donc <code>V = x ≥ 1</code> pendant l'exécution.
+            Pour la décroissance : après le corps, <code>x</code> vaut <code>(x−1)/2</code> si impair ou <code>x/2</code> si pair.
+            Comparer ces valeurs à <code>x</code> dans chaque cas.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Montrez que V = x est positif pendant la boucle et décroît strictement à chaque tour (deux cas : x pair, x impair)…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+            <p><strong>Variant :</strong> <code>V = x</code></p>
+
+            <!-- VERSION COURS -->
+            <div class="highlight-box">
+                <p><span class="badge badge-green">Version cours — positivité + décroissance</span></p>
+
+                <p><strong>Positivité</strong> <span class="inline-note">(V &gt; 0 tant que la boucle tourne)</span></p>
+                <ul class="steps">
+                    <li>La condition de boucle est <code>x &gt; 0</code>, donc <code>V = x ≥ 1 &gt; 0</code>. ✓</li>
+                </ul>
+
+                <p><strong>Décroissance stricte</strong> <span class="inline-note">(V diminue d'au moins 1 à chaque tour)</span></p>
+                <ul class="steps">
+                    <li><em>x impair :</em> <code>x := x−1</code> puis <code>x := x/2</code> → <code>x' = (x−1)/2 &lt; x</code> pour x ≥ 1. ✓</li>
+                    <li><em>x pair :</em> <code>x := x/2</code> → <code>x' = x/2 &lt; x</code> pour x ≥ 2. ✓</li>
+                    <li>Dans les deux cas <code>x' &lt; x</code> et <code>x ∈ ℕ</code> → la boucle termine. ✓</li>
+                </ul>
+            </div>
+
+            <!-- VERSION PROF -->
+            <div class="highlight-box">
+                <p><span class="badge badge-orange">Version prof — notation wp (Typage + Terminaison)</span></p>
+
+                <p><strong>2. Typage</strong> : <code>(I ∧ E) ⊃ V ∈ ℕ</code></p>
+                <p class="inline-note">
+                    Traduction : "pendant que la boucle tourne, le variant est bien un entier naturel."
+                    C'est nécessaire pour qu'il puisse servir de compteur de terminaison.
+                    Ici c'est immédiat : I contient déjà <code>x ∈ ℕ</code>, et V = x.
+                </p>
+                <ul class="steps">
+                    <li><code>I ∧ E</code> contient <code>x ∈ ℕ</code>, donc <code>V = x ∈ ℕ</code>. ✓</li>
+                </ul>
+
+                <p><strong>3. Terminaison</strong> : <code>(I ∧ E ∧ V = δ) ⊃ [S](V &lt; δ)</code></p>
+                <p class="inline-note">
+                    Traduction : "si le variant vaut δ avant un tour, il vaut strictement moins après."
+                    δ est une variable fantôme qui "photographie" la valeur de V au début du tour,
+                    pour pouvoir comparer avec sa valeur après le corps S.
+                    On calcule [S](x &lt; δ) et on vérifie que I∧E∧(x=δ) l'implique.
+                </p>
+                <ul class="steps">
+                    <li><em>x impair :</em> <code>[total:=total+y ; x:=x−1 ; x:=x/2 ; y:=y×2](x &lt; δ)</code> → <code>(x−1)/2 &lt; δ</code>.</li>
+                    <li>→ I∧E∧(x=δ) donne x ≥ 1 et x=δ, donc <code>(x−1)/2 &lt; x = δ</code>. ✓</li>
+                    <li><em>x pair :</em> <code>[x:=x/2 ; y:=y×2](x &lt; δ)</code> → <code>x/2 &lt; δ</code>.</li>
+                    <li>→ x=δ et x ≥ 2 (pair, x &gt; 0), donc <code>x/2 &lt; x = δ</code>. ✓</li>
+                </ul>
+            </div>
+
+            <div class="callout-info">
+                <strong>Bilan — correction totale</strong>
+                <ul>
+                    <li>Invariant établi, conservé, et impliquant la postcondition à la sortie → <strong>correction partielle</strong>.</li>
+                    <li>Variant strictement positif et décroissant → <strong>terminaison garantie</strong>.</li>
+                    <li>Les deux ensemble : le programme est <strong>totalement correct</strong>.</li>
+                </ul>
+                <p class="inline-note">Note : la convergence est <em>logarithmique</em> — au plus ⌊log₂ a⌋ + 1 tours, car x est au moins divisé par 2 à chaque itération.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">4</span>
+        <span class="bareme-label">Q1 — Preuve de l'invariant</span>
+        <span class="bareme-desc">1 pt établissement · 1.5 pt conservation (les deux cas pair/impair) · 1 pt conclusion · 0.5 pt <code>x' ∈ ℕ</code> justifié</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q2 — Preuve de terminaison</span>
+        <span class="bareme-desc">1 pt positivité de <code>V = x</code> · 1 pt décroissance stricte (les deux cas pair/impair)</span>
+
+        <div class="bareme-total">Total : <strong>6 pts</strong></div>
+    </div>
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Reliez l'algorithme à la représentation binaire de <code>a</code> : pour a = 6 (= 0b110), quelles itérations déclenchent une addition dans <code>total</code> ? Que remarquez-vous sur les bits à 1 ?</li>
+            <li>Modifiez le programme pour calculer <code>a<sup>n</sup></code> par multiplications successives. Quel serait l'invariant de cette nouvelle boucle ?</li>
+            <li>En méthode B, la précondition <code>a ∈ ℕ ∧ b ∈ ℕ</code> s'exprime-t-elle dans le <code>PRE</code> d'une opération ou dans l'<code>INVARIANT</code> de la machine ? Justifiez.</li>
+        </ul>
+    </div>
+
+</body>
+</html>

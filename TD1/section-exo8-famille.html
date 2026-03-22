@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 8 — Famille</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 20 pts</span>
+            <span class="exo-time">⏱ 30–45 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Formaliser des contraintes en langage naturel en expressions ensemblistes</li>
+                <li>Distinguer les types de relations : sous-ensemble, fonction partielle, injection</li>
+                <li>Construire des relations dérivées par composition, union et inversion</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours — Relations binaires, fonctions partielles &amp; composition relationnelle</em></p>
+    </div>
+
+    <!-- CONTEXTE -->
+    <div class="context-block">
+        <h3>Contexte — Modélisation d'une famille</h3>
+        <p>
+            On se donne un type de base <code>PERSONNE</code> (l'ensemble de toutes les personnes
+            concevables) et un sous-ensemble <code>personne ⊆ PERSONNE</code> représentant
+            les individus effectivement présents dans le modèle.
+        </p>
+        <p>
+            L'exercice construit pas à pas une spécification formelle : les premières
+            spécifications (R1–R2) introduisent les sous-ensembles fondamentaux ;
+            les suivantes (R3–R6) posent des contraintes sur les relations familiales ;
+            les dernières (R7–R10) définissent des relations dérivées.
+        </p>
+
+        <div class="callout-info">
+            <strong>Notation utilisée :</strong>
+            <ul>
+                <li><code>R ⊆ A × B</code> — R est une relation entre A et B (ensemble de paires)</li>
+                <li><code>R ∈ A ⇸ B</code> — R est une <em>fonction partielle</em> de A vers B (chaque élément de A a <em>au plus</em> une image)</li>
+                <li><code>R ∈ A ↣ B</code> — R est une <em>injection partielle</em> (fonction partielle injective : deux éléments distincts de A ont des images distinctes)</li>
+                <li><code>dom(R)</code> — ensemble des éléments de gauche ayant une image dans R</li>
+                <li><code>ran(R)</code> — ensemble des images (éléments de droite) de R</li>
+                <li><code>R⁻¹</code> — relation inverse de R (on échange les rôles gauche/droite)</li>
+                <li><code>R ; S</code> — composition de R puis S : appliquer R d'abord, puis S</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Rappel de cours -->
+    <button class="hint-btn" data-hint="rappel-fonctions" data-label="Rappel de cours — Fonctions partielles et injections" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours — Fonctions partielles et injections</span>
+    </button>
+    <div class="hint" id="rappel-fonctions">
+        <p><strong>Relation :</strong> <code>R ⊆ A × B</code> — une paire <code>(a, b)</code> signifie
+        « a est en relation avec b ».</p>
+
+        <p><strong>Fonction partielle</strong> <code>f ∈ A ⇸ B</code> — chaque élément de A a
+        <em>au plus</em> une image dans B. Autrement dit : si <code>(a, b1) ∈ f</code> et
+        <code>(a, b2) ∈ f</code>, alors <code>b1 = b2</code>.</p>
+
+        <p><strong>Injection partielle</strong> <code>f ∈ A ↣ B</code> — fonction partielle
+        <em>et</em> injective : deux éléments distincts de A ont des images distinctes.
+        Autrement dit : si <code>(a1, b) ∈ f</code> et <code>(a2, b) ∈ f</code>, alors <code>a1 = a2</code>.</p>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>Type</th><th>Notation</th><th>Contrainte</th><th>Exemple intuitif</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Relation</td><td><code>R ⊆ A × B</code></td><td>Aucune</td><td>« connaît »</td></tr>
+                    <tr><td>Fonction partielle</td><td><code>f ∈ A ⇸ B</code></td><td>Chaque a a ≤ 1 image</td><td>numéro de téléphone (optionnel, unique par personne)</td></tr>
+                    <tr><td>Injection partielle</td><td><code>f ∈ A ↣ B</code></td><td>Chaque a a ≤ 1 image <em>et</em> chaque b a ≤ 1 antécédent</td><td>numéro de sécurité sociale</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p><strong>Composition :</strong> <code>(R ; S)(x) = S(R(x))</code> — on applique <code>R</code>
+        en premier, puis <code>S</code> sur le résultat.</p>
+        <p><strong>Inverse :</strong> <code>R⁻¹ = {(b, a) | (a, b) ∈ R}</code> — on échange gauche et droite.</p>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 1 — R1, R2                           -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">4 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Donner la représentation formelle de :</p>
+        <div class="sub-question">
+            <strong>R1 :</strong> Toute personne est soit un homme, soit une femme
+        </div>
+        <div class="sub-question">
+            <strong>R2 :</strong> Une personne ne peut être à la fois une femme et un homme
+        </div>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> confondre R1 et R2. R1 dit que <code>homme</code> et
+            <code>femme</code> couvrent <code>personne</code> en entier (<em>couverture</em>).
+            R2 dit qu'ils sont disjoints (<em>partition</em>). Les deux ensemble forment une partition
+            de <code>personne</code>, mais chaque propriété s'exprime séparément.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            R1 : « tout élément de <code>personne</code> est dans <code>homme</code> ou dans <code>femme</code> »
+            — cela se traduit par une égalité ensembliste ou une inclusion.<br><br>
+            R2 : « il n'existe pas de personne qui soit à la fois dans <code>homme</code> et dans
+            <code>femme</code> » — cela se traduit par une intersection vide.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            R1 : <code>personne = homme ∪ femme</code><br>
+            R2 : <code>homme ∩ femme = ∅</code>
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="Votre réponse pour R1 et R2…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <p><strong>R1 :</strong> <code>personne = homme ∪ femme</code></p>
+            <p class="inline-note">Chaque personne du modèle est un homme ou une femme (ou les deux — mais R2 exclura ce cas).</p>
+
+            <p><strong>R2 :</strong> <code>homme ∩ femme = ∅</code></p>
+            <p class="inline-note">Les deux sous-ensembles sont disjoints. Combinées, R1 et R2 signifient que <code>homme</code> et <code>femme</code> forment une <em>partition</em> de <code>personne</code>.</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 2 — R3, R4, R5                       -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">6 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Donner la représentation formelle de :</p>
+        <div class="sub-question">
+            <strong>R3 :</strong> Seules les femmes peuvent avoir un mari qui est un homme
+        </div>
+        <div class="sub-question">
+            <strong>R4 :</strong> Les femmes ont au plus un mari
+        </div>
+        <div class="sub-question">
+            <strong>R5 :</strong> Les hommes ne peuvent être mariés qu'à au plus une femme
+        </div>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> exprimer R3 comme une propriété sur les éléments
+            (<code>∀ p · p a un mari ⇒ p ∈ femme</code>) sans préciser que le mari lui-même
+            est un homme. R3 contraint simultanément le <em>domaine</em> de la relation
+            (les épouses sont des femmes) <em>et</em> le <em>codomaine</em> (les maris sont des hommes).
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            R3 précise le type de la relation <code>mari</code> : son domaine est dans <code>femme</code>
+            et son codomaine dans <code>homme</code>.<br><br>
+            R4 dit qu'une femme a <em>au plus un</em> mari → <code>mari</code> est une <em>fonction partielle</em>.<br><br>
+            R5 dit qu'un homme est marié à <em>au plus une</em> femme → la fonction est <em>injective</em>.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q2-h2">
+            R3 seul : <code>mari ⊆ femme × homme</code><br>
+            R3 + R4 : <code>mari ∈ femme ⇸ homme</code><br>
+            R3 + R4 + R5 : <code>mari ∈ femme ↣ homme</code>
+        </div>
+    </div>
+
+    <div class="highlight-box">
+        <p><span class="badge badge-orange">Méthode</span></p>
+        <ul class="steps">
+            <li>Identifier de quel ensemble partent les paires (le domaine) et vers quel ensemble elles vont (le codomaine).</li>
+            <li>Vérifier si « au plus une image » est requis → fonction partielle (<code>⇸</code>).</li>
+            <li>Vérifier si « au plus un antécédent » est requis → injection (<code>↣</code>).</li>
+            <li>Combiner R3 + R4 + R5 pour obtenir le type le plus contraint.</li>
+        </ul>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="Votre réponse pour R3, R4 et R5…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+
+            <p><strong>R3 :</strong> <code>mari ⊆ femme × homme</code></p>
+            <p class="inline-note">Le domaine de <code>mari</code> est contenu dans <code>femme</code> et le codomaine dans <code>homme</code>.</p>
+
+            <p><strong>R4 :</strong> <code>mari ∈ femme ⇸ homme</code></p>
+            <p class="inline-note">La relation devient une fonction partielle : chaque femme a <em>au plus</em> un mari (elle peut ne pas en avoir).</p>
+
+            <p><strong>R5 :</strong> <code>mari ∈ femme ↣ homme</code></p>
+            <p class="inline-note">La fonction est en outre injective : deux femmes distinctes ne peuvent pas être mariées au même homme. R5 renforce R4 — l'injection partielle implique déjà la fonction partielle.</p>
+
+            <div class="callout-info">
+                <strong>Synthèse :</strong> R3, R4 et R5 ensemble donnent
+                <code>mari ∈ femme ↣ homme</code> (injection partielle de <code>femme</code> vers
+                <code>homme</code>). C'est la notation la plus concise qui capture les trois contraintes d'un coup.
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 3 — R6                               -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q3</span>
+            <span class="question-pts">2 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <div class="sub-question">
+            <strong>R6 :</strong> La mère d'une personne est une femme mariée
+        </div>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> écrire <code>ran(mère) ⊆ femme</code> (les mères sont des femmes),
+            ce qui est vrai mais insuffisant. R6 exige en plus que ces femmes soient <em>mariées</em>,
+            c'est-à-dire qu'elles appartiennent au domaine de la relation <code>mari</code>.
+        </div>
+
+        <button class="hint-btn" data-hint="q3-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q3-h1">
+            La relation <code>mère ⊆ personne × femme</code> associe chaque personne à sa mère.
+            L'ensemble de toutes les mères est <code>ran(mère)</code>.
+            L'ensemble des femmes mariées est <code>dom(mari)</code>.
+            Exprimer que toutes les mères sont mariées revient à inclure <code>ran(mère)</code> dans <code>dom(mari)</code>.
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="Votre réponse pour R6…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q3</h4>
+            <p><strong>R6 :</strong> <code>ran(mère) ⊆ dom(mari)</code></p>
+            <p class="inline-note">
+                <code>ran(mère)</code> est l'ensemble de toutes les femmes qui sont mères de quelqu'un
+                dans le modèle. <code>dom(mari)</code> est l'ensemble des femmes mariées (celles qui ont
+                un mari dans la relation <code>mari</code>). L'inclusion garantit que toute mère est mariée.
+            </p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 4 — R7, R8, R9, R10                  -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q4</span>
+            <span class="question-pts">8 pts</span>
+            <span class="diff-badge diff-avance">Avancé</span>
+        </div>
+        <p>
+            Définir les relations suivantes <em>en termes des relations déjà introduites</em>
+            (<code>mère</code>, <code>mari</code>) et des opérations relationnelles (composition <code>;</code>,
+            union <code>∪</code>, inverse <code>⁻¹</code>) :
+        </p>
+        <div class="sub-question"><strong>R7 :</strong> père</div>
+        <div class="sub-question"><strong>R8 :</strong> parent</div>
+        <div class="sub-question"><strong>R9 :</strong> enfant</div>
+        <div class="sub-question"><strong>R10 :</strong> frère — sœur</div>
+
+        <div class="erreur-freq">
+            <strong>Piège courant — R7 :</strong> confondre le sens de la composition.
+            <code>mère ; mari</code> signifie « appliquer <code>mère</code> d'abord, puis <code>mari</code> ».
+            Appliqué à une personne <code>p</code> : on obtient la mère de <code>p</code>, puis le mari
+            de cette mère — ce qui est bien le père de <code>p</code>. L'ordre est crucial.
+        </div>
+
+        <button class="hint-btn" data-hint="q4-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q4-h1">
+            <strong>R7 (père) :</strong> le père d'une personne est le mari de sa mère.
+            En composition : <code>père = mère ; mari</code>.<br><br>
+            <strong>R8 (parent) :</strong> un parent est soit une mère, soit un père.
+            C'est l'<em>union</em> des deux relations.<br><br>
+            <strong>R9 (enfant) :</strong> être l'enfant de quelqu'un, c'est l'inverse d'être son parent.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q4-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q4-h2">
+            <strong>R10 (frère–sœur) :</strong> deux personnes <code>p1</code> et <code>p2</code> sont frères/sœurs
+            si elles ont un parent commun et ne sont pas la même personne.<br>
+            En notation par compréhension :
+            <code>{(p1, p2) ∈ personne × personne | p1 ≠ p2 ∧ ∃ par ∈ personne · (p1, par) ∈ parent ∧ (p2, par) ∈ parent}</code><br>
+            En notation relationnelle : <code>(parent ; parent⁻¹) \ id_personne</code>
+        </div>
+    </div>
+
+    <div style="display:flex; justify-content:center; margin: 0.5rem 0 1rem;">
+        <img src="design/svg/exo8-famille-composition.svg" alt="Diagramme de composition : père = mère ; mari" style="max-width:100%;">
+    </div>
+
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple — R7 (père)</span></p>
+            <p>Soit <code>mère(Alice) = Marie</code> et <code>mari(Marie) = Jean</code>.</p>
+            <p>Alors <code>(mère ; mari)(Alice) = mari(mère(Alice)) = mari(Marie) = Jean</code>.</p>
+            <p>Jean est bien le père d'Alice — la composition donne le résultat attendu.</p>
+        </div>
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Analogie — R10 (frère–sœur)</span></p>
+            <p><strong>Intuition :</strong> <code>parent ; parent⁻¹</code> permet de « remonter » vers
+            un parent commun puis de « redescendre » vers tous ses enfants.
+            On exclut ensuite la paire <code>(p, p)</code> avec <code>\ id_personne</code>
+            pour ne pas compter une personne comme sa propre sœur.</p>
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="Votre réponse pour R7, R8, R9 et R10…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q4</h4>
+
+            <p><strong>R7 — père</strong></p>
+            <p><code>père = mère ; mari</code></p>
+            <p class="inline-note">
+                La composition <code>mère ; mari</code> associe une personne <code>p</code>
+                au mari de sa mère, c'est-à-dire à son père.
+                <code>père ∈ personne ⇸ homme</code> (fonction partielle, car tout le monde n'a
+                pas forcément un père modélisé).
+            </p>
+
+            <p><strong>R8 — parent</strong></p>
+            <p><code>parent = mère ∪ père</code> &nbsp;=&nbsp; <code>mère ∪ (mère ; mari)</code></p>
+            <p class="inline-note">
+                Un parent est soit la mère soit le père. L'union des deux relations couvre les deux cas.
+            </p>
+
+            <p><strong>R9 — enfant</strong></p>
+            <p><code>enfant = parent⁻¹</code></p>
+            <p class="inline-note">
+                Si <code>(p, par) ∈ parent</code> signifie « <code>par</code> est un parent de <code>p</code> »,
+                alors <code>(par, p) ∈ parent⁻¹</code> signifie « <code>p</code> est un enfant de <code>par</code> ».
+                L'inversion échange les rôles.
+            </p>
+
+            <p><strong>R10 — frère–sœur</strong></p>
+            <p><code>frère_soeur = {(p1, p2) ∈ personne × personne | p1 ≠ p2 ∧ ∃ par ∈ personne · (p1, par) ∈ parent ∧ (p2, par) ∈ parent}</code></p>
+            <p>Ou de façon équivalente en notation relationnelle :</p>
+            <p><code>frère_soeur = (parent ; parent⁻¹) \ id_personne</code></p>
+            <p class="inline-note">
+                <code>parent ; parent⁻¹</code> donne toutes les paires de personnes partageant un parent commun
+                (y compris <code>(p, p)</code>). On soustrait l'identité <code>id_personne</code>
+                pour exclure la paire d'une personne avec elle-même.
+            </p>
+
+            <div class="callout-info">
+                <strong>Vérification rapide pour R10 :</strong>
+                <ul>
+                    <li>Alice et Bob ont tous deux Marie comme mère → <code>(Alice, Marie) ∈ parent</code> et <code>(Bob, Marie) ∈ parent</code> → <code>(Alice, Bob) ∈ parent ; parent⁻¹</code> ✓</li>
+                    <li>Alice avec elle-même : <code>(Alice, Alice) ∈ parent ; parent⁻¹</code> mais exclu par <code>\ id_personne</code> ✓</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- BARÈME -->
+    <div class="bareme">
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">R1 — Couverture</span>
+        <span class="bareme-desc">2 pts <code>personne = homme ∪ femme</code></span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">R2 — Disjonction</span>
+        <span class="bareme-desc">2 pts <code>homme ∩ femme = ∅</code></span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">R3 — Type de mari</span>
+        <span class="bareme-desc">1 pt domaine dans femme · 1 pt codomaine dans homme</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">R4 — Fonction partielle</span>
+        <span class="bareme-desc">2 pts notation <code>⇸</code> correcte avec les bons ensembles</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">R5 — Injection partielle</span>
+        <span class="bareme-desc">2 pts notation <code>↣</code> ou mention explicite que l'inverse est aussi une fonction partielle</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">R6 — Mères mariées</span>
+        <span class="bareme-desc">1 pt <code>ran(mère)</code> · 1 pt inclusion dans <code>dom(mari)</code></span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">R7 — Père</span>
+        <span class="bareme-desc">2 pts composition <code>mère ; mari</code> dans le bon ordre</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">R8 — Parent</span>
+        <span class="bareme-desc">2 pts union correcte</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">R9 — Enfant</span>
+        <span class="bareme-desc">2 pts inversion de parent</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">R10 — Frère–sœur</span>
+        <span class="bareme-desc">1 pt parent commun · 1 pt exclusion de l'identité</span>
+
+        <div class="bareme-total">Total : <strong>20 pts</strong></div>
+    </div>
+
+
+    <!-- POUR ALLER PLUS LOIN -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>La relation <code>frère_soeur</code> telle que définie est-elle symétrique ? Est-elle réflexive ? Justifiez.</li>
+            <li>Définir <code>ancêtre</code> — la clôture transitive de <code>parent</code> — en notation formelle. Quel opérateur utilise-t-on ?</li>
+            <li>Peut-on exprimer « grand-parent » ? Quelle composition de relations le donne-t-il ?</li>
+            <li>Que se passe-t-il si l'on supprime R6 ? La relation <code>père = mère ; mari</code> reste-t-elle bien définie ? Pourquoi R6 la renforce-t-elle intuitivement ?</li>
+        </ul>
+    </div>
+
+</body>
+</html>

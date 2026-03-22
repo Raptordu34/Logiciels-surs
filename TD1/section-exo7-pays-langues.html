@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 7 — Pays &amp; Langues</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 10 pts</span>
+            <span class="exo-time">⏱ 20–30 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Exprimer des sous-ensembles de <code>PAYS</code> par compréhension à partir d'une relation donnée</li>
+                <li>Combiner conditions booléennes (∧, ∉) dans une définition par compréhension</li>
+                <li>Construire une relation dérivée sur un produit cartésien à l'aide d'un quantificateur existentiel</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours — Relations binaires &amp; compréhension d'ensembles</em></p>
+    </div>
+
+    <!-- CONTEXTE -->
+    <div class="context-block">
+        <h3>Contexte — Langues officielles du monde</h3>
+        <p>On se donne deux ensembles de base et une relation entre eux :</p>
+
+        <div class="highlight-box">
+            <ul>
+                <li><code>PAYS</code> : ensemble de <em>tous</em> les pays du monde</li>
+                <li><code>LANGUE</code> : ensemble de <em>toutes</em> les langues</li>
+                <li><code>parle ∈ PAYS ↔ LANGUE</code> : associant chaque pays à ses langues officielles</li>
+            </ul>
+        </div>
+
+        <p>
+            Ainsi <code>(France, français) ∈ parle</code>, <code>(Belgique, français) ∈ parle</code>
+            mais aussi <code>(Belgique, néerlandais) ∈ parle</code> et <code>(Belgique, allemand) ∈ parle</code>.
+            Un pays peut donc apparaître plusieurs fois dans <code>parle</code>, une fois par langue officielle.
+        </p>
+
+        <div style="display:flex; justify-content:center; margin: 1rem 0 0.5rem;">
+            <img src="design/svg/exo7-parle-bipartite.svg" alt="Graphe bipartite de la relation parle : pays à gauche, langues à droite" style="max-width:100%;">
+        </div>
+        <p class="inline-note" style="text-align:center;">La relation <code>parle</code> est many-to-many : Belgique pointe vers trois langues ; français est atteint par plusieurs pays. La diagonale atténuée (Cameroun → français) illustre une arête sur longue distance.</p>
+
+        <p>
+            L'objectif est d'exprimer des ensembles et des relations dérivés en utilisant uniquement
+            <code>PAYS</code>, <code>LANGUE</code> et <code>parle</code>.
+        </p>
+    </div>
+
+    <!-- Rappel de cours -->
+    <button class="hint-btn" data-hint="rappel-comprehension" data-label="Rappel de cours" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours — Compréhension d'ensembles</span>
+    </button>
+    <div class="hint" id="rappel-comprehension">
+        <p><strong>Compréhension :</strong> un ensemble défini par une propriété s'écrit
+        <code>{x ∈ E | P(x)}</code> — « l'ensemble des éléments <code>x</code> de <code>E</code>
+        vérifiant la condition <code>P(x)</code> ».</p>
+
+        <p><strong>Membre d'une relation :</strong> <code>(p, l) ∈ parle</code> signifie que
+        la langue <code>l</code> est officielle dans le pays <code>p</code>.</p>
+
+        <p><strong>Quantificateurs utiles :</strong></p>
+        <ul>
+            <li><code>∃ x ∈ E · P(x)</code> — il existe au moins un <code>x</code> dans <code>E</code> vérifiant <code>P</code></li>
+            <li><code>∀ x ∈ E · P(x)</code> — tout <code>x</code> de <code>E</code> vérifie <code>P</code></li>
+            <li><code>¬ P</code> ou <code>x ∉ S</code> — négation, non-appartenance</li>
+        </ul>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple</span></p>
+            <p>Pays hispanophones :
+            <code>{p ∈ PAYS | (p, espagnol) ∈ parle}</code></p>
+            <p class="inline-note">On filtre <code>PAYS</code> sur la condition « la paire (p, espagnol) appartient à parle ».</p>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple</span></p>
+            <p>Pays avec <em>uniquement</em> le français comme langue officielle :</p>
+            <p><code>{p ∈ PAYS | (p, français) ∈ parle ∧<br>
+            &nbsp;&nbsp;∀ l ∈ LANGUE · (p, l) ∈ parle ⇒ l = français}</code></p>
+            <p class="inline-note">La condition universelle garantit qu'aucune autre langue n'est officielle.</p>
+        </div>
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Analogie</span></p>
+            <p><strong>Intuition :</strong> la relation <code>parle</code> est comme un tableau à deux colonnes
+            (Pays | Langue). Définir un ensemble par compréhension revient à <em>filtrer</em> les lignes
+            selon une condition, puis à projeter sur la colonne <code>Pays</code>.</p>
+            <p>Demander les pays francophones, c'est garder uniquement les lignes où la langue est le français,
+            puis lire la colonne de gauche.</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 1                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">4 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>Donner la représentation formelle de :</p>
+        <div class="sub-question"><strong>a)</strong> <code>UE</code> — l'ensemble des pays européens</div>
+        <div class="sub-question"><strong>b)</strong> L'ensemble des pays <strong>anglophones</strong> (dont l'anglais est langue officielle)</div>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> tenter d'exprimer <code>UE</code> par une compréhension
+            sur <code>parle</code>. La propriété « être européen » est géographique — elle n'est pas
+            encodée dans <code>parle</code>. <code>UE</code> est donc une constante axiomatique
+            (un sous-ensemble de <code>PAYS</code> qu'on déclare sans le dériver).
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            <strong>a)</strong> On ne peut pas exprimer « être européen » à partir de <code>parle</code>.
+            On déclare simplement <code>UE : ℙ PAYS</code> (un sous-ensemble de <code>PAYS</code>),
+            sans le définir par compréhension.<br><br>
+            <strong>b)</strong> Chercher dans <code>PAYS</code> les éléments <code>p</code> tels que
+            la paire <code>(p, anglais)</code> appartient à <code>parle</code>.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            b) Compléter le patron : <code>{p ∈ PAYS | (p, ?) ∈ parle}</code>
+            en remplaçant <code>?</code> par le nom de la langue cible.
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="Votre réponse pour Q1 a) et b)…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <p><strong>a) UE</strong></p>
+            <p><code>UE : ℙ PAYS</code></p>
+            <p class="inline-note">
+                « Être européen » est une propriété géographique que <code>parle</code> n'encode pas.
+                <code>UE</code> est donc introduite comme une constante axiomatique : on postule son
+                existence en tant que sous-ensemble de <code>PAYS</code>, sans la définir par compréhension.
+                C'est un choix de modélisation — l'appartenance à l'UE serait encodée dans une relation
+                séparée si on en avait besoin.
+            </p>
+
+            <p><strong>b) Pays anglophones</strong></p>
+            <p><code>anglophones = {p ∈ PAYS | (p, anglais) ∈ parle}</code></p>
+            <p class="inline-note">
+                L'Australie, le Canada, l'Inde et les États-Unis appartiennent à cet ensemble.
+                Notez que ce sont tous les pays où l'anglais est <em>officiel</em> — pas uniquement
+                ceux où il est majoritairement parlé.
+            </p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 2                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">4 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>Donner la représentation formelle de :</p>
+        <div class="sub-question"><strong>a)</strong> L'ensemble des pays <strong>francophones hors UE</strong></div>
+        <div class="sub-question"><strong>b)</strong> L'ensemble des pays possédant <strong>plus d'une langue officielle</strong></div>
+
+        <div class="erreur-freq">
+            <strong>Piège courant — b) :</strong> écrire <code>{p ∈ PAYS | ∃ l ∈ LANGUE · (p, l) ∈ parle}</code>
+            donne les pays ayant <em>au moins une</em> langue officielle (soit presque tous les pays).
+            Pour exiger <em>plus d'une</em> langue, il faut deux variables de langue
+            <em>distinctes</em> liées au même pays.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            <strong>a)</strong> Combiner deux conditions avec <code>∧</code> : (p, français) ∈ parle
+            <em>et</em> p ∉ UE.<br><br>
+            <strong>b)</strong> Utiliser un quantificateur existentiel portant sur <em>deux</em> variables
+            de langue <code>l1</code> et <code>l2</code>, avec la contrainte <code>l1 ≠ l2</code>.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q2-h2">
+            b) Patron à compléter :
+            <code>{p ∈ PAYS | ∃ l1, l2 ∈ LANGUE · l1 ≠ l2 ∧ (p, l1) ∈ parle ∧ (p, l2) ∈ parle}</code>
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="Votre réponse pour Q2 a) et b)…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+
+            <p><strong>a) Pays francophones hors UE</strong></p>
+            <p><code>franco_hors_UE = {p ∈ PAYS | (p, français) ∈ parle ∧ p ∉ UE}</code></p>
+            <p class="inline-note">
+                Le Canada, la Côte d'Ivoire, le Sénégal, le Maroc appartiennent à cet ensemble.
+                La France et la Belgique en sont exclues (UE). La condition <code>p ∉ UE</code>
+                utilise la constante axiomatique définie en Q1a.
+            </p>
+
+            <p><strong>b) Pays possédant plus d'une langue officielle</strong></p>
+            <p><code>multi_langues = {p ∈ PAYS | ∃ l1, l2 ∈ LANGUE · l1 ≠ l2 ∧ (p, l1) ∈ parle ∧ (p, l2) ∈ parle}</code></p>
+            <p class="inline-note">
+                La Suisse (4 langues : français, allemand, italien, romanche), la Belgique (3 langues),
+                le Canada (2 langues : français, anglais) appartiennent à cet ensemble.
+                La contrainte <code>l1 ≠ l2</code> est indispensable : sans elle,
+                on pourrait prendre <code>l1 = l2 = français</code> et tous les pays francophones
+                seraient inclus à tort.
+            </p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 3                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q3</span>
+            <span class="question-pts">2 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>
+            Définir la <strong>relation</strong> <code>même_langue ∈ PAYS ↔ PAYS</code>
+            qui associe deux pays partageant au moins une langue officielle commune.
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> décrire <code>même_langue</code> comme un ensemble de pays
+            (sous-ensemble de <code>PAYS</code>) alors que l'on demande une <em>relation</em>,
+            c'est-à-dire un sous-ensemble de <code>PAYS × PAYS</code> — un ensemble de <em>paires</em>.
+            La réponse doit avoir la forme <code>{(p1, p2) ∈ PAYS × PAYS | …}</code>.
+        </div>
+
+        <button class="hint-btn" data-hint="q3-h1" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q3-h1">
+            Chercher les paires <code>(p1, p2)</code> dans <code>PAYS × PAYS</code> telles qu'il existe
+            une langue <code>l</code> qui soit officielle <em>à la fois</em> pour <code>p1</code>
+            et pour <code>p2</code> : <code>(p1, l) ∈ parle ∧ (p2, l) ∈ parle</code>.
+        </div>
+    </div>
+
+    <div class="reponse-zone" data-placeholder="Votre réponse pour Q3…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q3</h4>
+            <p><code>même_langue = {(p1, p2) ∈ PAYS × PAYS | ∃ l ∈ LANGUE · (p1, l) ∈ parle ∧ (p2, l) ∈ parle}</code></p>
+
+            <p class="inline-note">
+                Par exemple <code>(France, Canada) ∈ même_langue</code> (langue commune : français) ;
+                <code>(Belgique, Pays-Bas) ∈ même_langue</code> (langue commune : néerlandais).
+            </p>
+
+            <div class="callout-info">
+                <strong>Propriétés de cette relation :</strong>
+                <ul>
+                    <li><strong>Réflexive :</strong> tout pays partage ses propres langues avec lui-même — <code>(p, p) ∈ même_langue</code>.</li>
+                    <li><strong>Symétrique :</strong> si <code>p1</code> et <code>p2</code> partagent une langue, alors <code>p2</code> et <code>p1</code> la partagent aussi.</li>
+                    <li><strong>Non transitive en général :</strong> la France et les Pays-Bas partagent le néerlandais <em>via</em> la Belgique, mais pas directement — <code>même_langue</code> n'est donc pas une relation d'équivalence.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- BARÈME -->
+    <div class="bareme">
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q1a — UE comme constante axiomatique</span>
+        <span class="bareme-desc">1 pt notation <code>UE : ℙ PAYS</code> · 1 pt justification (propriété non exprimable par parle)</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q1b — Pays anglophones</span>
+        <span class="bareme-desc">2 pts compréhension correcte avec <code>(p, anglais) ∈ parle</code></span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q2a — Francophones hors UE</span>
+        <span class="bareme-desc">1 pt condition <code>(p, français) ∈ parle</code> · 1 pt condition <code>p ∉ UE</code></span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q2b — Plus d'une langue</span>
+        <span class="bareme-desc">1 pt deux variables de langue · 1 pt contrainte <code>l1 ≠ l2</code></span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q3 — Relation même_langue</span>
+        <span class="bareme-desc">1 pt type <code>PAYS × PAYS</code> · 1 pt condition de langue commune avec ∃</span>
+
+        <div class="bareme-total">Total : <strong>10 pts</strong></div>
+    </div>
+
+
+    <!-- POUR ALLER PLUS LOIN -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>La relation <code>même_langue</code> est-elle une relation d'équivalence ? Vérifiez formellement les trois propriétés : réflexivité, symétrie, transitivité.</li>
+            <li>Exprimer l'ensemble des pays ayant <em>exactement</em> une langue officielle.</li>
+            <li>Exprimer l'ensemble des langues parlées dans au moins deux pays de l'UE à la fois.</li>
+            <li>Comment définir la relation <code>plus_riche_en_langues ⊆ PAYS × PAYS</code> — où <code>(p1, p2)</code> appartient à cette relation si <code>p1</code> possède strictement plus de langues officielles que <code>p2</code> ?</li>
+        </ul>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="490" height="100" viewBox="0 0 490 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Node 1 : R₁ -->
+  <rect x="1" y="30" width="72" height="40" rx="7"
+    fill="rgba(214,117,86,0.08)" stroke="#d67556" stroke-width="1.5"/>
+  <text x="37" y="55" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="15" fill="#dedad5">R₁</text>
+
+  <!-- Arrow 1 : apply anti-restriction dom(R₂) ⩤ -->
+  <line x1="73" y1="50" x2="128" y2="50" stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 135 50 L 128 46 Q 130 50 128 54 Z" fill="#d67556"/>
+  <text x="103" y="40" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="8" fill="#9e9a94">dom(R₂) ⩤</text>
+
+  <!-- Node 2 : dom(R₂) ⩤ R₁ -->
+  <rect x="137" y="30" width="152" height="40" rx="7"
+    fill="rgba(214,117,86,0.08)" stroke="#d67556" stroke-width="1.5"/>
+  <text x="213" y="55" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="11.5" fill="#dedad5">dom(R₂) ⩤ R₁</text>
+
+  <!-- Arrow 2 : union avec R₂ -->
+  <line x1="289" y1="50" x2="344" y2="50" stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 351 50 L 344 46 Q 346 50 344 54 Z" fill="#d67556"/>
+  <text x="317" y="40" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="10" fill="#9e9a94">∪</text>
+
+  <!-- R₂ box arrivant par le bas -->
+  <rect x="284" y="72" width="66" height="26" rx="6"
+    fill="rgba(91,166,160,0.10)" stroke="#5ba6a0" stroke-width="1.5"/>
+  <text x="317" y="89" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="13" fill="#5ba6a0">R₂</text>
+  <line x1="317" y1="72" x2="317" y2="57" stroke="#5ba6a0" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 317 56 L 313 62 Q 317 59 321 62 Z" fill="#5ba6a0"/>
+
+  <!-- Node 3 : résultat R₁ ⊕ R₂ (emphase) -->
+  <rect x="353" y="20" width="132" height="60" rx="7"
+    fill="rgba(214,117,86,0.14)" stroke="#d67556" stroke-width="2"/>
+  <text x="419" y="49" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="15" font-weight="600" fill="#f5f3f0">R₁ ⊕ R₂</text>
+  <text x="419" y="67" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="8" fill="#9e9a94">R₂ prime sur dom(R₂)</text>
+
+</svg>

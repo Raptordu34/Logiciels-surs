@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 2 — Boucle produit</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+            <span class="exo-points">◎ 6 pts</span>
+            <span class="exo-time">⏱ 15 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Déterminer l'invariant et le variant d'une boucle.</li>
+                <li>Vérifier les trois propriétés de l'invariant (établissement, conservation, conclusion) et la terminaison.</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours — Invariants de boucle et correction de programmes</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3>Programme à analyser</h3>
+        <p>
+            La boucle suivante calcule le produit de tous les éléments d'un tableau <code>a</code>
+            de <code>N</code> entiers, indicé de <code>1</code> à <code>N</code>, avec <code>N ≥ 0</code>.
+        </p>
+
+        <pre><code>prod := 1;
+i    := 0;
+while i &lt; N do
+    i    := i + 1;
+    prod := prod * a(i);
+end</code></pre>
+
+        <p><strong>Postcondition visée :</strong> <code>prod = a(1) × a(2) × … × a(N)</code></p>
+
+        <div class="callout-info">
+            <strong>Cas limite :</strong> si <code>N = 0</code>, la boucle ne s'exécute pas et <code>prod = 1</code>.
+            C'est la valeur du <em>produit vide</em> — convention classique en mathématiques, analogue à la somme vide égale à 0.
+        </div>
+    </div>
+
+    <!-- ── VULGARISATION ── -->
+    <div class="callout-info">
+        <p><span class="badge badge-blue">C'est quoi un invariant ? (version vulgarisée)</span></p>
+        <p>
+            Imagine que tu comptes des billets de banque un par un. À chaque instant, tu peux noter
+            sur un papier : <em>« j'ai compté <code>i</code> billets, et la somme dans ma main est correcte »</em>.
+            Cette phrase est vraie <strong>avant de commencer</strong> (0 billets comptés, somme = 0),
+            vraie <strong>après chaque billet</strong>, et encore vraie <strong>quand tu as fini</strong>.
+        </p>
+        <p>
+            C'est exactement ça un <strong>invariant de boucle</strong> : une propriété sur les variables
+            qui reste vraie à chaque tour, du début à la fin. Elle décrit ce que la boucle a <em>accompli jusqu'ici</em>.
+        </p>
+        <p>
+            Le but : quand la boucle s'arrête, l'invariant + la condition d'arrêt doivent ensemble
+            prouver que le programme a bien fait ce qu'on voulait (la postcondition).
+        </p>
+    </div>
+
+    <div class="callout-info">
+        <p><span class="badge badge-blue">C'est quoi un variant ? (version vulgarisée)</span></p>
+        <p>
+            Le variant répond à la question : <em>« est-ce que la boucle va forcément s'arrêter ? »</em>
+        </p>
+        <p>
+            C'est un nombre entier positif qu'on associe à la boucle, et qui <strong>diminue strictement à chaque tour</strong>.
+            Comme un compte à rebours : 5, 4, 3, 2, 1… il ne peut pas descendre indéfiniment sous 0,
+            donc la boucle <em>doit</em> s'arrêter.
+        </p>
+        <p>
+            Pour la boucle de cet exercice, le variant naturel est <code>N - i</code> :
+            il vaut <code>N</code> au départ, diminue de 1 à chaque tour, et atteint 0 quand <code>i = N</code> (fin de boucle).
+        </p>
+    </div>
+
+    <!-- ── RAPPEL DE COURS ── -->
+    <button class="hint-btn" data-hint="rappel-invariant" data-label="Rappel formel — Invariant et variant" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel formel — Invariant et variant</span>
+    </button>
+    <div class="hint" id="rappel-invariant">
+        <p><strong>Invariant I</strong> — trois propriétés à vérifier :</p>
+        <ul>
+            <li>
+                <strong>Établissement</strong> — l'invariant est vrai avant d'entrer dans la boucle.<br>
+                <span class="inline-note">Concrètement : vérifier que <code>I</code> est satisfait avec les valeurs d'initialisation.</span>
+            </li>
+            <li>
+                <strong>Conservation</strong> — si <code>I</code> est vrai avant un tour et que la condition de boucle est vraie, alors <code>I</code> est encore vrai après ce tour.<br>
+                <span class="inline-note">Concrètement : supposer <code>I</code> vrai et <code>Cond</code> vraie, exécuter le corps de boucle, montrer que <code>I</code> tient toujours.</span>
+            </li>
+            <li>
+                <strong>Conclusion</strong> — à la sortie (<code>I ∧ ¬Cond</code>), on peut déduire la postcondition.<br>
+                <span class="inline-note">Concrètement : la négation de la condition combinée à l'invariant doit suffire à conclure.</span>
+            </li>
+        </ul>
+        <p><strong>Variant V</strong> — deux propriétés à vérifier :</p>
+        <ul>
+            <li><strong>Positivité</strong> — tant que la boucle continue (<code>Cond</code> vraie), <code>V &gt; 0</code>.</li>
+            <li><strong>Décroissance stricte</strong> — à chaque tour, <code>V</code> diminue d'au moins 1.</li>
+        </ul>
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Repère</span></p>
+            <p>L'invariant doit être assez <em>fort</em> pour impliquer la postcondition à la sortie,
+            et assez <em>faible</em> pour être vrai dès l'initialisation. Si l'invariant est trop fort,
+            il ne sera pas établi ; s'il est trop faible, il n'impliquera pas la postcondition.</p>
+        </div>
+    </div>
+
+    <!-- ── EXEMPLE TRACE PAS À PAS ── -->
+    <div class="callout-info">
+        <p><span class="badge badge-green">Exemple concret — trace pas à pas (N = 3, a = [2, 5, 4])</span></p>
+        <p>Regardons la boucle produit tourner sur un petit tableau :</p>
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>Moment</th><th><code>i</code></th><th><code>prod</code></th><th>Invariant <code>prod = a(1)×…×a(i)</code> ?</th><th>Variant <code>N−i</code></th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Avant la boucle</td><td>0</td><td>1</td><td>produit vide = 1 ✓</td><td>3</td></tr>
+                    <tr><td>Après tour 1</td><td>1</td><td>2</td><td>a(1) = 2 ✓</td><td>2</td></tr>
+                    <tr><td>Après tour 2</td><td>2</td><td>10</td><td>a(1)×a(2) = 2×5 = 10 ✓</td><td>1</td></tr>
+                    <tr><td>Après tour 3</td><td>3</td><td>40</td><td>a(1)×a(2)×a(3) = 10×4 = 40 ✓</td><td>0</td></tr>
+                    <tr><td>Sortie (i = N)</td><td>3</td><td>40</td><td>i = N → prod = a(1)×…×a(N) = 40 ✓</td><td>—</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="inline-note">
+            L'invariant est vrai à chaque ligne. Le variant passe de 3 à 0 en décroissant de 1 à chaque tour.
+            À la sortie, <code>i = N = 3</code>, donc l'invariant donne directement la postcondition.
+        </p>
+    </div>
+
+    <!-- ── EXEMPLE SOMME ── -->
+    <div class="highlight-box">
+        <p><span class="badge badge-green">Exemple parallèle — boucle somme</span></p>
+        <p>Même structure, mais avec une addition :</p>
+        <pre><code>sum := 0; i := 0;
+while i &lt; N do
+    i   := i + 1;
+    sum := sum + a(i);
+end</code></pre>
+        <ul>
+            <li>Invariant : <code>sum = a(1)+…+a(i)  ∧  0 ≤ i ≤ N</code></li>
+            <li>Variant : <code>N - i</code></li>
+        </ul>
+        <p class="inline-note">
+            La boucle produit est <strong>identique en structure</strong> : remplacer <code>+</code> par <code>×</code>
+            et la valeur neutre <code>0</code> par <code>1</code> (car le produit vide = 1, comme la somme vide = 0).
+        </p>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- QUESTION 1                                                 -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">6 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>
+            Donner l'<strong>invariant</strong> et le <strong>variant</strong> de la boucle permettant
+            d'établir la postcondition <code>prod = a(1) × a(2) × … × a(N)</code>.
+        </p>
+        <p>Vérifier ensuite les trois propriétés de l'invariant (établissement, conservation, conclusion) et la terminaison.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> écrire un invariant trop fort (<code>prod = a(1)×…×a(N) ∧ i = N</code>)
+            ou trop faible (<code>i ≤ N</code> seul). L'invariant doit <em>progresser avec la boucle</em> :
+            quand <code>i</code> est partiel, le produit doit être partiel. La contrainte <code>0 ≤ i ≤ N</code>
+            est indispensable pour assurer l'établissement et la conclusion.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/3" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/3</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            L'invariant doit relier <code>prod</code> à <code>i</code> à chaque instant.
+            À l'initialisation (<code>i = 0</code>, <code>prod = 1</code>), quel est le produit partiel
+            <code>a(1) × … × a(0)</code> (produit des 0 premiers éléments) ? Rappel : le produit vide vaut 1 par convention.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/3" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/3</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            L'invariant s'écrit : <code>prod = a(1) × … × a(i)  ∧  0 ≤ i ≤ N</code>.
+            Vérifier maintenant la <em>conservation</em> : si cette propriété est vraie avant le corps
+            et que <code>i &lt; N</code>, est-elle encore vraie après <code>i := i+1 ; prod := prod * a(i)</code> ?
+            Attention à l'ordre : <code>i</code> est incrémenté en premier.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h3" data-label="Indice 3/3" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 3/3</span>
+        </button>
+        <div class="hint" id="q1-h3">
+            Pour la <em>conclusion</em> : à la sortie de boucle, la condition est <code>i ≥ N</code>,
+            et l'invariant impose <code>i ≤ N</code>, donc <code>i = N</code> à la sortie.
+            Pour le <em>variant</em> : quel entier est strictement positif quand <code>i &lt; N</code>
+            et décroît exactement de 1 à chaque tour ?
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Donner l'invariant et le variant, puis vérifier les quatre propriétés (établissement, conservation, conclusion, terminaison)…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Boucle produit</h4>
+
+            <p><strong>Invariant :</strong></p>
+            <div class="highlight-box">
+                <p><code>I :  prod = a(1) × a(2) × … × a(i)  ∧  0 ≤ i ≤ N</code></p>
+                <p class="inline-note">
+                    Lecture : <code>prod</code> contient à tout moment le produit des <code>i</code> premiers éléments
+                    du tableau. Quand <code>i = 0</code>, le produit est vide et vaut 1. La contrainte <code>0 ≤ i ≤ N</code>
+                    délimite le domaine de la variable de comptage.
+                </p>
+            </div>
+
+            <p><strong>Variant :</strong></p>
+            <div class="highlight-box">
+                <p><code>V = N - i</code></p>
+            </div>
+
+            <p><strong>Vérification — Établissement :</strong></p>
+            <ul class="steps">
+                <li>Avant la boucle : <code>i = 0</code> et <code>prod = 1</code>.</li>
+                <li><code>prod = 1 = a(1)×…×a(0)</code> (produit vide = 1) ✓</li>
+                <li><code>0 ≤ 0 ≤ N</code> (car <code>N ≥ 0</code> par hypothèse) ✓</li>
+            </ul>
+
+            <p><strong>Vérification — Conservation :</strong></p>
+            <ul class="steps">
+                <li>Hypothèse : <code>prod = a(1)×…×a(i)  ∧  0 ≤ i ≤ N</code> et <code>i &lt; N</code>.</li>
+                <li>Après <code>i := i+1</code> : le nouveau <code>i</code> vaut <code>i+1</code>, avec <code>i+1 ≤ N</code>.</li>
+                <li>Après <code>prod := prod * a(i+1)</code> : <code>prod = a(1)×…×a(i) × a(i+1) = a(1)×…×a(i+1)</code> ✓</li>
+                <li><code>0 ≤ i+1 ≤ N</code> (car <code>i &lt; N</code> implique <code>i+1 ≤ N</code>) ✓</li>
+            </ul>
+
+            <p><strong>Vérification — Conclusion :</strong></p>
+            <ul class="steps">
+                <li>À la sortie : <code>I ∧ ¬(i &lt; N)</code> ⇒ <code>prod = a(1)×…×a(i)  ∧  i ≥ N  ∧  i ≤ N</code></li>
+                <li>Donc <code>i = N</code>, et <code>prod = a(1) × a(2) × … × a(N)</code> ✓</li>
+            </ul>
+
+            <p><strong>Vérification — Terminaison (variant) :</strong></p>
+            <ul class="steps">
+                <li>Tant que <code>i &lt; N</code> : <code>V = N-i ≥ 1 &gt; 0</code> ✓</li>
+                <li>Après chaque itération : <code>V</code> passe de <code>N-i</code> à <code>N-(i+1) = V-1</code>, strictement décroissant ✓</li>
+            </ul>
+
+            <div class="callout-info">
+                <strong>Bilan</strong>
+                <ul>
+                    <li>Invariant établi, conservé, et impliquant la postcondition à la sortie → <strong>correction partielle</strong>.</li>
+                    <li>Variant strictement positif et décroissant → <strong>terminaison garantie</strong>.</li>
+                    <li>Les deux ensemble établissent la <strong>correction totale</strong> du programme.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Invariant</span>
+        <span class="bareme-desc">1 pt formulation du produit partiel · 1 pt contrainte <code>0 ≤ i ≤ N</code> présente</span>
+
+        <span class="bareme-pts">1</span>
+        <span class="bareme-label">Variant</span>
+        <span class="bareme-desc">Expression <code>N - i</code> correcte</span>
+
+        <span class="bareme-pts">3</span>
+        <span class="bareme-label">Vérification des propriétés</span>
+        <span class="bareme-desc">0.75 pt établissement · 1 pt conservation (corps bien déroulé) · 0.75 pt conclusion · 0.5 pt terminaison</span>
+
+        <div class="bareme-total">Total : <strong>6 pts</strong></div>
+    </div>
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Que se passe-t-il si on inverse l'ordre du corps de boucle (<code>prod := prod * a(i) ; i := i+1</code>) ? L'invariant change-t-il ?</li>
+            <li>Adapter ce raisonnement à l'exercice 4 (multiplication russe) : l'invariant <code>total + x×y = a×b</code> suit la même logique — identifier pourquoi.</li>
+            <li>Formaliser l'invariant avec la notation produit : <code>prod = ∏{j | 1 ≤ j ≤ i} a(j)</code> — c'est la notation utilisée en B.</li>
+        </ul>
+    </div>
+
+</body>
+</html>

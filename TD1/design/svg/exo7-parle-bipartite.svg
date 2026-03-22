@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="272" viewBox="0 0 400 272" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- En-têtes de colonnes -->
+  <text x="70" y="14" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="10" font-weight="600" fill="#9e9a94">PAYS</text>
+  <text x="330" y="14" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="10" font-weight="600" fill="#9e9a94">LANGUE</text>
+  <text x="200" y="14" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="9" fill="#d67556">parle ⊆ PAYS × LANGUE</text>
+
+  <!-- ─── Nœuds PAYS ─── -->
+  <rect x="10" y="26" width="120" height="34" rx="7"
+    fill="rgba(214,117,86,0.08)" stroke="#d67556" stroke-width="1.5"/>
+  <text x="70" y="48" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="12" fill="#dedad5">France</text>
+
+  <rect x="10" y="110" width="120" height="34" rx="7"
+    fill="rgba(214,117,86,0.08)" stroke="#d67556" stroke-width="1.5"/>
+  <text x="70" y="132" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="12" fill="#dedad5">Belgique</text>
+
+  <rect x="10" y="194" width="120" height="34" rx="7"
+    fill="rgba(214,117,86,0.08)" stroke="#d67556" stroke-width="1.5"/>
+  <text x="70" y="216" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="12" fill="#dedad5">Cameroun</text>
+
+  <!-- ─── Nœuds LANGUE ─── -->
+  <rect x="270" y="26" width="120" height="34" rx="7"
+    fill="rgba(91,166,160,0.08)" stroke="#5ba6a0" stroke-width="1.5"/>
+  <text x="330" y="48" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="12" fill="#dedad5">français</text>
+
+  <rect x="270" y="92" width="120" height="34" rx="7"
+    fill="rgba(91,166,160,0.08)" stroke="#5ba6a0" stroke-width="1.5"/>
+  <text x="330" y="114" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="12" fill="#dedad5">néerlandais</text>
+
+  <rect x="270" y="158" width="120" height="34" rx="7"
+    fill="rgba(91,166,160,0.08)" stroke="#5ba6a0" stroke-width="1.5"/>
+  <text x="330" y="180" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="12" fill="#dedad5">allemand</text>
+
+  <rect x="270" y="224" width="120" height="34" rx="7"
+    fill="rgba(91,166,160,0.08)" stroke="#5ba6a0" stroke-width="1.5"/>
+  <text x="330" y="246" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="12" fill="#dedad5">anglais</text>
+
+  <!-- ─── Relations (parle) ─── -->
+  <!-- France → français  (y=43 → y=43, horizontal) -->
+  <line x1="130" y1="43" x2="270" y2="43"
+    stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Belgique → français  (y=127 → y=43) -->
+  <line x1="130" y1="127" x2="270" y2="43"
+    stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Belgique → néerlandais  (y=127 → y=109) -->
+  <line x1="130" y1="127" x2="270" y2="109"
+    stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Belgique → allemand  (y=127 → y=175) -->
+  <line x1="130" y1="127" x2="270" y2="175"
+    stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Cameroun → français  (y=211 → y=43, longue diagonale, atténuée) -->
+  <line x1="130" y1="211" x2="270" y2="43"
+    stroke="#d67556" stroke-width="1.5" stroke-linecap="round"
+    stroke-dasharray="5 4" opacity="0.40"/>
+
+  <!-- Cameroun → anglais  (y=211 → y=241) -->
+  <line x1="130" y1="211" x2="270" y2="241"
+    stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+
+</svg>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="510" height="120" viewBox="0 0 510 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Nœud 1 : personne quelconque (ex. Alice) -->
+  <rect x="1" y="24" width="108" height="40" rx="7"
+    fill="rgba(214,117,86,0.08)" stroke="#d67556" stroke-width="1.5"/>
+  <text x="55" y="41" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="9" fill="#9e9a94">personne p</text>
+  <text x="55" y="57" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="12" fill="#dedad5">Alice</text>
+
+  <!-- Flèche : mère -->
+  <line x1="109" y1="44" x2="172" y2="44" stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 179 44 L 172 40 Q 174 44 172 48 Z" fill="#d67556"/>
+  <text x="143" y="34" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="9" fill="#9e9a94">mère</text>
+
+  <!-- Nœud 2 : mère de p (femme) -->
+  <rect x="181" y="24" width="110" height="40" rx="7"
+    fill="rgba(91,166,160,0.08)" stroke="#5ba6a0" stroke-width="1.5"/>
+  <text x="236" y="41" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="9" fill="#5ba6a0">mère(p)</text>
+  <text x="236" y="57" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="12" fill="#dedad5">Marie</text>
+
+  <!-- Flèche : mari -->
+  <line x1="291" y1="44" x2="356" y2="44" stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M 363 44 L 356 40 Q 358 44 356 48 Z" fill="#d67556"/>
+  <text x="326" y="34" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="9" fill="#9e9a94">mari</text>
+
+  <!-- Nœud 3 : père de p (résultat, mis en valeur) -->
+  <rect x="365" y="14" width="132" height="60" rx="7"
+    fill="rgba(214,117,86,0.14)" stroke="#d67556" stroke-width="2"/>
+  <text x="431" y="38" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="9" fill="#9e9a94">père(p)</text>
+  <text x="431" y="57" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="13" font-weight="600" fill="#f5f3f0">Jean</text>
+
+  <!-- Barre de séparation -->
+  <line x1="1" y1="86" x2="496" y2="86" stroke="#d67556" stroke-width="1" opacity="0.22"/>
+
+  <!-- Annotation : formule de composition -->
+  <text x="248" y="100" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="10" fill="#d67556">père = mère ; mari</text>
+  <text x="248" y="114" text-anchor="middle"
+    font-family="'Inter',system-ui,sans-serif" font-size="8" fill="#9e9a94">composition : appliquer mère en premier, mari ensuite</text>
+
+</svg>

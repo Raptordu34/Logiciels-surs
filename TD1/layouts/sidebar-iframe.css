@@ -104,6 +104,12 @@ body {
     letter-spacing: 2px;
 }
 
+.nav-separator {
+    height: 1px;
+    margin: var(--spacing-sm) var(--spacing-md);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+}
+
 .nav-links {
     padding: var(--spacing-md) var(--spacing-sm);
     display: flex;

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 6 — Gestion auto-école</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-avance">Avancé</span>
+            <span class="exo-points">◎ 10 pts</span>
+            <span class="exo-time">⏱ 35 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Analyser informellement un problème pour identifier variables et opérations.</li>
+                <li>Modéliser un système réel sous forme de machine abstraite B avec invariant de disjonction.</li>
+                <li>Poser et simplifier des obligations de preuve.</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Machines abstraites B, théorie des ensembles, obligations de preuve</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3>Contexte — Machine autoEcole</h3>
+        <p>
+            On modélise la gestion d'une auto-école en méthode B.
+            La machine abstraite <code>autoEcole</code> gère trois ensembles de candidats
+            issus d'une population <code>POP</code> :
+        </p>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>Variable</th><th>Signification</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>inscrit</code></td><td>Candidats <em>actuellement</em> inscrits à l'auto-école (en cours de formation)</td></tr>
+                    <tr><td><code>aCode</code></td><td>Candidats inscrits ayant réussi l'épreuve du code (sous-ensemble de <code>inscrit</code>)</td></tr>
+                    <tr><td><code>aPermis</code></td><td>Anciens candidats ayant obtenu le permis (ils ont <em>quitté</em> <code>inscrit</code>)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout-info">
+            <strong>Point clé — modèle de sortie :</strong>
+            <p>
+                Obtenir le permis (<code>succesPermis</code>) fait <strong>sortir</strong> le candidat de <code>inscrit</code>.
+                Les ensembles <code>inscrit</code> et <code>aPermis</code> sont donc <strong>disjoints</strong> : on ne peut pas être
+                simultanément inscrit et titulaire du permis.
+                Un <code>abandon</code> fait également sortir de <code>inscrit</code>,
+                mais sans bénéficier du code (si acquis, il est perdu).
+            </p>
+        </div>
+
+        <p>Le squelette de la machine à compléter :</p>
+
+        <pre><code>MACHINE
+    autoEcole
+SETS
+    POP
+VARIABLES
+    inscrit, aCode, aPermis
+INVARIANT
+    …                               -- Q1 : à compléter
+INITIALISATION
+    inscrit, aCode, aPermis := ∅, ∅, ∅
+OPERATIONS
+    inscrire(e)    = …              -- Q2 : à écrire
+    ;
+    succesCode(e)  = …              -- Q3 : à écrire
+    ;
+    succesPermis(e)= …              -- Q4 : à écrire
+    ;
+    abandon(e)     = …              -- Q5 : à écrire
+END</code></pre>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 1                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">2 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>
+            Analysez informellement le problème puis proposez l'<strong>INVARIANT</strong>
+            de la machine <code>autoEcole</code>.
+            Vérifiez que l'initialisation <code>inscrit, aCode, aPermis := ∅, ∅, ∅</code>
+            établit bien cet invariant.
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Écrire <code>aPermis ⊆ aCode ⊆ inscrit</code> (modèle emboîté).
+            C'est faux ici : les candidats <em>quittent</em> <code>inscrit</code> une fois le permis obtenu.
+            L'invariant doit exprimer que <code>inscrit</code> et <code>aPermis</code> sont <strong>disjoints</strong>.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            Trois contraintes à exprimer :
+            <ol>
+                <li>Tous les candidats (inscrits ou diplômés) sont dans <code>POP</code> : <code>inscrit ∪ aPermis ⊆ POP</code>.</li>
+                <li>On ne peut pas être à la fois inscrit et titulaire du permis : <code>inscrit ∩ aPermis = ∅</code>.</li>
+                <li>Seul un inscrit peut avoir réussi le code : <code>aCode ⊆ inscrit</code>.</li>
+            </ol>
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            L'invariant complet est :
+            <pre><code>inscrit ∪ aPermis ⊆ POP  ∧
+inscrit ∩ aPermis = ∅    ∧
+aCode ⊆ inscrit</code></pre>
+            La clause de disjonction garantit que <code>succesPermis</code> doit retirer le candidat de <code>inscrit</code>.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Analysez le problème et écrivez l'INVARIANT, puis vérifiez l'initialisation…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+            <p><strong>Analyse informelle :</strong></p>
+            <ul>
+                <li>Les variables sont des <strong>ensembles reliés</strong> : <code>inscrit</code>, <code>aCode</code>, <code>aPermis</code>.</li>
+                <li>Les opérations sont des <strong>basculements d'ensembles</strong>.</li>
+                <li><code>succesPermis</code> fait <em>sortir</em> de <code>inscrit</code> ; <code>succesCode</code> ne le fait pas.</li>
+                <li>Un <code>abandon</code> fait perdre le bénéfice du code.</li>
+            </ul>
+            <pre><code>INVARIANT
+    inscrit ∪ aPermis ⊆ POP  ∧
+    inscrit ∩ aPermis = ∅    ∧
+    aCode ⊆ inscrit</code></pre>
+            <p><strong>Vérification de l'initialisation</strong> (substituer <code>inscrit = aCode = aPermis = ∅</code>) :</p>
+            <ul>
+                <li><code>∅ ∪ ∅ ⊆ POP</code> ✓ (l'ensemble vide est inclus dans tout ensemble)</li>
+                <li><code>∅ ∩ ∅ = ∅</code> ✓</li>
+                <li><code>∅ ⊆ ∅</code> ✓</li>
+            </ul>
+            <p>L'invariant est établi par l'initialisation. ✓</p>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 2                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">1 pt</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>
+            Écrivez l'opération <code>inscrire(e)</code> permettant à un candidat <code>e</code>
+            de s'inscrire à l'auto-école.
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Écrire <code>PRE e ∈ POP ∧ e ∉ inscrit</code>.
+            C'est insuffisant : un candidat qui a <em>déjà obtenu son permis</em> ne peut pas se réinscrire.
+            La précondition doit exclure <code>inscrit ∪ aPermis</code>.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1" data-label="Indice" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice</span>
+        </button>
+        <div class="hint" id="q2-h1">
+            La précondition est <code>e ∈ POP − (inscrit ∪ aPermis)</code>, c'est-à-dire
+            <code>e</code> est dans <code>POP</code>, pas encore inscrit et n'a pas déjà le permis.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Écrivez inscrire(e) avec PRE et THEN…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+            <pre><code>inscrire(e) =
+    PRE
+        e ∈ POP − (inscrit ∪ aPermis)
+    THEN
+        inscrit := inscrit ∪ {e}
+    END</code></pre>
+            <p>
+                La précondition <code>e ∈ POP − (inscrit ∪ aPermis)</code> garantit que <code>e</code>
+                est dans <code>POP</code>, n'est pas déjà inscrit, et n'a pas déjà obtenu son permis.
+            </p>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 3                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q3</span>
+            <span class="question-pts">1 pt</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p>
+            Écrivez l'opération <code>succesCode(e)</code> modélisant la réussite de l'épreuve du code.
+        </p>
+
+        <button class="hint-btn" data-hint="q3-h1" data-label="Indice" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice</span>
+        </button>
+        <div class="hint" id="q3-h1">
+            Précondition : <code>e ∈ inscrit − aCode</code> (inscrit mais n'a pas encore le code).
+            Substitution : ajouter <code>e</code> à <code>aCode</code>.
+            <code>inscrit</code> est inchangé : réussir le code ne fait pas sortir de l'auto-école.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Écrivez succesCode(e) avec PRE et THEN…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q3</h4>
+            <pre><code>succesCode(e) =
+    PRE
+        e ∈ inscrit − aCode
+    THEN
+        aCode := aCode ∪ {e}
+    END</code></pre>
+            <p>
+                Contrairement à <code>succesPermis</code>, réussir le code ne modifie pas <code>inscrit</code> :
+                le candidat reste inscrit et continue sa formation.
+            </p>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 4                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q4</span>
+            <span class="question-pts">2 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>
+            Écrivez l'opération <code>succesPermis(e)</code> modélisant l'obtention du permis de conduire.
+            Vérifiez que l'opération conserve l'invariant.
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> N'ajouter <code>e</code> à <code>aPermis</code> sans le retirer
+            de <code>inscrit</code> et <code>aCode</code>.
+            La clause <code>inscrit ∩ aPermis = ∅</code> serait violée : <code>e</code> serait
+            simultanément dans les deux ensembles.
+        </div>
+
+        <button class="hint-btn" data-hint="q4-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q4-h1">
+            Précondition : <code>e ∈ aCode</code> (avoir réussi le code est la prérequis).
+            La substitution doit faire <strong>trois</strong> choses simultanément :
+            retirer <code>e</code> de <code>inscrit</code>, retirer <code>e</code> de <code>aCode</code>,
+            ajouter <code>e</code> à <code>aPermis</code>.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q4-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q4-h2">
+            En B, une substitution simultanée s'écrit avec <code>;</code> (séquencement) :
+            <pre><code>inscrit := inscrit − {e};
+aCode   := aCode   − {e};
+aPermis := aPermis ∪ {e}</code></pre>
+            Notez que <code>aCode := aCode − {e}</code> est correct même si <code>e ∉ aCode</code>
+            (mais ici la PRE garantit <code>e ∈ aCode</code>).
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Écrivez succesPermis(e) et vérifiez l'invariant…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q4</h4>
+            <pre><code>succesPermis(e) =
+    PRE
+        e ∈ aCode
+    THEN
+        inscrit := inscrit − {e};
+        aCode   := aCode   − {e};
+        aPermis := aPermis ∪ {e}
+    END</code></pre>
+            <p><strong>Vérification de l'invariant :</strong></p>
+            <ul>
+                <li><code>inscrit' ∪ aPermis' = (inscrit − {e}) ∪ (aPermis ∪ {e})</code>.
+                    Puisque <code>e ∈ inscrit</code> (car <code>aCode ⊆ inscrit</code> et <code>e ∈ aCode</code>),
+                    on a <code>inscrit' ∪ aPermis' ⊆ inscrit ∪ aPermis ⊆ POP</code>. ✓</li>
+                <li><code>inscrit' ∩ aPermis'</code> : <code>e</code> est dans <code>aPermis'</code> mais plus dans <code>inscrit'</code> ;
+                    les autres éléments de <code>inscrit'</code> ne sont pas dans <code>aPermis</code> (INV).
+                    Donc <code>inscrit' ∩ aPermis' = ∅</code>. ✓</li>
+                <li><code>aCode' = aCode − {e} ⊆ inscrit − {e} = inscrit'</code>. ✓</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 5                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q5</span>
+            <span class="question-pts">2 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p>
+            Écrivez l'opération <code>abandon(e)</code> modélisant le fait qu'un candidat
+            abandonne sa formation (sans obtenir le permis).
+            Vérifiez que l'opération conserve l'invariant.
+        </p>
+
+        <div class="callout-info">
+            <strong>Sémantique d'un abandon :</strong>
+            Un candidat qui abandonne quitte <code>inscrit</code>.
+            S'il avait réussi le code, ce bénéfice est perdu : il doit quitter <code>aCode</code> aussi.
+            Il ne rejoint <strong>pas</strong> <code>aPermis</code>.
+        </div>
+
+        <button class="hint-btn" data-hint="q5-h1" data-label="Indice" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice</span>
+        </button>
+        <div class="hint" id="q5-h1">
+            Précondition : <code>e ∈ inscrit</code>.
+            La substitution retire <code>e</code> de <code>inscrit</code> et de <code>aCode</code>
+            (<code>aCode := aCode − {e}</code> est correct même si <code>e ∉ aCode</code> : retirer
+            un élément absent d'un ensemble ne change pas l'ensemble).
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Écrivez abandon(e) et vérifiez l'invariant…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q5</h4>
+            <pre><code>abandon(e) =
+    PRE
+        e ∈ inscrit
+    THEN
+        inscrit := inscrit − {e};
+        aCode   := aCode   − {e}     // correct même si e ∉ aCode
+    END</code></pre>
+            <p><strong>Vérification de l'invariant :</strong></p>
+            <ul>
+                <li><code>inscrit' ∪ aPermis ⊆ inscrit ∪ aPermis ⊆ POP</code> (on a retiré un élément). ✓</li>
+                <li><code>inscrit' ∩ aPermis</code> : <code>inscrit' ⊆ inscrit</code> et <code>inscrit ∩ aPermis = ∅</code> (INV),
+                    donc <code>inscrit' ∩ aPermis = ∅</code>. ✓</li>
+                <li><code>aCode' = aCode − {e} ⊆ aCode ⊆ inscrit</code>.
+                    Et <code>aCode' ⊆ inscrit − {e} = inscrit'</code>. ✓</li>
+            </ul>
+
+            <p><strong>Machine complète :</strong></p>
+            <pre><code>MACHINE
+    autoEcole
+SETS
+    POP
+VARIABLES
+    inscrit, aCode, aPermis
+INVARIANT
+    inscrit ∪ aPermis ⊆ POP  ∧
+    inscrit ∩ aPermis = ∅    ∧
+    aCode ⊆ inscrit
+INITIALISATION
+    inscrit, aCode, aPermis := ∅, ∅, ∅
+OPERATIONS
+    inscrire(e) =
+        PRE e ∈ POP − (inscrit ∪ aPermis)
+        THEN inscrit := inscrit ∪ {e}
+        END;
+    succesCode(e) =
+        PRE e ∈ inscrit − aCode
+        THEN aCode := aCode ∪ {e}
+        END;
+    succesPermis(e) =
+        PRE e ∈ aCode
+        THEN
+            inscrit := inscrit − {e};
+            aCode   := aCode   − {e};
+            aPermis := aPermis ∪ {e}
+        END;
+    abandon(e) =
+        PRE e ∈ inscrit
+        THEN
+            inscrit := inscrit − {e};
+            aCode   := aCode   − {e}
+        END
+END</code></pre>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 6                                     -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q6</span>
+            <span class="question-pts">2 pts</span>
+            <span class="diff-badge diff-avance">Avancé</span>
+        </div>
+        <p>
+            Posez et simplifiez les <strong>obligations de preuve</strong> pour la machine <code>autoEcole</code>.
+        </p>
+        <ol>
+            <li>Montrez que l'initialisation établit l'invariant : <code>C ⊢ [U] I</code>.</li>
+            <li>Montrez que l'opération <code>succesCode</code> conserve l'invariant : <code>C ∧ I ∧ P ⊢ [S] I</code>.</li>
+        </ol>
+
+        <div class="callout-info">
+            <strong>Rappel — forme générale des obligations de preuve :</strong>
+            <ul>
+                <li><strong>Initialisation :</strong> substituer chaque variable par sa valeur initiale dans l'invariant et vérifier que la proposition est vraie.</li>
+                <li><strong>Opération :</strong> <code>I ∧ PRE ⊢ [substitution] I</code>, c'est-à-dire remplacer les variables par leur valeur après la substitution dans l'invariant et vérifier que l'hypothèse <code>I ∧ PRE</code> suffit.</li>
+            </ul>
+        </div>
+
+        <button class="hint-btn" data-hint="q6-h1" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q6-h1">
+            Pour l'initialisation, remplacez <code>inscrit, aCode, aPermis</code> par <code>∅, ∅, ∅</code>
+            dans l'invariant. Les trois clauses doivent être vraies avec des ensembles vides.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q6-h2" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q6-h2">
+            Pour <code>succesCode</code>, la substitution est <code>aCode := aCode ∪ {e}</code>.
+            Remplacez <code>aCode</code> par <code>aCode ∪ {e}</code> dans l'invariant.
+            La PRE <code>e ∈ inscrit − aCode</code> fournit <code>e ∈ inscrit</code>,
+            ce qui permet de conclure <code>aCode ∪ {e} ⊆ inscrit</code>.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Posez et simplifiez les obligations de preuve…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q6</h4>
+
+            <p><strong>1. L'initialisation établit l'invariant</strong> — substituer <code>∅, ∅, ∅</code> :</p>
+            <pre><code>(∅ ∪ ∅ ⊆ POP) ∧ (∅ ∩ ∅ = ∅) ∧ (∅ ⊆ ∅)
+≡ vrai ∧ vrai ∧ vrai
+≡ vrai  ✓</code></pre>
+
+            <p><strong>2. L'opération <code>succesCode</code> conserve l'invariant</strong></p>
+            <p>Hypothèses : <code>I</code> (invariant) et <code>PRE : e ∈ inscrit − aCode</code>.</p>
+            <p>Substitution : <code>[aCode := aCode ∪ {e}]</code>. Réécriture de <code>I</code> :</p>
+            <pre><code>inscrit ∪ aPermis ⊆ POP             // inchangé ✓ (par INV)
+∧ inscrit ∩ aPermis = ∅              // inchangé ✓ (par INV)
+∧ (aCode ∪ {e}) ⊆ inscrit</code></pre>
+            <p>Il reste à prouver <code>(aCode ∪ {e}) ⊆ inscrit</code> :</p>
+            <ul>
+                <li><code>aCode ⊆ inscrit</code> : vrai par INV. ✓</li>
+                <li><code>{e} ⊆ inscrit</code>, i.e. <code>e ∈ inscrit</code> : vrai car <code>e ∈ inscrit − aCode</code> (PRE). ✓</li>
+            </ul>
+            <p>L'invariant est conservé par <code>succesCode</code>. ✓</p>
+        </div>
+    </div>
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q1 — Invariant de la machine</span>
+        <span class="bareme-desc">1 pt invariant complet (3 clauses dont disjonction) · 1 pt vérification initialisation</span>
+
+        <span class="bareme-pts">1</span>
+        <span class="bareme-label">Q2 — Opération inscrire</span>
+        <span class="bareme-desc">0,5 pt PRE (exclusion inscrit ∪ aPermis) · 0,5 pt substitution</span>
+
+        <span class="bareme-pts">1</span>
+        <span class="bareme-label">Q3 — Opération succesCode</span>
+        <span class="bareme-desc">0,5 pt PRE · 0,5 pt substitution</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q4 — Opération succesPermis</span>
+        <span class="bareme-desc">0,5 pt PRE · 0,5 pt triple substitution · 1 pt vérification invariant</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q5 — Opération abandon</span>
+        <span class="bareme-desc">0,5 pt PRE · 0,5 pt substitution (retire des deux) · 1 pt vérification invariant</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q6 — Obligations de preuve</span>
+        <span class="bareme-desc">1 pt initialisation · 1 pt succesCode (simplification complète)</span>
+
+        <div class="bareme-total">Total : <strong>10 pts</strong></div>
+    </div>
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Posez et simplifiez les obligations de preuve pour <code>succesPermis</code> et <code>abandon</code>. Laquelle est la plus complexe à justifier ?</li>
+            <li>Modifiez la machine pour autoriser la réinscription après un abandon (mais pas après l'obtention du permis). Quelle clause de l'invariant doit changer ?</li>
+            <li>Ajoutez une variable <code>enEchec ⊆ inscrit</code> pour les candidats ayant échoué au code. Comment l'invariant et <code>succesCode</code> évoluent-ils ?</li>
+        </ul>
+    </div>
+
+</body>
+</html>

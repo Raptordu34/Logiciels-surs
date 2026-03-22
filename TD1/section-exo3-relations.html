@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 3 — Opérations sur les relations</h2>
+
+    <!-- ── EN-TÊTE DE L'EXERCICE ── -->
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+            <span class="exo-points">◎ 10 pts</span>
+            <span class="exo-time">⏱ 20–30 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Calculer le domaine d'une relation (<code>dom</code>)</li>
+                <li>Appliquer la restriction de domaine (◁) et de codomaine (▷)</li>
+                <li>Maîtriser l'opération de surcharge (←)</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Cours 2 — Relations, fonctions et notations Z</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3>Contexte — Opérations sur une relation</h3>
+        <p>
+            Soit A = {a1, a2, a3} et B = {a1, a2, a3}.
+            On considère la relation R ⊆ A × B définie par :
+        </p>
+
+        <div class="highlight-box">
+            <strong>R = { a1 → a2,  a1 → a3,  a3 → a2 }</strong>
+        </div>
+
+        <div style="display:flex; justify-content:center; margin: 1rem 0;">
+            <svg width="300" height="130" viewBox="0 0 300 130" fill="none" xmlns="http://www.w3.org/2000/svg" style="font-family:'Inter',system-ui,sans-serif;">
+              <!-- Nodes -->
+              <circle cx="50" cy="65" r="20" fill="rgba(214,117,86,0.1)" stroke="#d67556" stroke-width="1.5"/>
+              <text x="50" y="70" text-anchor="middle" font-size="12" fill="#dedad5">a1</text>
+              <circle cx="250" cy="25" r="20" fill="rgba(214,117,86,0.1)" stroke="#d67556" stroke-width="1.5"/>
+              <text x="250" y="30" text-anchor="middle" font-size="12" fill="#dedad5">a2</text>
+              <circle cx="250" cy="105" r="20" fill="rgba(214,117,86,0.1)" stroke="#d67556" stroke-width="1.5"/>
+              <text x="250" y="110" text-anchor="middle" font-size="12" fill="#dedad5">a3</text>
+              <!-- a1 → a2 : direction (200,−40), unit≈(0.980,−0.196) -->
+              <line x1="70" y1="61" x2="228" y2="29" stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+              <polygon points="230,29 223,34 221,27" fill="#d67556"/>
+              <!-- a1 → a3 : direction (200,40), unit≈(0.980,0.196) -->
+              <line x1="70" y1="69" x2="228" y2="101" stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+              <polygon points="230,101 222,103 224,96" fill="#d67556"/>
+              <!-- a3 → a2 : vertical up -->
+              <line x1="250" y1="85" x2="250" y2="45" stroke="#d67556" stroke-width="1.5" stroke-linecap="round"/>
+              <polygon points="250,45 246,53 254,53" fill="#d67556"/>
+            </svg>
+        </div>
+
+        <p>Calculez le résultat des expressions suivantes :</p>
+
+        <div class="callout-info">
+            <strong>Rappel de notation</strong>
+            <ul>
+                <li><code>x → y</code> désigne le couple (x, y) — aussi appelé <em>maplet</em> en notation Z.</li>
+                <li><code>dom(R)</code> : ensemble des antécédents de R (éléments de gauche de chaque paire).</li>
+                <li><code>S ◁ R</code> : restriction de R au domaine S — ne conserve que les paires dont la source ∈ S.</li>
+                <li><code>R ▷ T</code> : restriction de R au codomaine T — ne conserve que les paires dont la cible ∈ T.</li>
+                <li><code>R ← S</code> : surcharge de R par S — S écrase R là où S est défini.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Rappel de cours compact -->
+    <button class="hint-btn" data-hint="rappel-ops-court" data-label="Rappel de cours" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours</span>
+    </button>
+    <div class="hint" id="rappel-ops-court">
+        <p>Pour R ⊆ A × B, S ⊆ A et T ⊆ B :</p>
+        <ul>
+            <li><strong>dom(R)</strong> = { x | ∃ y · x → y ∈ R } — éléments qui ont au moins une image dans R.</li>
+            <li><strong>S ◁ R</strong> = { x → y ∈ R | x ∈ S } — filtre les paires dont la source est dans S.</li>
+            <li><strong>R ▷ T</strong> = { x → y ∈ R | y ∈ T } — filtre les paires dont la cible est dans T.</li>
+            <li><strong>R ← S</strong> = (dom(S) ⩤ R) ∪ S — supprime de R les paires de source dans dom(S), puis ajoute toutes les paires de S.</li>
+        </ul>
+    </div>
+
+    <!-- Rappel de cours approfondi -->
+    <button class="hint-btn" data-hint="rappel-ops-long" data-label="Rappel de cours approfondi" data-close-label="Masquer le rappel" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel de cours approfondi</span>
+    </button>
+    <div class="hint" id="rappel-ops-long">
+        <p><strong>Relations vs fonctions :</strong> une relation peut associer plusieurs images à un même antécédent. Ici, a1 → a2 et a1 → a3 coexistent — R n'est donc pas une fonction partielle.</p>
+        <p><strong>◁ (restriction de domaine) :</strong> S ◁ R supprime toutes les paires dont la source n'appartient pas à S. Si S = {a1}, seules les paires commençant par a1 survivent.</p>
+        <p><strong>▷ (restriction de codomaine) :</strong> R ▷ T supprime les paires dont la cible n'appartient pas à T. Si T = {a2}, seules les paires finissant par a2 survivent.</p>
+        <p><strong>← (surcharge) :</strong> R ← S fonctionne comme une mise à jour globale. On retire <em>toutes</em> les paires de R ayant une source dans dom(S), puis on ajoute l'intégralité de S.</p>
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">Point clé</span></p>
+            <p>La surcharge agit sur le <em>domaine entier</em> de S. Si S = { a1 → a1 }, alors toutes les paires de R dont la source est a1 — y compris a1 → a2 <strong>et</strong> a1 → a3 — sont remplacées d'un coup.</p>
+        </div>
+    </div>
+
+    <div class="two-col">
+        <div class="highlight-box">
+            <p><span class="badge badge-green">Exemple</span></p>
+            <p>Soit P = { x → y,  x → z,  w → y }.</p>
+            <p><strong>{ x } ◁ P</strong> = { x → y,  x → z } <em>(la paire w → y est supprimée car w ∉ {x})</em></p>
+            <p><strong>P ▷ { y }</strong> = { x → y,  w → y } <em>(la paire x → z est supprimée car z ∉ {y})</em></p>
+        </div>
+        <div class="callout-info">
+            <p><span class="badge badge-blue">Analogie — surcharge</span></p>
+            <p><strong>Intuition :</strong> imaginez un carnet de contacts. R est l'ancien carnet, S est une liste de mises à jour. Pour chaque contact présent dans S, on efface <em>toutes</em> ses anciennes entrées dans R et on applique la nouvelle valeur. Les contacts absents de S restent intacts.</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 1 — dom                              -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q1</span>
+            <span class="question-pts">2 pts</span>
+            <span class="diff-badge diff-fondamental">Fondamental</span>
+        </div>
+        <p><strong>a.</strong> Calculez <code>dom({ a1 → a2,  a1 → a3,  a3 → a2 })</code>.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Inclure les <em>images</em> (éléments de droite) dans le domaine. Le domaine rassemble uniquement les antécédents — les éléments de gauche. Même si a1 apparaît dans deux paires, il ne figure qu'une seule fois dans dom(R).
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1-rel" data-label="Indice 1/1" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/1</span>
+        </button>
+        <div class="hint" id="q1-h1-rel">
+            Parcourez R paire par paire et notez l'élément de gauche : <code>a1 → a2</code> donne a1 ; <code>a1 → a3</code> donne a1 (doublon — on ne l'ajoute pas deux fois) ; <code>a3 → a2</code> donne a3. L'élément a2 n'est jamais à gauche d'une paire.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Écrivez le résultat de dom(R)…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q1</h4>
+
+            <ul class="steps">
+                <li>Paire <code>a1 → a2</code> : antécédent = <strong>a1</strong></li>
+                <li>Paire <code>a1 → a3</code> : antécédent = <strong>a1</strong> (déjà présent, doublon ignoré)</li>
+                <li>Paire <code>a3 → a2</code> : antécédent = <strong>a3</strong></li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>dom({ a1 → a2,  a1 → a3,  a3 → a2 }) = { a1,  a3 }</strong>
+            </div>
+
+            <p class="inline-note">L'élément a2 n'appartient pas au domaine : il n'apparaît qu'en position d'image. Le fait que a1 intervienne dans deux paires ne le compte qu'une seule fois dans l'ensemble résultat.</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 2 — restriction domaine + codomaine  -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q2</span>
+            <span class="question-pts">4 pts</span>
+            <span class="diff-badge diff-moyen">Intermédiaire</span>
+        </div>
+        <p><strong>b.</strong> Calculez <code>{ a1 } ◁ { a1 → a2,  a1 → a3,  a3 → a2 } ▷ { a2 }</code>.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> N'appliquer qu'une seule des deux restrictions. L'expression combine ◁ (filtre sur la source) <em>et</em> ▷ (filtre sur la cible) — les deux filtres doivent être appliqués pour obtenir le résultat correct.
+        </div>
+
+        <button class="hint-btn" data-hint="q2-h1-rel" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q2-h1-rel">
+            Commencez par la restriction de domaine : <code>{ a1 } ◁ R</code> conserve uniquement les paires dont la source est a1. Parmi { a1 → a2, a1 → a3, a3 → a2 }, quelles paires survivent ?
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q2-h2-rel" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q2-h2-rel">
+            Après <code>{ a1 } ◁ R = { a1 → a2,  a1 → a3 }</code>, appliquez ▷ { a2 } : ne conservez que les paires dont la cible est a2. Laquelle des deux paires restantes a bien a2 à droite ?
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Calculez l'expression étape par étape…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q2</h4>
+
+            <ul class="steps">
+                <li><strong>Étape 1 — restriction de domaine ◁ :</strong> ne conserver que les paires avec a1 à gauche.
+                    <br>{ a1 } ◁ { a1 → a2, a1 → a3, a3 → a2 } = <strong>{ a1 → a2,  a1 → a3 }</strong>
+                    <br><em>(la paire a3 → a2 est supprimée car a3 ∉ { a1 })</em></li>
+                <li><strong>Étape 2 — restriction de codomaine ▷ :</strong> ne conserver que les paires avec a2 à droite.
+                    <br>{ a1 → a2, a1 → a3 } ▷ { a2 } = <strong>{ a1 → a2 }</strong>
+                    <br><em>(la paire a1 → a3 est supprimée car a3 ∉ { a2 })</em></li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>{ a1 } ◁ R ▷ { a2 } = { a1 → a2 }</strong>
+            </div>
+
+            <p class="inline-note">Les deux restrictions se combinent : on exige simultanément que la source soit dans {a1} et que la cible soit dans {a2}. Seule la paire a1 → a2 satisfait les deux conditions.</p>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION 3 — surcharge                        -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q3</span>
+            <span class="question-pts">4 pts</span>
+            <span class="diff-badge diff-avance">Avancé</span>
+        </div>
+        <p><strong>c.</strong> Calculez <code>{ a1 → a2,  a1 → a3,  a3 → a2 } ← { a1 → a1 }</code>.</p>
+        <p class="inline-note">Le symbole ← désigne l'opération de <strong>surcharge</strong>.</p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> Ne remplacer qu'une seule paire de R au lieu de toutes celles qui partagent le même antécédent. La surcharge supprime <em>l'ensemble</em> des paires de R dont la source appartient à dom(S). Ici, <em>a1 → a2</em> <strong>et</strong> <em>a1 → a3</em> sont toutes les deux supprimées — pas seulement la première.
+        </div>
+
+        <button class="hint-btn" data-hint="q3-h1-rel" data-label="Indice 1/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2</span>
+        </button>
+        <div class="hint" id="q3-h1-rel">
+            La surcharge R ← S se décompose en deux étapes :
+            <ol>
+                <li>Retirer de R <em>toutes</em> les paires dont la source est dans dom(S).</li>
+                <li>Ajouter toutes les paires de S au résultat.</li>
+            </ol>
+            Commencez par calculer dom({ a1 → a1 }).
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q3-h2-rel" data-label="Indice 2/2" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2</span>
+        </button>
+        <div class="hint" id="q3-h2-rel">
+            dom({ a1 → a1 }) = { a1 }. Supprimez de R toutes les paires de source a1 : disparaissent a1 → a2 et a1 → a3. Il reste { a3 → a2 }. Ajoutez-y { a1 → a1 }.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Décomposez la surcharge étape par étape…"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q3</h4>
+
+            <ul class="steps">
+                <li><strong>dom({ a1 → a1 }) = { a1 }</strong> — la mise à jour porte sur l'antécédent a1.</li>
+                <li><strong>Anti-restriction :</strong> supprimer de R toutes les paires de source a1.
+                    <br>Supprimées : a1 → a2 <em>et</em> a1 → a3 (les deux paires ayant a1 à gauche).
+                    <br>Il reste : <strong>{ a3 → a2 }</strong>.</li>
+                <li><strong>Union :</strong> ajouter les paires de S = { a1 → a1 }.
+                    <br>Résultat = { a3 → a2 } ∪ { a1 → a1 }.</li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>R ← { a1 → a1 } = { a1 → a1,  a3 → a2 }</strong>
+            </div>
+
+            <p class="inline-note">La surcharge a remplacé les deux paires a1 → a2 et a1 → a3 par une seule paire a1 → a1. La paire a3 → a2 reste inchangée car a3 ∉ dom({ a1 → a1 }).</p>
+        </div>
+    </div>
+
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">Q1 — Calcul de dom(R)</span>
+        <span class="bareme-desc">1 pt résultat correct · 1 pt justification (identification des antécédents, gestion des doublons)</span>
+
+        <span class="bareme-pts">4</span>
+        <span class="bareme-label">Q2 — Restrictions ◁ et ▷</span>
+        <span class="bareme-desc">2 pts étape ◁ correcte · 2 pts étape ▷ correcte sur le résultat intermédiaire</span>
+
+        <span class="bareme-pts">4</span>
+        <span class="bareme-label">Q3 — Surcharge ←</span>
+        <span class="bareme-desc">2 pts anti-restriction correcte (suppression de toutes les paires de source a1) · 2 pts union avec S</span>
+
+        <div class="bareme-total">Total : <strong>10 pts</strong></div>
+    </div>
+
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Que vaut <code>∅ ◁ R</code> ? Et <code>A ◁ R</code> (avec A = domaine complet) ? Ces cas limites révèlent le comportement de la restriction sur les extrêmes.</li>
+            <li>La surcharge est-elle commutative ? Construisez un contre-exemple montrant que <code>R ← S ≠ S ← R</code> en général.</li>
+            <li>Exprimez formellement la surcharge à l'aide de l'anti-restriction de domaine (⩤) et de l'union ensembliste — comparez avec la définition vue en cours.</li>
+        </ul>
+    </div>
+
+</body>
+</html>

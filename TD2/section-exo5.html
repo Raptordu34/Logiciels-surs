@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./components.css">
+    <script src="./section-utils.js" defer></script>
+</head>
+<body>
+
+    <h2>Exercice 5 — Feux de circulation</h2>
+
+    <div class="exo-header">
+        <div class="exo-meta">
+            <span class="diff-badge diff-avance">Avancé</span>
+            <span class="exo-points">◎ 8 pts</span>
+            <span class="exo-time">⏱ 25 min</span>
+        </div>
+        <div class="objectifs">
+            <strong>Objectifs</strong>
+            <ul>
+                <li>Modéliser un système réel en machine abstraite B.</li>
+                <li>Distinguer propriété de séquentialité et propriété de sûreté.</li>
+                <li>Écrire des opérations avec préconditions qui garantissent l'invariant.</li>
+            </ul>
+        </div>
+        <p class="exo-prereq"><strong>Prérequis :</strong> <em>Machines abstraites B, variables, invariant, opérations, préconditions, fonctions totales</em></p>
+    </div>
+
+    <!-- ── CONTEXTE ── -->
+    <div class="context-block">
+        <h3>Contexte — Carrefour à deux directions</h3>
+        <p>
+            On modélise un carrefour à 4 voies contrôlé par des feux dans deux directions :
+            <strong>NordSud</strong> et <strong>EstOuest</strong>.
+            Les feux Est et Ouest sont toujours de la même couleur, idem pour Nord et Sud —
+            on les traite donc comme une seule entité par direction.
+        </p>
+        <p>Les feux peuvent prendre trois couleurs : <strong>Rouge</strong>, <strong>Vert</strong>, <strong>Orange</strong>.</p>
+
+        <div class="two-col">
+            <div class="highlight-box">
+                <p><span class="badge badge-green">Propriété de séquentialité</span></p>
+                <p>La seule suite de couleurs autorisée est :</p>
+                <p style="text-align:center;font-size:1.1em;"><code>Rouge → Vert → Orange → Rouge → …</code></p>
+                <ul>
+                    <li>Seul un feu <strong>Orange</strong> peut passer au Rouge.</li>
+                    <li>Seul un feu <strong>Rouge</strong> peut passer au Vert.</li>
+                    <li>Seul un feu <strong>Vert</strong> peut passer à l'Orange.</li>
+                </ul>
+            </div>
+            <div class="highlight-box">
+                <p><span class="badge badge-orange">Propriété de sûreté</span></p>
+                <p>Les deux directions ne peuvent pas circuler en même temps :</p>
+                <p><strong>Si une direction est Vert ou Orange, l'autre doit être Rouge.</strong></p>
+                <p class="inline-note">
+                    En d'autres termes : au moins une des deux directions est toujours Rouge.
+                    Sans cette propriété, deux voitures pourraient traverser le carrefour simultanément — collision assurée.
+                </p>
+            </div>
+        </div>
+
+        <p>Il y a 3 opérations à spécifier, chacune prenant une direction en paramètre :</p>
+        <ul>
+            <li><code>PasseAuRouge(dir)</code> — met le feu de <code>dir</code> au Rouge.</li>
+            <li><code>PasseAuVert(dir)</code> — met le feu de <code>dir</code> au Vert.</li>
+            <li><code>PasseAlOrange(dir)</code> — met le feu de <code>dir</code> à l'Orange.</li>
+        </ul>
+
+        <div class="callout-info">
+            <strong>Question Q5.1 :</strong> écrire la Machine Abstraite B complète.
+        </div>
+    </div>
+
+    <!-- ── VULGARISATION MACHINE B ── -->
+    <div class="callout-info">
+        <p><span class="badge badge-blue">C'est quoi une Machine Abstraite B ?</span></p>
+        <p>
+            Une Machine Abstraite B, c'est une façon formelle de décrire un système avec des <strong>variables d'état</strong>
+            et des <strong>opérations</strong> qui les modifient. L'idée centrale : on définit un <strong>invariant</strong>
+            — une propriété qui doit rester vraie en permanence — et on prouve que chaque opération le maintient.
+        </p>
+        <p>
+            <strong>Analogie :</strong> pense à un compte bancaire. L'invariant serait "le solde est ≥ 0".
+            L'opération "retirer X€" a une précondition "solde ≥ X" pour garantir que l'invariant reste vrai.
+            La machine ne gère pas le cas interdit — c'est à l'appelant de ne pas appeler l'opération hors conditions.
+        </p>
+        <p>Structure d'une machine :</p>
+        <pre><code>MACHINE NomDeLaMachine
+SETS        -- les types/ensembles de valeurs possibles
+VARIABLES   -- les variables d'état
+INVARIANT   -- propriété permanente sur les variables
+INITIALISATION  -- valeurs initiales (doivent établir l'invariant)
+OPERATIONS  -- les opérations modifiant l'état
+END</code></pre>
+    </div>
+
+    <!-- ── VULGARISATION NOTATION FONCTION ── -->
+    <div class="callout-info">
+        <p><span class="badge badge-blue">La notation <code>feux ∈ DIRECTION → FEU</code> — c'est quoi ?</span></p>
+        <p>
+            <code>DIRECTION → FEU</code> désigne l'ensemble des <strong>fonctions totales</strong> de DIRECTION vers FEU.
+            Dire que <code>feux ∈ DIRECTION → FEU</code>, c'est dire que <code>feux</code> est une fonction
+            qui associe à chaque direction exactement une couleur.
+        </p>
+        <p>Concrètement :</p>
+        <ul>
+            <li><code>feux(NordSud)</code> = couleur du feu NordSud (ex : Rouge)</li>
+            <li><code>feux(EstOuest)</code> = couleur du feu EstOuest (ex : Vert)</li>
+        </ul>
+        <p>
+            C'est comme un tableau à deux cases. Modifier <code>feux(dir) := Rouge</code> revient à
+            changer la valeur à l'index <code>dir</code> dans ce tableau.
+        </p>
+        <p class="inline-note">
+            En B, <code>{NordSud ↦ Rouge, EstOuest ↦ Rouge}</code> est la notation pour la fonction
+            qui envoie NordSud sur Rouge et EstOuest sur Rouge — c'est la valeur initiale de <code>feux</code>.
+        </p>
+    </div>
+
+    <!-- ── VULGARISATION INVARIANT ── -->
+    <div class="callout-info">
+        <p><span class="badge badge-blue">Comprendre l'invariant — deux formes équivalentes</span></p>
+        <p>La propriété de sûreté ("au moins une direction est Rouge") peut s'écrire de deux façons logiquement équivalentes :</p>
+
+        <div class="two-col">
+            <div class="highlight-box">
+                <p><span class="badge badge-green">Forme 1 — disjonction directe</span></p>
+                <pre><code>feux(NordSud) = Rouge
+∨ feux(EstOuest) = Rouge</code></pre>
+                <p class="inline-note">
+                    "Au moins une des deux est Rouge."
+                    Simple et direct, mais moins explicite sur ce qui se passe quand une est Verte.
+                </p>
+            </div>
+            <div class="highlight-box">
+                <p><span class="badge badge-orange">Forme 2 — implications (version prof Allel)</span></p>
+                <pre><code>(feux(NordSud) ∈ {Vert,Orange}
+  ⟹ feux(EstOuest) = Rouge)
+∧
+(feux(EstOuest) ∈ {Vert,Orange}
+  ⟹ feux(NordSud) = Rouge)</code></pre>
+                <p class="inline-note">
+                    "Si NordSud circule, EstOuest est Rouge — et vice versa."
+                    Plus lisible en termes de sûreté réelle.
+                </p>
+            </div>
+        </div>
+
+        <p>
+            Ces deux formes sont <strong>logiquement équivalentes</strong> grâce à la règle
+            <code>p ⟹ q  ≡  ¬p ∨ q</code>.
+            La forme 1 est plus compacte ; la forme 2 est plus proche du langage naturel de la propriété de sûreté.
+        </p>
+    </div>
+
+    <!-- ── POURQUOI CES PRÉCONDITIONS ── -->
+    <div class="callout-info">
+        <p><span class="badge badge-blue">Pourquoi ces préconditions pour chaque opération ?</span></p>
+        <p>
+            Chaque opération doit garantir que l'invariant reste vrai après son exécution.
+            La précondition est choisie exactement pour ça.
+        </p>
+
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr><th>Opération</th><th>PRE</th><th>Pourquoi ?</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>PasseAuRouge(dir)</code></td>
+                        <td><code>feux(dir) = Orange</code></td>
+                        <td>
+                            Séquentialité : seul Orange → Rouge est légal.<br>
+                            Sûreté : si dir est Orange, l'autre est déjà Rouge (invariant). Passer dir au Rouge ne change rien à la sûreté. Pas besoin de condition supplémentaire.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>PasseAuVert(dir)</code></td>
+                        <td>
+                            <code>feux(dir) = Rouge</code><br>
+                            <code>∧ autre dir = Rouge</code>
+                        </td>
+                        <td>
+                            Séquentialité : seul Rouge → Vert est légal.<br>
+                            Sûreté : après, dir sera Vert → l'autre DOIT être Rouge. On l'exige explicitement dans la PRE, car les deux pourraient être Rouges au départ sans que l'invariant l'impose.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>PasseAlOrange(dir)</code></td>
+                        <td><code>feux(dir) = Vert</code></td>
+                        <td>
+                            Séquentialité : seul Vert → Orange est légal.<br>
+                            Sûreté : si dir est Vert, l'autre est déjà Rouge (invariant). Passer à Orange maintient "au moins une est Rouge". Pas besoin de condition supplémentaire.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="inline-note">
+            <strong>Résumé :</strong> seule <code>PasseAuVert</code> a besoin d'une condition de sûreté explicite,
+            parce que c'est la seule opération qui fait passer une direction de Rouge (inoffensif) à Vert (bloquant pour l'autre).
+            Pour les deux autres, l'invariant garantit déjà la sûreté.
+        </p>
+    </div>
+
+    <!-- ── RAPPEL SYNTAXE B ── -->
+    <button class="hint-btn" data-hint="rappel-machine-b" data-label="Rappel syntaxe B" data-close-label="Masquer" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Rappel syntaxe B</span>
+    </button>
+    <div class="hint" id="rappel-machine-b">
+        <ul>
+            <li><code>SETS</code> — types énumérés : <code>MON_TYPE = {val1, val2, val3}</code></li>
+            <li><code>INVARIANT</code> — propriété permanente, conjonction de prédicats.</li>
+            <li><code>feux ∈ DIRECTION → FEU</code> — feux est une fonction totale de DIRECTION dans FEU.</li>
+            <li><code>feux(dir) := val</code> — affectation fonctionnelle : change la valeur pour la clé <code>dir</code>.</li>
+            <li><code>{NordSud ↦ Rouge, EstOuest ↦ Rouge}</code> — définition en extension d'une fonction.</li>
+        </ul>
+        <p><strong>Structure d'une opération avec paramètre :</strong></p>
+        <pre><code>NomOp(param) =
+    PRE
+        param ∈ TYPE ∧ condition_sur_etat
+    THEN
+        variable := nouvelle_valeur
+    END</code></pre>
+        <p class="inline-note">
+            Le paramètre <code>param</code> doit toujours être contraint dans la <code>PRE</code>
+            (<code>param ∈ TYPE</code>) pour que la machine soit bien typée.
+        </p>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- QUESTION                                       -->
+    <!-- ══════════════════════════════════════════════ -->
+
+    <div class="question">
+        <div class="question-header">
+            <span class="question-num">Q5.1</span>
+            <span class="question-pts">8 pts</span>
+            <span class="diff-badge diff-avance">Avancé</span>
+        </div>
+        <p>
+            Écrire la <strong>Machine Abstraite B</strong> complète <code>FeuxTricolores</code>
+            modélisant le carrefour : sets, variables, invariant, initialisation, et les trois opérations
+            avec leurs préconditions.
+        </p>
+
+        <div class="erreur-freq">
+            <strong>Piège courant :</strong> oublier la condition de sûreté dans la PRE de <code>PasseAuVert</code>.
+            La condition séquentielle <code>feux(dir) = Rouge</code> seule ne suffit pas :
+            les deux feux pourraient être Rouges, et passer l'un au Vert sans vérifier l'autre
+            violerait l'invariant si on n'y prend garde.
+        </div>
+
+        <button class="hint-btn" data-hint="q1-h1" data-label="Indice 1/2 — Invariant" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 1/2 — Invariant</span>
+        </button>
+        <div class="hint" id="q1-h1">
+            L'invariant comporte deux parties :<br>
+            1. Le typage : <code>feux ∈ DIRECTION → FEU</code> (chaque direction a une couleur).<br>
+            2. La sûreté : au moins une direction est Rouge — soit <code>feux(NordSud) = Rouge ∨ feux(EstOuest) = Rouge</code>.
+        </div>
+
+        <button class="hint-btn hint-locked" data-hint="q1-h2" data-label="Indice 2/2 — PasseAuVert" aria-expanded="false">
+            <span class="btn-arrow">▶</span>
+            <span class="btn-label">Indice 2/2 — PasseAuVert</span>
+        </button>
+        <div class="hint" id="q1-h2">
+            Pour <code>PasseAuVert(dir)</code>, la PRE doit contenir trois conditions :<br>
+            • <code>dir ∈ DIRECTION</code> (typage du paramètre)<br>
+            • <code>feux(dir) = Rouge</code> (séquentialité : Rouge → Vert)<br>
+            • l'autre direction est Rouge (sûreté), exprimée par une implication selon <code>dir</code>.
+        </div>
+    </div>
+
+    <div class="reponse-zone" contenteditable="true" data-placeholder="Écrire la machine complète : MACHINE … SETS … VARIABLES … INVARIANT … INITIALISATION … OPERATIONS … END"></div>
+
+    <button class="solution-btn" aria-expanded="false">
+        <span class="btn-arrow">▶</span>
+        <span class="btn-label">Voir la solution</span>
+    </button>
+    <div class="solution">
+        <div class="solution-inner">
+            <h4 style="margin-top:0;">Solution — Q5.1</h4>
+
+            <pre><code>MACHINE FeuxTricolores
+
+SETS
+    DIRECTION = {NordSud, EstOuest};
+    FEU = {Rouge, Vert, Orange}
+
+VARIABLES
+    feux
+
+INVARIANT
+    feux ∈ DIRECTION → FEU
+    ∧
+    (feux(NordSud) = Rouge ∨ feux(EstOuest) = Rouge)
+
+INITIALISATION
+    feux := {NordSud ↦ Rouge, EstOuest ↦ Rouge}
+
+OPERATIONS
+
+    PasseAuRouge(dir) =
+    PRE
+        -- séquentialité : seul Orange peut passer au Rouge
+        dir ∈ DIRECTION ∧ feux(dir) = Orange
+    THEN
+        feux(dir) := Rouge
+    END
+    ;
+
+    PasseAuVert(dir) =
+    PRE
+        -- séquentialité : seul Rouge peut passer au Vert
+        dir ∈ DIRECTION ∧ feux(dir) = Rouge
+        ∧
+        -- sûreté : la direction opposée doit être Rouge
+        (dir = NordSud  ⟹ feux(EstOuest) = Rouge)
+        ∧
+        (dir = EstOuest ⟹ feux(NordSud)  = Rouge)
+    THEN
+        feux(dir) := Vert
+    END
+    ;
+
+    PasseAlOrange(dir) =
+    PRE
+        -- séquentialité : seul Vert peut passer à l'Orange
+        dir ∈ DIRECTION ∧ feux(dir) = Vert
+    THEN
+        feux(dir) := Orange
+    END
+
+END</code></pre>
+
+            <!-- VÉRIFICATION INVARIANT -->
+            <div class="callout-info">
+                <strong>Vérification — l'initialisation établit l'invariant</strong>
+                <ul class="steps">
+                    <li><code>feux = {NordSud ↦ Rouge, EstOuest ↦ Rouge}</code> est bien dans <code>DIRECTION → FEU</code>. ✓</li>
+                    <li><code>feux(NordSud) = Rouge</code> → la disjonction est vraie. ✓</li>
+                </ul>
+            </div>
+
+            <!-- VÉRIFICATION OPÉRATIONS -->
+            <div class="callout-info">
+                <strong>Vérification — chaque opération maintient l'invariant</strong>
+                <ul class="steps">
+                    <li>
+                        <em>PasseAuRouge(dir) :</em> PRE impose <code>feux(dir) = Orange</code>.
+                        Par l'invariant, l'autre direction est déjà Rouge.
+                        Après : <code>feux(dir) = Rouge</code> → la disjonction reste vraie. ✓
+                    </li>
+                    <li>
+                        <em>PasseAuVert(dir) :</em> PRE impose que l'autre direction est Rouge.
+                        Après : <code>feux(dir) = Vert</code>, l'autre = Rouge → disjonction vraie. ✓
+                    </li>
+                    <li>
+                        <em>PasseAlOrange(dir) :</em> PRE impose <code>feux(dir) = Vert</code>.
+                        Par l'invariant, l'autre est Rouge.
+                        Après : <code>feux(dir) = Orange</code>, l'autre = Rouge → disjonction vraie. ✓
+                    </li>
+                </ul>
+            </div>
+
+            <!-- VARIANTE ALLEL -->
+            <div class="highlight-box">
+                <p><span class="badge badge-orange">Variante — invariant sous forme d'implications (Allel)</span></p>
+                <p>L'invariant peut aussi s'écrire avec des implications — logiquement équivalent :</p>
+                <pre><code>INVARIANT
+    feux ∈ DIRECTION → FEU
+    ∧
+    (feux(NordSud)  ∈ {Vert, Orange} ⟹ feux(EstOuest) = Rouge)
+    ∧
+    (feux(EstOuest) ∈ {Vert, Orange} ⟹ feux(NordSud)  = Rouge)</code></pre>
+                <p class="inline-note">
+                    Équivalence : <code>feux(NordSud) = Rouge ∨ feux(EstOuest) = Rouge</code>
+                    est la même chose que <code>(feux(NordSud) ≠ Rouge ⟹ feux(EstOuest) = Rouge)</code>,
+                    et <code>feux(NordSud) ≠ Rouge</code> ≡ <code>feux(NordSud) ∈ {Vert, Orange}</code>.
+                    La version avec implications est plus explicite sur la contrainte de sûreté.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── BARÈME ── -->
+    <div class="bareme">
+        <span class="bareme-pts">1</span>
+        <span class="bareme-label">SETS corrects</span>
+        <span class="bareme-desc">DIRECTION et FEU bien définis</span>
+
+        <span class="bareme-pts">2</span>
+        <span class="bareme-label">INVARIANT</span>
+        <span class="bareme-desc">1 pt typage <code>feux ∈ DIRECTION → FEU</code> · 1 pt propriété de sûreté</span>
+
+        <span class="bareme-pts">1</span>
+        <span class="bareme-label">INITIALISATION</span>
+        <span class="bareme-desc">Fonction correcte établissant l'invariant</span>
+
+        <span class="bareme-pts">4</span>
+        <span class="bareme-label">OPERATIONS</span>
+        <span class="bareme-desc">1 pt PasseAuRouge · 1 pt PasseAlOrange · 2 pts PasseAuVert (séquentialité + sûreté)</span>
+
+        <div class="bareme-total">Total : <strong>8 pts</strong></div>
+    </div>
+
+    <!-- ── POUR ALLER PLUS LOIN ── -->
+    <div class="pour-aller-plus-loin">
+        <strong>Pour aller plus loin</strong>
+        <ul>
+            <li>Montrer formellement que les deux formes de l'invariant sont équivalentes en utilisant la règle <code>p ⟹ q ≡ ¬p ∨ q</code>.</li>
+            <li>Que se passe-t-il si on ajoute une troisième direction (ex. piétons) ? Comment adapter l'invariant et les préconditions de <code>PasseAuVert</code> ?</li>
+            <li>Dans l'Atelier B, quelles obligations de preuve sont générées pour <code>PasseAuVert</code> ? Combien en compte-t-on ?</li>
+        </ul>
+    </div>
+
+</body>
+</html>
