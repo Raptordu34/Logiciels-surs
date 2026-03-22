@@ -1,10 +1,10 @@
 {
   "templateName": "td-exercice",
-  "templateVersion": "1.6.0",
+  "templateVersion": "2.0.0",
   "createdAt": "2026-03-21T21:32:25.958Z",
   "fileHashes": {
     "components.css": "1a801c10521f4ef06f0dac040ded2a3bd33ce7a46d6f3d48348238314648402e",
-    "print-utils.js": "403dd3442464ef5da0b32fb36abb1bef8f90ca43b1fa0568d9cc6c5712f42526",
+    "print-utils.js": "88da30633d8dc8e8a608a1b0cd66b9c807cad14d466d13ca495f0d79ac06bec6",
     "PROMPT.md": "2421ad654261cdbbcc2ed37d476db12db03b45c2854b3c5e7d0d708590f0197e",
     "section-utils.js": "e47dd47c0b53dfffe323c0a696942d13dcdc6c74987f330d5e770835365afce1",
     "design/base.css": "c528758a14a26fcdacb013e7bd49773ced9fd623d691c3492188d27472feb3ed",

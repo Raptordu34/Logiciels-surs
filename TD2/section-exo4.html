@@ -110,6 +110,89 @@ end
         </p>
     </div>
 
+    <!-- QUAND UTILISER L'INVARIANT / VARIANT -->
+    <div class="callout-info">
+        <p><span class="badge badge-orange">La "grosse artillerie" est réservée aux boucles <code>while</code> — et uniquement elles</span></p>
+        <p>
+            L'invariant <code>I</code>, le variant <code>V</code>, et les 4 obligations de preuve avec <code>δ</code>
+            sont des outils <strong>exclusivement conçus pour les boucles <code>while</code></strong>.
+            Pourquoi ? Parce que c'est la <strong>seule structure de programmation</strong> dont on ne sait pas
+            à l'avance combien de fois le code va s'exécuter. La boucle peut tourner 0 fois, 3 fois,
+            100 fois… On ne peut donc pas dérouler mécaniquement le calcul jusqu'à la fin.
+        </p>
+        <p>
+            Pour toutes les autres structures — <strong>séquences</strong> et <strong>conditions <code>if</code></strong> —
+            on sait exactement ce qui va s'exécuter. On peut remonter la précondition wp <em>instruction par instruction</em>,
+            sans aucun invariant ni aucun variant.
+        </p>
+
+        <div class="table-glass" style="margin: 0.75rem 0;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Structure</th>
+                        <th>Nb d'exécutions connu ?</th>
+                        <th>Méthode de preuve</th>
+                        <th>Invariant ?</th>
+                        <th>Variant ?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>S₁ ; S₂ ; … ; Sₙ</code> (séquence)</td>
+                        <td>Oui — 1 fois chaque instruction</td>
+                        <td>wp de droite à gauche, substitution mécanique</td>
+                        <td>Non</td>
+                        <td>Non</td>
+                    </tr>
+                    <tr>
+                        <td><code>if B then S₁ else S₂</code></td>
+                        <td>Oui — exactement une des deux branches</td>
+                        <td>wp des deux branches séparément + conjonction</td>
+                        <td>Non</td>
+                        <td>Non</td>
+                    </tr>
+                    <tr>
+                        <td><code>while E do S end</code></td>
+                        <td><strong>Non</strong> — 0, 1, ou ∞ tours possibles</td>
+                        <td>Invariant <code>I</code> + Variant <code>V</code> + 4 obligations (δ)</td>
+                        <td><strong>Oui</strong></td>
+                        <td><strong>Oui</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p><span class="badge badge-green">Exemple — Séquence</span></p>
+        <p>Calculer la précondition de <code>[x := x+1 ; y := x*2](y &gt; 8)</code> :</p>
+        <ul class="steps">
+            <li><strong>Étape 1</strong> — wp de la dernière instruction : <code>wp(y := x*2, y &gt; 8)</code><br>
+                Substituer <code>y ← x*2</code> dans <code>y &gt; 8</code> → <code>x*2 &gt; 8</code> → <code>x &gt; 4</code></li>
+            <li><strong>Étape 2</strong> — wp de la première instruction : <code>wp(x := x+1, x &gt; 4)</code><br>
+                Substituer <code>x ← x+1</code> dans <code>x &gt; 4</code> → <code>x+1 &gt; 4</code> → <code>x &gt; 3</code></li>
+        </ul>
+        <p class="inline-note">Résultat : <code>x &gt; 3</code>. Aucun invariant, aucun variant — calcul direct, terminé.</p>
+
+        <p><span class="badge badge-green">Exemple — Condition if/else</span></p>
+        <p>Calculer la précondition de <code>if x &gt; 0 then y := x else y := -x end</code> avec postcondition <code>y ≥ 0</code> :</p>
+        <p>Formule : <code>wp(if B then S₁ else S₂, Q) = (B ⊃ wp(S₁, Q)) ∧ (¬B ⊃ wp(S₂, Q))</code></p>
+        <ul class="steps">
+            <li><strong>Branche alors</strong> (<code>x &gt; 0</code>) : <code>wp(y := x, y ≥ 0)</code> → <code>x ≥ 0</code><br>
+                Obligation : <code>x &gt; 0 ⊃ x ≥ 0</code> → vraie (si x &gt; 0 alors x ≥ 0). ✓</li>
+            <li><strong>Branche sinon</strong> (<code>x ≤ 0</code>) : <code>wp(y := -x, y ≥ 0)</code> → <code>-x ≥ 0</code> → <code>x ≤ 0</code><br>
+                Obligation : <code>x ≤ 0 ⊃ x ≤ 0</code> → triviale. ✓</li>
+        </ul>
+        <p class="inline-note">
+            Résultat : wp = <code>true</code> — la postcondition est toujours satisfaite, quelle que soit la valeur de x.
+            Aucun invariant, aucun variant. Les deux branches ont été traitées séparément et la conjonction est vraie.
+        </p>
+
+        <p>
+            <strong>Conclusion :</strong> dès que tu vois un <code>while</code>, sors l'invariant et le variant.
+            Pour tout le reste, remonte la wp mécaniquement.
+        </p>
+    </div>
+
     <!-- INTUITION INVARIANT -->
     <div class="callout-info">
         <p><span class="badge badge-blue">L'invariant — intuition</span></p>
@@ -249,6 +332,101 @@ end
         </div>
     </div>
 
+    <!-- CORRECTION PARTIELLE vs. TOTALE -->
+    <div class="callout-info">
+        <p><span class="badge badge-orange">Correction partielle vs. correction totale — ce que ça change concrètement</span></p>
+
+        <div class="two-col">
+            <div class="highlight-box">
+                <p><span class="badge badge-blue">Correction partielle</span></p>
+                <p>
+                    <strong>La promesse conditionnelle :</strong> <em>Si</em> le programme s'arrête un jour,
+                    alors il donnera à 100% le bon résultat.
+                </p>
+                <p>
+                    <strong>Analogie :</strong> c'est le livreur qui promet "si j'arrive chez toi,
+                    ce sera bien la bonne commande" — mais qui ne garantit absolument pas
+                    qu'il ne va pas tourner en rond indéfiniment sur un rond-point sans jamais trouver ta maison.
+                </p>
+                <p class="inline-note">
+                    On sait que le résultat sera juste. On ne sait pas que la boucle s'arrêtera.
+                </p>
+            </div>
+            <div class="highlight-box">
+                <p><span class="badge badge-orange">Correction totale</span></p>
+                <p>
+                    <strong>La promesse inconditionnelle :</strong> le programme s'arrête <em>toujours</em>
+                    et donne <em>toujours</em> le bon résultat.
+                </p>
+                <p>
+                    <strong>Analogie :</strong> le livreur garantit à la fois qu'il arrivera chez toi
+                    <em>et</em> qu'il aura la bonne commande. Pas de round-point infini, pas de mauvaise surprise.
+                </p>
+                <p class="inline-note">
+                    Correction totale = Correction partielle + Terminaison.
+                    C'est le combo ultime.
+                </p>
+            </div>
+        </div>
+
+        <p><strong>Le lien avec l'invariant et le variant :</strong></p>
+        <div class="table-glass">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ce qu'on prouve</th>
+                        <th>Outil</th>
+                        <th>Obligations wp requises</th>
+                        <th>Résultat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Justesse du résultat</td>
+                        <td>Invariant <code>I</code> seul</td>
+                        <td>Établissement + Invariance <code>(I∧E)⊃[S]I</code> + Finalisation <code>(I∧¬E)⊃R</code></td>
+                        <td><strong>Correction partielle</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Arrêt garanti</td>
+                        <td>Variant <code>V</code> seul</td>
+                        <td>Typage <code>(I∧E)⊃V∈ℕ</code> + Terminaison <code>(I∧E∧V=δ)⊃[S](V&lt;δ)</code></td>
+                        <td><strong>Terminaison</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Arrêt garanti <em>et</em> résultat juste</td>
+                        <td>Invariant <code>I</code> + Variant <code>V</code></td>
+                        <td>Les 4 obligations + établissement</td>
+                        <td><strong>Correction totale</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="highlight-box">
+            <p><span class="badge badge-orange">À l'examen — ce que ça change selon l'énoncé</span></p>
+            <p>
+                Si l'examen demande de prouver uniquement la <strong>correction partielle</strong>,
+                tu peux ignorer tout ce qui concerne le variant.
+                Il te suffit de valider <strong>3 points</strong> sur les 4 obligations + l'établissement :
+            </p>
+            <ul>
+                <li><strong>Établissement</strong> — I est vraie avant d'entrer dans la boucle
+                    <span class="inline-note">(pas de numéro dans les 4 obligations wp du prof, mais obligatoire)</span></li>
+                <li><strong>1. Invariance</strong> : <code>(I ∧ E) ⊃ [S]I</code></li>
+                <li><strong>4. Finalisation</strong> : <code>(I ∧ ¬E) ⊃ R</code></li>
+            </ul>
+            <p>
+                Si l'examen demande de prouver la <strong>correction totale</strong> (ou la terminaison en plus),
+                il faut ajouter :
+            </p>
+            <ul>
+                <li><strong>2. Typage</strong> : <code>(I ∧ E) ⊃ V ∈ ℕ</code></li>
+                <li><strong>3. Terminaison</strong> : <code>(I ∧ E ∧ V = δ) ⊃ [S](V &lt; δ)</code></li>
+            </ul>
+        </div>
+    </div>
+
     <!-- ══════════════════════════════════════════════ -->
     <!-- QUESTION 1                                     -->
     <!-- ══════════════════════════════════════════════ -->
@@ -303,35 +481,6 @@ end
         <div class="solution-inner">
             <h4 style="margin-top:0;">Solution — Q1</h4>
             <p><strong>Invariant :</strong> <code>I  ≡  x ∈ ℕ  ∧  total + x × y = a × b</code> &nbsp;·&nbsp; <strong>E :</strong> <code>x &gt; 0</code></p>
-
-            <!-- VERSION COURS -->
-            <div class="highlight-box">
-                <p><span class="badge badge-green">Version cours — établissement, conservation, conclusion</span></p>
-
-                <p><strong>Établissement</strong> <span class="inline-note">(I est vraie avant d'entrer dans la boucle)</span></p>
-                <ul class="steps">
-                    <li>Avant la boucle : <code>x = a ∈ ℕ</code>, <code>y = b</code>, <code>total = 0</code>.</li>
-                    <li><code>x ∈ ℕ</code> ✓</li>
-                    <li><code>total + x×y = 0 + a×b = a×b</code> ✓</li>
-                </ul>
-
-                <p><strong>Conservation</strong> <span class="inline-note">(supposons I vraie et x &gt; 0 ; montrons que I est encore vraie après un tour)</span></p>
-                <ul class="steps">
-                    <li><em>x impair :</em> <code>total' = total + y</code>, <code>x' = (x−1)/2</code>, <code>y' = 2y</code>.</li>
-                    <li>→ <code>total' + x'×y' = (total+y) + (x−1)/2 × 2y = total + y + (x−1)y = total + xy = a×b</code> ✓</li>
-                    <li>→ <code>x' = (x−1)/2 ∈ ℕ</code> car x impair implique x−1 pair. ✓</li>
-                    <li><em>x pair :</em> <code>total' = total</code>, <code>x' = x/2</code>, <code>y' = 2y</code>.</li>
-                    <li>→ <code>total' + x'×y' = total + (x/2)×2y = total + xy = a×b</code> ✓</li>
-                    <li>→ <code>x' = x/2 ∈ ℕ</code> car x pair et x ≥ 2. ✓</li>
-                    <li>Dans les deux cas, I est restaurée après le tour. ✓</li>
-                </ul>
-
-                <p><strong>Conclusion</strong> <span class="inline-note">(quand la boucle s'arrête, I implique la postcondition)</span></p>
-                <ul class="steps">
-                    <li>À la sortie, <code>¬E</code> donc <code>x = 0</code>.</li>
-                    <li>I donne : <code>total + 0×y = a×b</code>, soit <code>total = a×b</code>. ✓</li>
-                </ul>
-            </div>
 
             <!-- VERSION PROF -->
             <div class="highlight-box">
@@ -405,23 +554,6 @@ end
         <div class="solution-inner">
             <h4 style="margin-top:0;">Solution — Q2</h4>
             <p><strong>Variant :</strong> <code>V = x</code></p>
-
-            <!-- VERSION COURS -->
-            <div class="highlight-box">
-                <p><span class="badge badge-green">Version cours — positivité + décroissance</span></p>
-
-                <p><strong>Positivité</strong> <span class="inline-note">(V &gt; 0 tant que la boucle tourne)</span></p>
-                <ul class="steps">
-                    <li>La condition de boucle est <code>x &gt; 0</code>, donc <code>V = x ≥ 1 &gt; 0</code>. ✓</li>
-                </ul>
-
-                <p><strong>Décroissance stricte</strong> <span class="inline-note">(V diminue d'au moins 1 à chaque tour)</span></p>
-                <ul class="steps">
-                    <li><em>x impair :</em> <code>x := x−1</code> puis <code>x := x/2</code> → <code>x' = (x−1)/2 &lt; x</code> pour x ≥ 1. ✓</li>
-                    <li><em>x pair :</em> <code>x := x/2</code> → <code>x' = x/2 &lt; x</code> pour x ≥ 2. ✓</li>
-                    <li>Dans les deux cas <code>x' &lt; x</code> et <code>x ∈ ℕ</code> → la boucle termine. ✓</li>
-                </ul>
-            </div>
 
             <!-- VERSION PROF -->
             <div class="highlight-box">

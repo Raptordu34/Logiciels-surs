@@ -285,14 +285,14 @@
                         ↓ Export
                     </button>
 
-                    <!-- Générer fiche récap imprimable -->
-                    <button class="toolbar-btn-secondary" id="fiche-btn" onclick="toggleFichePanel()" title="Configurer et générer une fiche récap A4 paysage imprimable">
+                    <!-- Fiche récap imprimable -->
+                    <button class="toolbar-btn-secondary" id="fiche-btn" onclick="toggleFichePanel()" title="Générer une fiche récap imprimable A4 paysage">
                         ⎙ Fiche
                     </button>
 
                     <!-- Révéler toutes les solutions -->
                     <button class="floating-toggle-btn" id="solutions-toggle" onclick="toggleAllSolutions()">
-                        <span class="btn-full">▶ Révéler toutes les solutions</span><span class="btn-short">▶ Solutions</span>
+                        ▶ Révéler toutes les solutions
                     </button>
                 </div>
 
@@ -300,29 +300,40 @@
                 <div class="fiche-panel glass-panel" id="fiche-panel" role="dialog" aria-label="Options de la fiche récap">
                     <div class="fiche-panel-header">
                         <span>⎙ Fiche récap</span>
-                        <button class="fiche-panel-close" onclick="closeFichePanel()">✕</button>
+                        <button class="fiche-panel-close" onclick="toggleFichePanel()" aria-label="Fermer">✕</button>
                     </div>
-                    <p class="fiche-panel-section-label">Préréglages</p>
+
+                    <p class="fiche-panel-section-label">Presets rapides</p>
                     <div class="fiche-presets">
-                        <button id="preset-all" onclick="setFichePreset('all')">Tout</button>
-                        <button id="preset-revision" onclick="setFichePreset('revision')">Révision</button>
-                        <button id="preset-entrainement" onclick="setFichePreset('entrainement')">Entraînement</button>
+                        <button onclick="applyPreset('all')">Tout</button>
+                        <button onclick="applyPreset('revision')">Révision</button>
+                        <button onclick="applyPreset('entrainement')">Entraînement</button>
                     </div>
-                    <hr class="fiche-divider">
-                    <p class="fiche-panel-section-label">Contenu</p>
+
+                    <p class="fiche-panel-section-label">Contenu à inclure</p>
                     <div class="fiche-checks">
-                        <label><input type="checkbox" id="fc-objectifs" onchange="saveFicheFilters()"> Objectifs</label>
-                        <label><input type="checkbox" id="fc-ctx" onchange="saveFicheFilters()"> Contexte</label>
-                        <label><input type="checkbox" id="fc-rappel" onchange="saveFicheFilters()"> Rappels</label>
-                        <label><input type="checkbox" id="fc-exemple" onchange="saveFicheFilters()"> Exemples guidés</label>
-                        <label><input type="checkbox" id="fc-question" onchange="saveFicheFilters()"> Énoncés</label>
-                        <label><input type="checkbox" id="fc-solution" onchange="saveFicheFilters()"> Solutions</label>
-                        <label><input type="checkbox" id="fc-erreur" onchange="saveFicheFilters()"> Erreurs fréquentes</label>
-                        <label><input type="checkbox" id="fc-tip" onchange="saveFicheFilters()"> Points clés</label>
-                        <label><input type="checkbox" id="fc-callout" onchange="saveFicheFilters()"> Infos / Analogies</label>
-                        <label><input type="checkbox" id="fc-methode" onchange="saveFicheFilters()"> Méthodes</label>
+                        <label><input type="checkbox" id="f-objectifs" checked> Objectifs</label>
+                        <label><input type="checkbox" id="f-ctx"       checked> Contexte</label>
+                        <label><input type="checkbox" id="f-rappel"    checked> Rappels de cours</label>
+                        <label><input type="checkbox" id="f-exemple"   checked> Exemples guidés</label>
+                        <hr class="fiche-divider">
+                        <label><input type="checkbox" id="f-question"  checked> Énoncés des questions</label>
+                        <label><input type="checkbox" id="f-solution"  checked> Solutions</label>
+                        <hr class="fiche-divider">
+                        <label><input type="checkbox" id="f-erreur"    checked> Erreurs fréquentes</label>
+                        <label><input type="checkbox" id="f-tip"       checked> Points clés &amp; Tips</label>
+                        <label><input type="checkbox" id="f-callout"   checked> Infos &amp; Analogies</label>
+                        <label><input type="checkbox" id="f-methode"   checked> Méthodes</label>
                     </div>
-                    <button class="fiche-generate-btn" onclick="launchFicheFromPanel()">⎙ Générer la fiche</button>
+
+                    <p class="fiche-panel-section-label">Mode couleur</p>
+                    <div class="fiche-presets">
+                        <button class="color-mode-btn active" onclick="selectColorMode('neutre', this)">Neutre</button>
+                        <button class="color-mode-btn" onclick="selectColorMode('sobre', this)">Sobre</button>
+                        <button class="color-mode-btn" onclick="selectColorMode('couleur', this)">Couleur</button>
+                    </div>
+
+                    <button class="fiche-generate-btn" onclick="generateFromPanel()">⎙ Générer la fiche</button>
                 </div>
 
                 <iframe id="content-frame" src="" frameborder="0"></iframe>
@@ -330,6 +341,7 @@
         </main>
     </div>
 
+    <script src="./print-utils.js" defer></script>
     <script>
         // ── Halo curseur ──────────────────────────────────────────────────
         const halo = document.getElementById('cursor-halo');
@@ -373,7 +385,7 @@
             // Réinitialiser le toggle quand on change d'exercice
             solutionsRevealed = false;
             updateToggleBtn();
-            
+
             // Mettre à jour le bouton de validation
             updateValidateBtn(localStorage.getItem('td_done_' + url));
 
@@ -404,12 +416,13 @@
 
         function updateToggleBtn() {
             const btn = document.getElementById('solutions-toggle');
-            if (solutionsRevealed) {
-                btn.innerHTML = '<span class="btn-full">▼ Masquer les solutions</span><span class="btn-short">▼ Masquer</span>';
-            } else {
-                btn.innerHTML = '<span class="btn-full">▶ Révéler toutes les solutions</span><span class="btn-short">▶ Solutions</span>';
-            }
+            const mobile = window.innerWidth <= 768;
+            btn.innerHTML = solutionsRevealed
+                ? (mobile ? '▼ Masquer' : '▼ Masquer les solutions')
+                : (mobile ? '▶ Solutions' : '▶ Révéler toutes les solutions');
         }
+
+        window.addEventListener('resize', updateToggleBtn);
 
         // ── Effacer les réponses (avec confirmation) ──────────────────────
         function clearAnswers() {
@@ -481,7 +494,7 @@
         function validateCurrentSection() {
             const sectionUrl = localStorage.getItem('td_currentSection') || '';
             const isDone = localStorage.getItem('td_done_' + sectionUrl);
-            
+
             if (isDone) {
                 // S'il est déjà validé, on donne la possibilité de l'invalider
                 localStorage.removeItem('td_done_' + sectionUrl);
@@ -528,6 +541,83 @@
             URL.revokeObjectURL(url);
         }
 
+        // ── Panneau fiche ──────────────────────────────────────────────
+        const FILTER_KEYS = ['objectifs','ctx','rappel','exemple','question','solution','erreur','tip','callout','methode'];
+
+        function toggleFichePanel() {
+            const panel = document.getElementById('fiche-panel');
+            panel.classList.toggle('visible');
+            if (panel.classList.contains('visible')) {
+                loadFilterState();
+                loadColorModeState();
+            }
+        }
+
+        // Fermer si clic en dehors
+        document.addEventListener('click', (e) => {
+            const panel = document.getElementById('fiche-panel');
+            const btn   = document.getElementById('fiche-btn');
+            if (panel?.classList.contains('visible') && !panel.contains(e.target) && e.target !== btn) {
+                panel.classList.remove('visible');
+            }
+        });
+
+        function loadFilterState() {
+            const saved = JSON.parse(localStorage.getItem('td_fiche_filters') || '{}');
+            FILTER_KEYS.forEach(k => {
+                const el = document.getElementById('f-' + k);
+                if (el) el.checked = saved[k] !== false; // true par défaut
+            });
+        }
+
+        function saveFilterState() {
+            const filters = {};
+            FILTER_KEYS.forEach(k => {
+                const el = document.getElementById('f-' + k);
+                if (el) filters[k] = el.checked;
+            });
+            localStorage.setItem('td_fiche_filters', JSON.stringify(filters));
+            return filters;
+        }
+
+        function applyPreset(name) {
+            const presets = {
+                all:          { objectifs:true, ctx:true, rappel:true, exemple:true, question:true, solution:true, erreur:true, tip:true, callout:true, methode:true },
+                revision:     { objectifs:true, ctx:false, rappel:false, exemple:false, question:true, solution:true, erreur:true, tip:true, callout:false, methode:false },
+                entrainement: { objectifs:true, ctx:true, rappel:true, exemple:true, question:true, solution:false, erreur:false, tip:false, callout:false, methode:false },
+            };
+            const p = presets[name] || presets.all;
+            FILTER_KEYS.forEach(k => {
+                const el = document.getElementById('f-' + k);
+                if (el) el.checked = !!p[k];
+            });
+            document.querySelectorAll('.fiche-presets button').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.fiche-presets button[onclick="applyPreset('${name}')"]`)?.classList.add('active');
+        }
+
+        let selectedColorMode = localStorage.getItem('td_fiche_colorMode') || 'neutre';
+
+        function selectColorMode(mode, btn) {
+            selectedColorMode = mode;
+            localStorage.setItem('td_fiche_colorMode', mode);
+            document.querySelectorAll('.color-mode-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+        }
+
+        function loadColorModeState() {
+            const mode = localStorage.getItem('td_fiche_colorMode') || 'neutre';
+            selectedColorMode = mode;
+            document.querySelectorAll('.color-mode-btn').forEach(b => {
+                b.classList.toggle('active', b.textContent.trim().toLowerCase() === mode);
+            });
+        }
+
+        async function generateFromPanel() {
+            const filters = saveFilterState();
+            document.getElementById('fiche-panel')?.classList.remove('visible');
+            await generatePrintSheet(filters, selectedColorMode);
+        }
+
         function restoreProgressDots() {
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 const url = btn.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
@@ -536,94 +626,6 @@
                 }
             });
         }
-
-        // ── Panneau filtres fiche ─────────────────────────────────────
-        const FICHE_FILTER_KEYS = ['objectifs','ctx','rappel','exemple','question','solution','erreur','tip','callout','methode'];
-
-        function toggleFichePanel() {
-            const panel = document.getElementById('fiche-panel');
-            const isOpen = panel.classList.contains('visible');
-            if (isOpen) {
-                panel.classList.remove('visible');
-            } else {
-                loadFicheFilters();
-                panel.classList.add('visible');
-            }
-        }
-
-        function closeFichePanel() {
-            document.getElementById('fiche-panel').classList.remove('visible');
-        }
-
-        document.addEventListener('click', function(e) {
-            const panel = document.getElementById('fiche-panel');
-            const btn   = document.getElementById('fiche-btn');
-            if (panel.classList.contains('visible') && !panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
-                closeFichePanel();
-            }
-        });
-
-        function setFichePreset(preset) {
-            const values = {
-                objectifs: true,
-                ctx:       preset !== 'revision',
-                rappel:    preset !== 'revision',
-                exemple:   preset !== 'revision',
-                question:  true,
-                solution:  preset !== 'entrainement',
-                erreur:    preset !== 'entrainement',
-                tip:       preset !== 'entrainement',
-                callout:   preset === 'all',
-                methode:   preset === 'all',
-            };
-            FICHE_FILTER_KEYS.forEach(k => {
-                const el = document.getElementById('fc-' + k);
-                if (el) el.checked = values[k];
-            });
-            updateFichePresetBtns(preset);
-            saveFicheFilters();
-        }
-
-        function updateFichePresetBtns(active) {
-            ['all','revision','entrainement'].forEach(p => {
-                const btn = document.getElementById('preset-' + p);
-                if (btn) btn.classList.toggle('active', p === active);
-            });
-        }
-
-        function saveFicheFilters() {
-            const data = {};
-            FICHE_FILTER_KEYS.forEach(k => {
-                const el = document.getElementById('fc-' + k);
-                if (el) data[k] = el.checked;
-            });
-            localStorage.setItem('td_fiche_filters', JSON.stringify(data));
-            updateFichePresetBtns(null);
-        }
-
-        function loadFicheFilters() {
-            const saved = localStorage.getItem('td_fiche_filters');
-            if (!saved) { setFichePreset('all'); return; }
-            try {
-                const data = JSON.parse(saved);
-                FICHE_FILTER_KEYS.forEach(k => {
-                    const el = document.getElementById('fc-' + k);
-                    if (el && k in data) el.checked = data[k];
-                });
-            } catch(e) { setFichePreset('all'); }
-        }
-
-        function launchFicheFromPanel() {
-            saveFicheFilters();
-            const filters = {};
-            FICHE_FILTER_KEYS.forEach(k => {
-                const el = document.getElementById('fc-' + k);
-                filters[k] = el ? el.checked : true;
-            });
-            closeFichePanel();
-            generatePrintSheet(filters);
-        }
     </script>
-    <script src="./print-utils.js"></script>
 </body>
 </html>

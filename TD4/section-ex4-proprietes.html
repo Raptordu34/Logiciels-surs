@@ -34,11 +34,31 @@
         </p>
         <div class="callout-info">
             <strong>Rappel de notation :</strong>
+
+            <p style="margin:0.6rem 0 0.3rem;"><span class="badge badge-blue">Quantificateurs de chemins (CTL)</span></p>
+            <ul>
+                <li><code>A</code> — <strong>pour tous</strong> les chemins d'exécution (All paths)</li>
+                <li><code>E</code> — <strong>il existe</strong> un chemin d'exécution (Exists a path)</li>
+            </ul>
+
+            <p style="margin:0.6rem 0 0.3rem;"><span class="badge badge-orange">Opérateurs temporels (LTL)</span></p>
             <ul>
                 <li><code>□φ</code> — φ est vraie à tout instant (G, globally)</li>
                 <li><code>◇φ</code> — φ sera vraie à un instant (F, finally)</li>
                 <li><code>○φ</code> — φ est vraie à l'instant suivant (X, next)</li>
-                <li><code>φ U ψ</code> — φ tient jusqu'à ce que ψ soit vrai</li>
+                <li><code>φ U ψ</code> — φ tient jusqu'à ce que ψ soit vrai (Until)</li>
+            </ul>
+
+            <p style="margin:0.6rem 0 0.3rem;"><span class="badge badge-green">Lecture d'une formule CTL</span></p>
+            <p>
+                Une formule CTL combine toujours un <strong>quantificateur de chemin</strong> (A ou E)
+                suivi d'un <strong>opérateur temporel</strong> (□, ◇, ○, U). Exemples :
+            </p>
+            <ul>
+                <li><code>A□p</code> — sur <em>tous</em> les chemins, p est <em>toujours</em> vrai</li>
+                <li><code>E◇p</code> — il <em>existe</em> un chemin où p est vrai <em>un jour</em></li>
+                <li><code>A(p U q)</code> — sur <em>tous</em> les chemins, p tient <em>jusqu'à</em> q</li>
+                <li><code>E○p</code> — il <em>existe</em> un chemin où p est vrai à l'instant <em>suivant</em></li>
             </ul>
         </div>
     </div>
